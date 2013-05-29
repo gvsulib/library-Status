@@ -39,53 +39,9 @@
 	<div class="line">
 		<div class="span1 unit">
 
-			<!-- load system names -->
 			<?php
 
-			/*
-
-			$result = $db->query("SELECT * FROM systems ORDER BY system_name ASC");
-
-			while($row = $result->fetch_assoc())
-			{
-
-				$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
-												FROM issue_entries i
-												WHERE i.system_id = {$row['system_id']}");
-
-				while ($rw = $system_result->fetch_assoc()) {
-					if ($rw['end_time'] == 0) { 
-
-						if ($rw['status_type_id'] == 2) { 
-							$msg = '
-						<div class="lib-success" style="margin-top: 1em;>
-							<span><b>The Library Website is Behaving</b><br>
-								All systems operational</span>
-							</div>
-						';
-						}
-						else {
-							$msg = '
-							<div class="lib-alert" style="margin-top: 1em">
-								<span><b>The Library Website is Experiencing Some Minor Issues/span>
-							</div>
-							';
-						}
-					} else {
-						$msg = '
-						<div class="lib-success" style="margin-top: 1em;>
-							<span><b>The Library Website is Behaving</b><br>
-								All systems operational</span>
-						</div>
-						';
-					}
-				}
-
-			}
-
-			echo $msg;
-			
-			*/
+				// library status div
 
 			?>
 
@@ -179,7 +135,6 @@
 								if ($num_rows == 0) {
 
 									$cnt = 0;
-
 									foreach(range(0,5) as $cnt) {
 										echo  '<td style="text-align: center">';
 										echo'<img src="resources/img/checkmark.png">';
@@ -189,8 +144,9 @@
 								// display specific status types
 								} else {
 
-									$cnt = 0;
+									$day = date('Ymd', time());
 
+									$cnt = 0;
 									foreach(range(0,5) as $cnt) {
 
 										echo'<td style="text-align: center">';
@@ -201,16 +157,28 @@
 																FROM issue_entries i
 																WHERE i.system_id = {$row['system_id']}");
 
+										
+
 										// Display Day
 										while ($rw = $system_result->fetch_assoc()) {
 
 											//echo '<br>check cell';
-											$day = date('Ymd', time());
-											$day = $day-1;
+											
+											$day--;
 											$start_day = date('Ymd', $rw['start_time']);
 											$end_day = date('Ymd', $rw['end_time']);
 
-											if ($day - $cnt >= $start_day && $day - $cnt <= $end_day) {
+											/*
+											// error checking
+											echo 'Day: ' . $day;
+											echo '<br><br>Start time: ' . $start_day;
+											echo '<br><br>End time: ' . $end_day;
+											echo '<br><br>';
+											*/
+
+
+											if ((($day >= $start_day) && ($rw['end_time'] == 0)) || 
+												(($day >= $start_day && $day <= $end_day))) {
 
 												echo '<a href="detail.php?system_id='. $row['system_id'] .'" style = "text-decoration: none;">';
 

@@ -46,7 +46,8 @@
 
 			//update issue end_time and close issue
 			$db->query("UPDATE issue_entries
-						SET issue_entries.end_time = '$now'");
+						SET issue_entries.end_time = '$now'
+						WHERE $issue_id = issue_entries.issue_id");
 		}
 
 		// Create a new status entry
