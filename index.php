@@ -36,12 +36,58 @@
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 
-	<div class="line break">
+	<div class="line">
 		<div class="span1 unit">
-			<div class="lib-success">
-				<span><b>The Library Website is Behaving</b><br>
-				All systems operational</span>
-			</div>
+
+			<!-- load system names -->
+			<?php
+
+			/*
+
+			$result = $db->query("SELECT * FROM systems ORDER BY system_name ASC");
+
+			while($row = $result->fetch_assoc())
+			{
+
+				$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
+												FROM issue_entries i
+												WHERE i.system_id = {$row['system_id']}");
+
+				while ($rw = $system_result->fetch_assoc()) {
+					if ($rw['end_time'] == 0) { 
+
+						if ($rw['status_type_id'] == 2) { 
+							$msg = '
+						<div class="lib-success" style="margin-top: 1em;>
+							<span><b>The Library Website is Behaving</b><br>
+								All systems operational</span>
+							</div>
+						';
+						}
+						else {
+							$msg = '
+							<div class="lib-alert" style="margin-top: 1em">
+								<span><b>The Library Website is Experiencing Some Minor Issues/span>
+							</div>
+							';
+						}
+					} else {
+						$msg = '
+						<div class="lib-success" style="margin-top: 1em;>
+							<span><b>The Library Website is Behaving</b><br>
+								All systems operational</span>
+						</div>
+						';
+					}
+				}
+
+			}
+
+			echo $msg;
+			*/
+
+			?>
+
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 
@@ -65,6 +111,7 @@
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 
+
 	<div class="line break">
 		<div class="span1 unit">
 
@@ -74,14 +121,14 @@
 
 						<thead>
 							<tr>
-								<th colspan="9">Library Status</th>
+								<th colspan="8">Library Status</th>
 							</tr>
 
-							<tr colspan="9" class="lib-row-headings name">
+							<tr colspan="8" class="lib-row-headings name">
 								<th style="text-align: right" >System</th>
-								<th style="text-align: center">Currently</th>
+								<th style="text-align: center">Current Status</th>
 
-								<?php foreach(range(0,6) as $cnt) {
+								<?php foreach(range(0,5) as $cnt) {
 										echo  '<th style="text-align: center">' . date("M d", mktime(0, 0, 0, date("m")  , date("d")-$cnt-1, date("Y")))
 										. '</th>';
 										
@@ -107,7 +154,7 @@
 	
 								$currently = ' color: #149811">online'; // currently displayed
 
-								// System Issues
+								// Display Day
 								while ($rw = $system_result->fetch_assoc()) {
 									if ($rw['end_time'] == 0) { 
 										if ($rw['status_type_id'] == 2) { 
@@ -127,57 +174,61 @@
 
 								$num_rows = $system_result->num_rows;
 
+								// If no issues, then all is well
 								if ($num_rows == 0) {
+
 									$cnt = 0;
-									foreach(range(0,6) as $cnt) {
-										echo  '<td style="text-align: center"><img src="resources/img/checkmark.png"></td>';
+
+									foreach(range(0,5) as $cnt) {
+										echo  '<td style="text-align: center">';
+										echo'<img src="resources/img/checkmark.png">';
+										echo '</td>';
 									}
 
+								// display specific status types
 								} else {
 
-									while ($rw = $system_result->fetch_assoc()) {
+									$cnt = 0;
 
-										$cnt = 0;
-										foreach(range(0,6) as $cnt) {
+									foreach(range(0,5) as $cnt) {
 
-											$msg = '<img src="resources/img/checkmark.png">';
-											echo  '<td style="text-align: center">';
+										echo'<td style="text-align: center">';
 
+										$day_status = '<img src="resources/img/checkmark.png">';
+
+										$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
+																FROM issue_entries i
+																WHERE i.system_id = {$row['system_id']}");
+
+										// Display Day
+										while ($rw = $system_result->fetch_assoc()) {
+
+											//echo '<br>check cell';
 											$day = date('Ymd', time());
 											$day = $day-1;
 											$start_day = date('Ymd', $rw['start_time']);
 											$end_day = date('Ymd', $rw['end_time']);
 
-											/*
-											// error checking
-											//echo '<br>SYSTEM: ' . $row['system_id'];
-											//echo '<br>ST_TYPE: ' . $rw['status_type_id'];
-											echo '<br>rowDay: ' . ($day - $cnt);
-											echo '<br>startDay: ' . $start_day;
-											if ($rw['end_time'] != 0) {
-												echo '<br>endDay: ' . $end_day;
-											} else
-												echo '<br>endDay: 0';
-											echo '<br>';*/
-
-
 											if ($day - $cnt >= $start_day && $day - $cnt <= $end_day) {
 
-												if ($rw['status_type_id'] == '1') {
-													$msg = '<b style= "color: orange">---</b>';
-												}
-												else {
-													$msg = '<b style= "color: red">X</b>';
+												echo '<a href="detail.php?system_id='. $row['system_id'] .'" style = "text-decoration: none;">';
+
+												if ($rw['status_type_id'] == 2) {
+													$day_status = '<b style= "color: red">X</b>';
 												}
 
-											} else {
-												$msg = '<img src="resources/img/checkmark.png">';
+												else {
+													$day_status = '<b style= "color: orange">---</b>';
+												}
 											}
 
-											echo $msg . '</td>'; // close item
 										}
+
+										echo $day_status . "</td>"; // close currently displayed
+
 									}
-								}
+
+								} // end else if
 
 								echo '</tr>'; // close row
 							}

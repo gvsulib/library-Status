@@ -38,7 +38,6 @@
 
 		$issue_resolved = $_POST['issue_resolved'];
 
-		echo $issue_resolved;
 		$now = time();
 
 		$status_value = $status_type_id;

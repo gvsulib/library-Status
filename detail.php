@@ -1,11 +1,9 @@
 <?php
+	session_start();
 
-	#
-	# Connect to database
-	#
 
-	$db = new mysqli('localhost', 'root', 'root', 'library_status');
-
+	include 'resources/secret/config.php';
+	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
 	if ($db->connect_errno) {
     	printf("Connect failed: %s\n", $db->connect_error);
     	exit();
@@ -13,13 +11,10 @@
 
 	date_default_timezone_set('America/Detroit');
 
+	$system_id = $_GET['system_id'];
 
-	$issue_id = $_POST['issue_id'];
-	$system_name = $_POST['system_name'];
-
-
-	$issue_id = 55;
 	$system_name = 'Library Homepage';
+	$issue_id = 55;
 
 ?>
 
@@ -47,12 +42,16 @@
 	<div class="line">
 		<div class="span1 unit">
 
-		<!-- Create issues -->
+<!-- Create issues -->
 		<?php
+
+			$issue_result = $db->query("SELECT issue_entries.issue_id, systems.system_name FROM issue_entries, systems WHERE issue_entries.system_id = $system_id AND issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC");
+
+			while ($issue_entries = $issue_result->fetch_assoc()) {
 
 				$result = $db->query("SELECT s.status_id, s.issue_id, s.status_timestamp, s.status_public, s.status_user_id, s.status_text, s.status_delete, u.user_id, u.user_fn, u.user_ln, st.status_type_id, st.status_type_text
 					FROM status_entries s, user u, status_type st
-					WHERE s.issue_id = $issue_id AND s.status_user_id = u.user_id AND s.status_type_id = st.status_type_id
+					WHERE s.issue_id = '{$issue_entries['issue_id']}' AND s.status_user_id = u.user_id AND s.status_type_id = st.status_type_id
 					ORDER BY s.status_timestamp ASC");
 
 				$num_rows = $result->num_rows;
@@ -78,7 +77,7 @@
 										<p class="time">' . date("D g:i a - n/j/y", $status_entries['status_timestamp']) . '</p>
 									</div>
 									<div style="float: right;">
-										<p class="name tag-system">' . $system_name . '</p>';
+										<p class="name tag-system">' . $issue_entries['system_name'] . '</p>';
 										
 										if ($status_entries['status_type_text'] == 'Outage') {
 											echo '<p class="name tag-outage">' . $status_entries['status_type_text'] . '</p>';
@@ -93,23 +92,32 @@
 									<p class="comment-text">' . $status_entries['status_text'] . '</p>
 								</div> <!-- end span --> ';
 
+								//echo '<br>ISSUE ID: ' . $status_entries['issue_id'];
+								//echo '<br>STATUS TYPE ID: ' . $status_entries['status_type_id'];
+
+
 					// list comments
 					} else if ($num_rows >= 2) {
-							echo '
-								<div class="span1 unit comment-box">
-									<div style="float: left;">
-										<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
-										<p class="time">' . date("D g:i a - n/j/y", $status_entries["status_timestamp"]) . '</p>
-									</div>
-									<p class ="comment-text">' . $status_entries['status_text'] . '</p>
-								</div> <!-- end span --> ';
-
-
+						echo '
+							<div class="span1 unit comment-box">
+								<div style="float: left;">
+									<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
+									<p class="time">' . date("D g:i a - n/j/y", $status_entries["status_timestamp"]) . '</p>
+								</div>
+								<p class ="comment-text">' . $status_entries['status_text'] . '</p>
+							</div> <!-- end span --> ';
 					}
 
-				} // close status loop
 
-				echo '</div></div> <!-- close issue line -->';
+				} // close status loop
+				// close comment wrapper
+					echo '</div>';
+
+				echo '
+							</div> 
+						</div> <!-- close issue line -->';
+
+			} // close issue loop
 
 		?>
 	
