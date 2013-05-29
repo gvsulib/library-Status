@@ -1,14 +1,14 @@
 <?php
 	session_start();
 
-	date_default_timezone_set('America/Detroit');
-
 	include 'resources/secret/config.php';
 	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
 	if ($db->connect_errno) {
     	printf("Connect failed: %s\n", $db->connect_error);
     	exit();
 	}
+
+	date_default_timezone_set('America/Detroit');
 
 	// new issue post
 	if ($_POST['submit_issue']) {

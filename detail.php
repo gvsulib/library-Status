@@ -1,7 +1,6 @@
 <?php
 	session_start();
 
-
 	include 'resources/secret/config.php';
 	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
 	if ($db->connect_errno) {
@@ -12,6 +11,7 @@
 	date_default_timezone_set('America/Detroit');
 
 	$system_id = $_GET['system_id'];
+	$day = $_GET['day'];
 
 	$system_name = 'Library Homepage';
 	$issue_id = 55;
@@ -39,7 +39,8 @@
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 
-	<div class="line">
+
+	<div class="line break">
 		<div class="span1 unit">
 
 <!-- Create issues -->

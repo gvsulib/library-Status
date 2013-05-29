@@ -1,10 +1,10 @@
 <?php
-
-	#
-	# Connect to database
-	#
-
-	$db = new mysqli('localhost', 'root', 'root', 'library_status');
+	include 'resources/secret/config.php';
+	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
+	if ($db->connect_errno) {
+    	printf("Connect failed: %s\n", $db->connect_error);
+    	exit();
+	}
 
 	if ($db->connect_errno) {
     	printf("Connect failed: %s\n", $db->connect_error);
@@ -83,10 +83,10 @@
 
 							<tr colspan="8" class="lib-row-headings name">
 								<th style="text-align: right" >System</th>
-								<th style="text-align: center">Current Status</th>
+								<th style="text-align: center">Currently</th>
 
 								<?php foreach(range(0,5) as $cnt) {
-										echo  '<th style="text-align: center">' . date("M d", mktime(0, 0, 0, date("m")  , date("d")-$cnt-1, date("Y")))
+										echo  '<th style="text-align: center;">' . date("M d", mktime(0, 0, 0, date("m")  , date("d")-$cnt-1, date("Y")))
 										. '</th>';
 										
 									}?>
@@ -102,7 +102,7 @@
 							while($row = $result->fetch_assoc())
 							{
 								echo '<tr>';
-								echo '<td style="text-align: right">' . $row["system_name"] . '</td> ';
+								echo '<td style="text-align: right ">' . $row["system_name"] . '</td> ';
 								echo'<td class = "col2 name" style="text-align: center;';
 
 								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
@@ -163,24 +163,23 @@
 										while ($rw = $system_result->fetch_assoc()) {
 
 											//echo '<br>check cell';
-											
-											$day--;
+							
 											$start_day = date('Ymd', $rw['start_time']);
 											$end_day = date('Ymd', $rw['end_time']);
 
-											/*
 											// error checking
-											echo 'Day: ' . $day;
+											/*
+											echo 'Day: ' . ($day-$cnt-1);
 											echo '<br><br>Start time: ' . $start_day;
 											echo '<br><br>End time: ' . $end_day;
 											echo '<br><br>';
 											*/
 
 
-											if ((($day >= $start_day) && ($rw['end_time'] == 0)) || 
-												(($day >= $start_day && $day <= $end_day))) {
+											if ((( ($day-$cnt-1) >= $start_day) && ($rw['end_time'] == 0)) || 
+												(( ($day-$cnt-1) >= $start_day && ($day-$cnt-1) <= $end_day))) {
 
-												echo '<a href="detail.php?system_id='. $row['system_id'] .'" style = "text-decoration: none;">';
+												echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none;">';
 
 												if ($rw['status_type_id'] == 2) {
 													$day_status = '<b style= "color: red">X</b>';
