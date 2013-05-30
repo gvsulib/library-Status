@@ -11,9 +11,6 @@ h4 {
 	-webkit-margin-after: .6em;
 }
 
-a {
-	text-decoration:none;
-}
 
 .unit {
 	padding: 0px;
@@ -214,4 +211,17 @@ div.hover {
 .footer {
 	margin-top: 2em;
 	padding-top: 1em;
+}
+
+
+.feedback {
+	position: fixed;
+	top: 0;
+	max-width: 56em;
+	width: 60%;
+	margin: 0 auto;
+	background-color: #fff;
+	padding: 3%;
+	border: 1px solid #bbb;
+	border-top: none;
 }

@@ -10,6 +10,10 @@
 
 	date_default_timezone_set('America/Detroit');
 
+	// reidsmam, fisherin
+	$_SESSION['username'] = 'earleyj';
+
+
 	// new issue post
 	if ($_POST['submit_issue']) {
 
@@ -55,9 +59,6 @@
 		VALUES ('','$issue_id','$now','1','$status_value',1,'$status_text','0')");
 	}
 
-	function addComment($issue_id) {
-		echo 'add a comment...';
-	}
 ?>
 
 <!DOCTYPE html>
@@ -244,7 +245,7 @@
 								// comment show/hide
 								if ($num_rows >= 2) {
 									echo '
-									<div style = "cursor: hand; cursor: pointer;" class="comment-toggle hover">
+									<div style = "cursor: hand; cursor: pointer;" class="comment-toggle">
 										<div class="span1 unit comment-box">
 											<p class="name">'.($num_rows -1).' comment';
 											

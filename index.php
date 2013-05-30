@@ -53,17 +53,18 @@
 			<h3>Get Help</h3>
 			<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In posuere felis nec tortor. Pellentesque faucibus.</p>
 			<div class="lib-button-small-grey">
-				<p>Chat</p>
+
+				<a href='#' onclick='window.open("https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489&identity=Librarian", "chat", "resizable=1,width=225,height=280"); return false;' ><span>Chat</span></a>
 			</div>
 			<div class="lib-button-small-grey">
-				<p>Email</p>
+				<a href="mailto:library@gvsu.edu">Email</a>
 			</div>
 		</div> <!-- end span -->
 		<div class="span2 unit right">
 			<h3>Report a Problem</h3>
 			<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In posuere felis nec tortor. Pellentesque faucibus.</p>
 			<div class="lib-button-small-grey">
-				<p>Report a Problem</p>
+				<a id="feedback-trigger">Report a Problem</a>
 			</div>
 		</div> <!-- end span -->
 	</div> <!-- end line -->
@@ -124,7 +125,6 @@
 								}
 								echo $currently . '</td>'; // close currently displayed
 
-
 								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
 																FROM issue_entries i
 																WHERE i.system_id = {$row['system_id']}");
@@ -157,24 +157,11 @@
 																FROM issue_entries i
 																WHERE i.system_id = {$row['system_id']}");
 
-										
-
 										// Display Day
 										while ($rw = $system_result->fetch_assoc()) {
-
-											//echo '<br>check cell';
 							
 											$start_day = date('Ymd', $rw['start_time']);
 											$end_day = date('Ymd', $rw['end_time']);
-
-											// error checking
-											/*
-											echo 'Day: ' . ($day-$cnt-1);
-											echo '<br><br>Start time: ' . $start_day;
-											echo '<br><br>End time: ' . $end_day;
-											echo '<br><br>';
-											*/
-
 
 											if ((( ($day-$cnt-1) >= $start_day) && ($rw['end_time'] == 0)) || 
 												(( ($day-$cnt-1) >= $start_day && ($day-$cnt-1) <= $end_day))) {
@@ -215,6 +202,24 @@
 			<p>Footer - Grand Valley State University Libraries</p>
 		</div> <!-- end span -->
 	</div> <!-- end line -->
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+
+$(document).ready(function() {
+
+	$("body").append('<div class="feedback lib-form"> <form method="post" action="http://www.gvsu.edu/library/customemail-post.htm?keyId=9D7CB431-E6EB-A2DB-48089384265083C9"> <label for="name">Your Name:</label> <input type="text" name="name" id="name" placeholder="Optional" /> <label for="feedback">Have an idea? See a problem?</label> <textarea name="feedback"></textarea> <div class="right"> <a href="index.php" style="display: inline-block; margin-right: 2em;">Cancel</a> <input class="lib-button" type="submit" value="Send Feedback" style="margin-top: 1em;" /> </div> </form> </div>');
+
+	$(".feedback").hide();
+
+	$("#feedback-trigger").click(function() {
+
+		$(".feedback").slideToggle(400);
+
+	});
+});
+
+</script>
 </body>
 
 </html>
