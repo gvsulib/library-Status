@@ -165,7 +165,8 @@
 	<div class="line break footer">
 		<div class="span1 unit break">
 			
-		</div> <!-- end span -->
+		</div> <!-- end span -->			<p>Written by <a href="http://jonearley.net/">Jon Earley</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
+
 	</div> <!-- end line -->
 </div>
 </body>

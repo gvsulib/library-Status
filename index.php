@@ -213,7 +213,7 @@
 
 	<div class="line break footer">
 		<div class="span1 unit break">
-			<p>Grand Valley State University Libraries</p>
+			<p>Written by <a href="http://jonearley.net/">Jon Earley</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 </div>

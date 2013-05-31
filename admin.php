@@ -384,6 +384,7 @@ To show to not-logged-in users, look for $logged_in == 0;
 	<div class="line footer">
 		<div class="span1 unit">
 			
+			<p>Written by <a href="http://jonearley.net/">Jon Earley</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
 
 		</div> <!-- end span -->
 	</div> <!-- end line -->

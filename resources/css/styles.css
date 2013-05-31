@@ -113,7 +113,9 @@ a {
 	color: #00549d;
 }
 
-.lib-small-button-grey a { 
+h2 a { text-decoration: none;}
+
+.lib-button-small-grey a { 
 	color: #333 !important; 
 	text-decoration: none;
 }
