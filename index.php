@@ -1,5 +1,5 @@
 <?php
-	/*include 'resources/secret/config.php';
+	include 'resources/secret/config.php';
 	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
 	if ($db->connect_errno) {
     	printf("Connect failed: %s\n", $db->connect_error);
@@ -12,7 +12,7 @@
 	}
 
 	date_default_timezone_set('America/Detroit');
-	*/
+	
 
 ?>
 
