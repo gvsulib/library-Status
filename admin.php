@@ -18,6 +18,12 @@
 
 	if(isset($_SESSION['username'])) { // User has logged in
 
+		if (isset($_REQUEST['logout'])) {
+			$_SESSION = array();
+			session_destroy();
+			phpCAS::logout();
+		}
+
 		$username = $_SESSION['username'];
 		// User names are unique, so only need a single row
 		// Get all the bits from the user name so you don't have to ask again
@@ -33,8 +39,10 @@
 
 			// Open or all issues
 			if(isset($_GET['issues']) && ($_GET['issues'] == 'all')) {
+				$all_issues = 1;
 				$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC";
 			} else {
+				$all_issues = 0;
 				$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
 			}
 
@@ -119,9 +127,13 @@ To show to not-logged-in users, look for $logged_in == 0;
 <body>
 
 	<div class="line break" style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
-		<div class="span1 unit">
+		<div class="span2of3 unit left">
 			<h2>University Libraries Status</h2>
 		</div> <!-- end span -->
+
+		<div class="span3 unit left">
+			<p style="text-align:right;"><?php ($logged_in == 1 ? echo '<a href="?logout" title="Log out">Log out</a>'; : ) ?></p>
+		</div>
 	</div> <!-- end line -->
 
 <?php 
@@ -195,8 +207,8 @@ To show to not-logged-in users, look for $logged_in == 0;
 		<div class="span1 unit">
 			<div class="lib-tabs">
 				<ul>
-					<li class="active"> <a href="admin.php">Open Issues</a></li>
-					<li><a href="admin.php?issues=all">All Issues</a></li>
+					<li<?php ($all_issues == 0 ? echo ' class="active"'; : ) ?>> <a href="admin.php">Open Issues</a></li>
+					<li<?php ($all_issues == 1 ? echo ' class="active"'; : ) ?>><a href="admin.php?issues=all">All Issues</a></li>
 				</ul>
 			</div>
 		</div>
