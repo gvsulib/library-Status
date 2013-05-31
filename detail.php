@@ -60,7 +60,7 @@
 
 			$result = $db->query("SELECT s.status_id, s.issue_id, s.status_timestamp, s.status_public, s.status_user_id, s.status_text, s.status_delete, u.user_id, u.user_fn, u.user_ln, st.status_type_id, st.status_type_text
 				FROM status_entries s, user u, status_type st
-				WHERE s.issue_id = '$issue_id_now' AND s.status_user_id = u.user_id AND s.status_type_id = st.status_type_id
+				WHERE s.issue_id = '$issue_id_now' AND s.status_type_id = st.status_type_id
 				ORDER BY s.status_timestamp ASC") or die(mysqli_error());
 
 			$num_rows = $result->num_rows;
