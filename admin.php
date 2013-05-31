@@ -1,13 +1,14 @@
 <?php
 	session_start();
-
+	$_SESSION['location'] = 'http://' . $_SERVER['SERVER_NAME'] . "/status/admin.php";
+/*
 	include 'resources/secret/config.php';
 	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
 	if ($db->connect_errno) {
     	printf("Connect failed: %s\n", $db->connect_error);
     	exit();
 	}
-
+*/
 	date_default_timezone_set('America/Detroit');
 
 	$logged_in = 0; // By default, user is logged out
@@ -29,6 +30,8 @@
 			// Create the user object as $user.
 			// User id is then $loggedin_user->user_id
 			$loggedin_user = $user_result->fetch_object();
+
+			echo $loggedin_user->user_id;
 
 			// Open or all issues
 			if(isset($_GET['issues']) && ($_GET['issues'] == 'all')) {
@@ -54,7 +57,7 @@
 
 				// Create a new status entry
 				$db->query("INSERT INTO status_entries
-				VALUES ('','$issue_id','$now','1','$status_type_id',$user_id,'$issue_text','0')");
+				VALUES ('','$issue_id','$now','1','$status_type_id',$loggedin_user->user_id,'$issue_text','0')");
 			}
 
 			// new status post
@@ -87,8 +90,6 @@
 		} // End loop for logged in user
 
 } else { // No $_SESSION['username'] variable, send to login script
-
-	$_SESSION['location'] = 'http://' . $_SERVER['SERVER_NAME'] . "/status";
 
 	// User has not logged in
 	header('Location: http://labs.library.gvsu.edu/login');
