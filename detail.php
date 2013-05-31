@@ -38,11 +38,11 @@
 <body>
 	<div class="line break">
 		<div class="span2of3 unit left">
-			<h2><a href="index.php" title="University Libraries System Status">University Libraries Status</a></h2>
+			<h2><a href="index.php">University Libraries Status</a></h2>
 		</div> <!-- end span -->
 
-		<div class="span3 unit left">
-			<?php echo '<p style="text-align:right;">' . ($logged_in == 1 ? '<a href="?logout" title="Log out">Log out</a></p>' : '</p>'); ?>
+		<div class="span3 unit left login">
+			<?php echo '<p>' . (isset($_SESSION['username']) ? '<a href="?logout" title="Log out">Log out</a></p>' : '<a href="admin.php" title="Log in">Log in</a></p>'); ?>
 		</div>
 	</div> <!-- end line -->
 

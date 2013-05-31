@@ -32,7 +32,7 @@
 <body>
 	<div class="line break">
 		<div class="span2of3 unit left">
-			<h2>University Libraries Status</h2>
+			<h2><a href="index.php">University Libraries Status</a></h2>
 		</div> <!-- end span -->
 
 		<div class="span3 unit left login">
