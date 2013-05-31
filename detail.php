@@ -13,10 +13,7 @@
 	$system_id = $_GET['system_id'];
 	$day = $_GET['day'];
 
-	$system_name = 'Library Homepage';
-	$issue_id = 55;
-
-	$result=$db->query("SELECT systems.system_name FROM systems WHERE systems.system_id = 1");
+	$result=$db->query("SELECT systems.system_name FROM systems WHERE systems.system_id = '$system_id'");
 
 	while ($row = $result->fetch_assoc()) {
 		$system_name = $row['system_name'];
