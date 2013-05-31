@@ -87,7 +87,7 @@
 								<th style="text-align: right" >System</th>
 								<th style="text-align: center">Currently</th>
 
-								<?php foreach(range(0,6) as $cnt) {
+								<?php foreach(range(0,5) as $cnt) {
 										echo  '<th style="text-align: center;">' . date("M d", mktime(0, 0, 0, date("m")  , date("d")-$cnt, date("Y")))
 										. '</th>';
 										
@@ -136,7 +136,7 @@
 								if ($num_rows == 0) {
 
 									$cnt = 0;
-									foreach(range(0,6) as $cnt) {
+									foreach(range(0,5) as $cnt) {
 										echo '<td style="text-align: center">';
 										echo '<img src="resources/img/checkmark.png">';
 										echo '</td>';
@@ -148,7 +148,7 @@
 									$day = date('Ymd', time());
 
 									$cnt = 0;
-									foreach(range(0,6) as $cnt) {
+									foreach(range(0,5) as $cnt) {
 
 										echo'<td style="text-align: center">';
 
