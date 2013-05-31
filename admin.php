@@ -1,14 +1,14 @@
 <?php
 	session_start();
 	$_SESSION['location'] = 'http://' . $_SERVER['SERVER_NAME'] . "/status/admin.php";
-/*
+
 	include 'resources/secret/config.php';
 	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
 	if ($db->connect_errno) {
     	printf("Connect failed: %s\n", $db->connect_error);
     	exit();
 	}
-*/
+
 	date_default_timezone_set('America/Detroit');
 
 	$logged_in = 0; // By default, user is logged out
