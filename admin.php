@@ -132,7 +132,7 @@ To show to not-logged-in users, look for $logged_in == 0;
 		</div> <!-- end span -->
 
 		<div class="span3 unit left">
-			<p style="text-align:right;"><?php echo ($logged_in == 1 ? '<a href="?logout" title="Log out">Log out</a>' : ); ?></p>
+			<?php echo '<p style="text-align:right;">' . ($logged_in == 1 ? '<a href="?logout" title="Log out">Log out</a></p>' : '</p>'); ?>
 		</div>
 	</div> <!-- end line -->
 
@@ -207,8 +207,8 @@ To show to not-logged-in users, look for $logged_in == 0;
 		<div class="span1 unit">
 			<div class="lib-tabs">
 				<ul>
-					<li<?php echo ($all_issues == 0 ? ' class="active"' : ); ?>> <a href="admin.php">Open Issues</a></li>
-					<li<?php echo ($all_issues == 1 ? ' class="active"' : ); ?>><a href="admin.php?issues=all">All Issues</a></li>
+					<li<?php echo ($all_issues == 0 ? ' class="active">' : '>'); ?> <a href="admin.php">Open Issues</a></li>
+					<li<?php echo ($all_issues == 1 ? ' class="active">' : '>'); ?><a href="admin.php?issues=all">All Issues</a></li>
 				</ul>
 			</div>
 		</div>
