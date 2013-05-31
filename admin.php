@@ -31,8 +31,6 @@
 			// User id is then $loggedin_user->user_id
 			$loggedin_user = $user_result->fetch_object();
 
-			echo $loggedin_user->user_id;
-
 			// Open or all issues
 			if(isset($_GET['issues']) && ($_GET['issues'] == 'all')) {
 				$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC";
@@ -64,6 +62,8 @@
 			// Inside the loop so you can't submit without being logged in
 			if ($_POST['submit_status']) {
 
+				echo "We are trying here";
+
 				$issue_id = $_POST['issue_id'];
 				$status_type_id = $_POST['status_type_id'];
 				$status_text = $_POST['status'];
@@ -84,7 +84,7 @@
 
 				// Create a new status entry
 				$db->query("INSERT INTO status_entries
-				VALUES ('','$issue_id','$now','1','$status_value',$loggedin_user->user_id,$status_text','0')");
+				VALUES ('','$issue_id','$now','1','$status_value',$loggedin_user->user_id,$status_text','0')") or die(mysqli_error());
 			}
 
 		} // End loop for logged in user
