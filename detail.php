@@ -153,7 +153,7 @@
 
 	<div class="line break footer">
 		<div class="span1 unit break">
-			<p>Footer - Grand Valley State University Libraries</p>
+			
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 </body>

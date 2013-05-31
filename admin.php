@@ -10,9 +10,30 @@
 
 	date_default_timezone_set('America/Detroit');
 
-	// reidsmam, fisherin
-	$_SESSION['username'] = 'earleyj';
 
+	// reidsmam, fisherin
+	$_SESSION['username'] = 'earleyj'; // remove this
+
+	$username = $_SESSION['username'];
+	$user_result=$db->query("SELECT user.user_id FROM user WHERE user.user_username = '$username'");
+
+	while ($row = $user_result->fetch_assoc()) {
+		if ($row['user_id'] != ''){
+			$user_id = $row['user_id'];
+		}
+	}
+
+	// Is user a valif login
+	if ($user_id != '') {
+
+	$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
+
+	// Open or all issues
+	if ($_GET['issues'] == 'all') {
+		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC";
+	} else {
+		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
+	}
 
 	// new issue post
 	if ($_POST['submit_issue']) {
@@ -30,7 +51,7 @@
 
 		// Create a new status entry
 		$db->query("INSERT INTO status_entries
-		VALUES ('','$issue_id','$now','1','$status_type_id',1,'$issue_text','0')");
+		VALUES ('','$issue_id','$now','1','$status_type_id',$user_id,'$issue_text','0')");
 	}
 
 	// new status post
@@ -56,7 +77,7 @@
 
 		// Create a new status entry
 		$db->query("INSERT INTO status_entries
-		VALUES ('','$issue_id','$now','1','$status_value',1,'$status_text','0')");
+		VALUES ('','$issue_id','$now','1','$status_value',$user_id,'$status_text','0')");
 	}
 
 ?>
@@ -134,6 +155,7 @@
 						$result = $db->query("SELECT * FROM status_type");
 						while($row = $result->fetch_assoc())
 						{
+							if ($row["status_type_id"] != 3)
 							echo '<option value="' . $row["status_type_id"] . '">' . $row["status_type_text"] . '</option>';
 						}
 						?>
@@ -157,8 +179,8 @@
 		<div class="span1 unit">
 			<div class="lib-tabs">
 				<ul>
-					<li class="active"><a href="#">Open Issues</a></li>
-					<li><a href="#">All Issues</a></li>
+					<li class="active"> <a href="admin.php">Open Issues</a></li>
+					<li><a href="admin.php?issues=all">All Issues</a></li>
 				</ul>
 			</div>
 		</div>
@@ -166,7 +188,10 @@
 		<!-- Create issues -->
 		<?php
 
-			$issue_result = $db->query("SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC");
+		$issue_result = $db->query($issue_query);
+		$n_rows = $issue_result->num_rows;
+
+		if ($n_rows > 0) {
 
 			while ($issue_entries = $issue_result->fetch_assoc()) {
 
@@ -300,26 +325,50 @@
 
 
 				} // close status loop
+
 				// close comment wrapper
-					echo '</div>';
+				echo '</div>';
 
 				echo '
-							</div> 
-						</div> <!-- close issue line -->';
+				</div> 
+				</div> <!-- close issue line -->';
 
 			} // close issue loop
 
+		} else {
+
+			echo '<p style="margin-top: 1em">No open issues.</p>';
+		}
+
 		?>
+
 	</div>
 
 	<div class="line footer">
 		<div class="span1 unit">
-			<p>Footer - Grand Valley State University Libraries</p>
+			
 
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 </body>
 </html>
+
+<?php
+
+	} else {
+
+		echo '
+		<div class="line">
+			<div class="span1 unit">
+				<p>You do not have access here, sorry!</p>
+			</div> <!-- end span -->
+		</div> <!-- end line -->
+		';
+}
+
+?>
+
+
 
 
 

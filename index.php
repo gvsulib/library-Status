@@ -40,9 +40,7 @@
 		<div class="span1 unit">
 
 			<?php
-
 				// library status div
-
 			?>
 
 		</div> <!-- end span -->
@@ -54,10 +52,10 @@
 			<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In posuere felis nec tortor. Pellentesque faucibus.</p>
 			<div class="lib-button-small-grey">
 
-				<a href='#' onclick='window.open("https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489&identity=Librarian", "chat", "resizable=1,width=225,height=280"); return false;' ><span>Chat</span></a>
+				<a href='#' style="text-decoration: none;" onclick='window.open("https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489&identity=Librarian", "chat", "resizable=1,width=225,height=280"); return false;' ><span>Chat</span></a>
 			</div>
 			<div class="lib-button-small-grey">
-				<a href="mailto:library@gvsu.edu">Email</a>
+				<a style="text-decoration: none;" href="mailto:library@gvsu.edu">Email</a>
 			</div>
 		</div> <!-- end span -->
 		<div class="span2 unit right">
@@ -68,7 +66,6 @@
 			</div>
 		</div> <!-- end span -->
 	</div> <!-- end line -->
-
 
 	<div class="line break">
 		<div class="span1 unit">
@@ -104,7 +101,7 @@
 							{
 								echo '<tr>';
 								echo '<td style="text-align: right ">' . $row["system_name"] . '</td> ';
-								echo'<td class = "col2 name" style="text-align: center;';
+								echo '<td class = "col2 name" style="text-align: center;';
 
 								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
 																FROM issue_entries i
@@ -116,10 +113,10 @@
 								while ($rw = $system_result->fetch_assoc()) {
 									if ($rw['end_time'] == 0) { 
 										if ($rw['status_type_id'] == 2) { 
-											$currently = ' color: red">outage';
+											$currently = ' color: red"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: red;">outage</a>';
 										}
 										else {
-											$currently = ' color: orange">disruption';
+											$currently = ' color: orange"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: orange;">Disruption</a>';
 										}
 									}
 								}
@@ -136,8 +133,8 @@
 
 									$cnt = 0;
 									foreach(range(0,5) as $cnt) {
-										echo  '<td style="text-align: center">';
-										echo'<img src="resources/img/checkmark.png">';
+										echo '<td style="text-align: center">';
+										echo '<img src="resources/img/checkmark.png">';
 										echo '</td>';
 									}
 
@@ -176,11 +173,9 @@
 													$day_status = '<b style= "color: orange">---</b>';
 												}
 											}
-
 										}
 
 										echo $day_status . "</td>"; // close currently displayed
-
 									}
 
 								} // end else if
@@ -199,7 +194,7 @@
 
 	<div class="line break footer">
 		<div class="span1 unit break">
-			<p>Footer - Grand Valley State University Libraries</p>
+			<p>Grand Valley State University Libraries</p>
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 
