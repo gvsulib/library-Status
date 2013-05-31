@@ -21,7 +21,6 @@
 		if (isset($_REQUEST['logout'])) {
 			$_SESSION = array();
 			session_destroy();
-			phpCAS::logout();
 		}
 
 		$username = $_SESSION['username'];
