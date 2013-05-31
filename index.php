@@ -30,10 +30,14 @@
 </head>
 
 <body>
-	<div class="line break" style="padding-top: 1em">
-		<div class="span1 unit">
+	<div class="line break" style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
+		<div class="span2of3 unit left">
 			<h2>University Libraries Status</h2>
 		</div> <!-- end span -->
+
+		<div class="span3 unit left login">
+			<?php echo '<p>' . (isset($_SESSION['username']) ? '<a href="?logout" title="Log out">Log out</a></p>' : '<a href="admin.php" title="Log in">Log in</a></p>'); ?>
+		</div>
 	</div> <!-- end line -->
 
 	<div class="line">
@@ -49,7 +53,7 @@
 	<div class="line break">
 		<div class="span2 unit left">
 			<h3>Get Help</h3>
-			<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In posuere felis nec tortor. Pellentesque faucibus.</p>
+			<p>We&#8217;re available to help even if you&#8217;re off campus. Stop in at <a href="http://gvsu.edu/library/directions">any location</a>, or contact us during <a href="http://gvsu.edu/library/hours">Kirkhof library's regular hours</a>.</p>
 			<div class="lib-button-small-grey">
 
 				<a href='#' style="text-decoration: none;" onclick='window.open("https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489&identity=Librarian", "chat", "resizable=1,width=225,height=280"); return false;' ><span>Chat</span></a>
@@ -60,7 +64,7 @@
 		</div> <!-- end span -->
 		<div class="span2 unit right">
 			<h3>Report a Problem</h3>
-			<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In posuere felis nec tortor. Pellentesque faucibus.</p>
+			<p>Having trouble with any of the University Library's online systems? Drop us a line and let us know. We&#8217;ll do our best to sort it out.</p>
 			<div class="lib-button-small-grey">
 				<a id="feedback-trigger">Report a Problem</a>
 			</div>
