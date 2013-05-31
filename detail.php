@@ -36,10 +36,14 @@
 </head>
 
 <body>
-	<div class="line break" style="padding-top: 1em">
-		<div class="span1 unit">
-			<h2>University Libraries Status</h2>
+	<div class="line break">
+		<div class="span2of3 unit left">
+			<h2><a href="index.php" title="University Libraries System Status">University Libraries Status</a></h2>
 		</div> <!-- end span -->
+
+		<div class="span3 unit left">
+			<?php echo '<p style="text-align:right;">' . ($logged_in == 1 ? '<a href="?logout" title="Log out">Log out</a></p>' : '</p>'); ?>
+		</div>
 	</div> <!-- end line -->
 
 
