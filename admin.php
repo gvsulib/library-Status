@@ -84,7 +84,7 @@
 
 				// Create a new status entry
 				$db->query("INSERT INTO status_entries
-				VALUES ('','$issue_id','$now','1','$status_value',$loggedin_user->user_id,$status_text','0')") or die(mysqli_error());
+				VALUES ('','$issue_id','$now','1','$status_value',$loggedin_user->user_id,'$status_text','0')") or die(mysqli_error());
 			}
 
 		} // End loop for logged in user
