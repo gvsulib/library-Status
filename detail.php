@@ -51,7 +51,7 @@
 
 		echo '<h4>' . $system_name . ' System Details</h4>';
 
-		$issue_result = $db->query("SELECT issue_entries.issue_id, systems.system_name FROM issue_entries, systems WHERE issue_entries.system_id = $system_id AND issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC");
+		$issue_result = $db->query("SELECT issue_entries.issue_id, systems.system_name FROM issue_entries, systems WHERE issue_entries.system_id = $system_id AND issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC") or die(mysqli_error());
 
 		while ($issue_entries = $issue_result->fetch_assoc()) {
 
