@@ -53,6 +53,8 @@
 
 		$issue_result = $db->query("SELECT issue_entries.issue_id FROM issue_entries WHERE issue_entries.system_id = $system_id ORDER BY issue_entries.issue_id DESC") or die(mysqli_error());
 
+		echo $issue_result->num_rows;
+
 		while ($issue_entries = $issue_result->fetch_assoc()) {
 
 			$result = $db->query("SELECT s.status_id, s.issue_id, s.status_timestamp, s.status_public, s.status_user_id, s.status_text, s.status_delete, u.user_id, u.user_fn, u.user_ln, st.status_type_id, st.status_type_text
