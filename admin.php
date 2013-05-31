@@ -21,6 +21,7 @@
 		if (isset($_REQUEST['logout'])) {
 			$_SESSION = array();
 			session_destroy();
+			header('Location: index.php');
 		}
 
 		$username = $_SESSION['username'];
@@ -136,9 +137,9 @@ To show to not-logged-in users, look for $logged_in == 0;
 	</div> <!-- end line -->
 
 <?php 
-	if($logged_in != 1) { // User is not logged in
-?>
+	if($logged_in != 1) {
 
+?>
 	<div class="line">
 		<div class="span1 unit">
 			<span class="lib-error">Whoops! You don't have access to this page. Think this is wrong? Email <a href="mailto:reidsmam@gvsu.edu">reidsmam@gvsu.edu</a></span>
