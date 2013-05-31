@@ -76,15 +76,15 @@
 
 						<thead>
 							<tr>
-								<th colspan="8">Library Status</th>
+								<th colspan="9">Library Status</th>
 							</tr>
 
-							<tr colspan="8" class="lib-row-headings name">
+							<tr colspan="9" class="lib-row-headings name">
 								<th style="text-align: right" >System</th>
 								<th style="text-align: center">Currently</th>
 
-								<?php foreach(range(0,5) as $cnt) {
-										echo  '<th style="text-align: center;">' . date("M d", mktime(0, 0, 0, date("m")  , date("d")-$cnt-1, date("Y")))
+								<?php foreach(range(0,6) as $cnt) {
+										echo  '<th style="text-align: center;">' . date("M d", mktime(0, 0, 0, date("m")  , date("d")-$cnt, date("Y")))
 										. '</th>';
 										
 									}?>
@@ -132,7 +132,7 @@
 								if ($num_rows == 0) {
 
 									$cnt = 0;
-									foreach(range(0,5) as $cnt) {
+									foreach(range(0,6) as $cnt) {
 										echo '<td style="text-align: center">';
 										echo '<img src="resources/img/checkmark.png">';
 										echo '</td>';
@@ -144,7 +144,7 @@
 									$day = date('Ymd', time());
 
 									$cnt = 0;
-									foreach(range(0,5) as $cnt) {
+									foreach(range(0,6) as $cnt) {
 
 										echo'<td style="text-align: center">';
 
@@ -160,10 +160,10 @@
 											$start_day = date('Ymd', $rw['start_time']);
 											$end_day = date('Ymd', $rw['end_time']);
 
-											if ((( ($day-$cnt-1) >= $start_day) && ($rw['end_time'] == 0)) || 
-												(( ($day-$cnt-1) >= $start_day && ($day-$cnt-1) <= $end_day))) {
+											if ((( ($day-$cnt) >= $start_day) && ($rw['end_time'] == 0)) || 
+												(( ($day-$cnt) >= $start_day && ($day-$cnt-1) <= $end_day))) {
 
-												echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none;">';
+												echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" style = "text-decoration: none;">';
 
 												if ($rw['status_type_id'] == 2) {
 													$day_status = '<b style= "color: red">X</b>';
