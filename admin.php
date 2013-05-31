@@ -13,7 +13,7 @@
 	$logged_in = 0; // By default, user is logged out
 
 	// Debug
-	$_SESSION['username'] = 'earleyj';
+	//$_SESSION['username'] = 'earleyj';
 
 	if(isset($_SESSION['username'])) { // User has logged in
 
