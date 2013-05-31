@@ -1,5 +1,5 @@
 <?php
-	include 'resources/secret/config.php';
+	/*include 'resources/secret/config.php';
 	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
 	if ($db->connect_errno) {
     	printf("Connect failed: %s\n", $db->connect_error);
@@ -12,6 +12,7 @@
 	}
 
 	date_default_timezone_set('America/Detroit');
+	*/
 
 ?>
 
@@ -30,6 +31,20 @@
 </head>
 
 <body>
+<div id="gvsu-header-wrapper">
+		<div id="gvsu-header">
+			<div id="gvsu-logo">
+				<a href="http://www.gvsu.edu/">
+					<img src="http://www.gvsu.edu/homepage/files/img/gvsu_logo.png" alt="Grand Valley State University" border="0">
+				</a>
+			</div>
+		</div>
+	</div>
+	<div id="wrapper">
+
+	
+
+
 	<div class="line break">
 		<div class="span2of3 unit left">
 			<h2><a href="index.php">University Libraries Status</a></h2>
@@ -201,6 +216,7 @@
 			<p>Grand Valley State University Libraries</p>
 		</div> <!-- end span -->
 	</div> <!-- end line -->
+</div>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>

@@ -103,6 +103,54 @@ pre {white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;whi
 
 /* Typography styles */
 
+.login p {
+	 text-align: right; 
+	 font-size: .9em; 
+	 margin-top: 1em;
+}
+
+a { 
+	color: #00549d;
+}
+
+.lib-small-button-grey a { 
+	color: #333 !important; 
+	text-decoration: none;
+}
+
+#gvsu-header-wrapper {
+    background: #0065a4;
+    color: #363636;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    width: 100%;
+    height: 10em;
+    text-align: center;
+}
+#gvsu-header-wrapper img, #gvsu-header-wrapper embed, #gvsu-header-wrapper object, #gvsu-header-wrapper video {
+	max-width: 100%;
+}
+#gvsu-header-wrapper .gvsu-clear {
+	clear: both;
+}
+
+#gvsu-header-wrapper #gvsu-header {
+	width: 100%;
+	margin: 0 auto;
+}
+
+/* ------------ header ------------ */
+#gvsu-header-wrapper #gvsu-logo {
+	padding: 1.167em 0 0.75em 0.25em; /* 14 0 9 3 */
+	margin: 0;
+	float: left;
+	margin-left: .5em;
+	
+}
+
+body { max-width: 100%; width: 100%; margin: 0; padding: 0;}
+#wrapper { max-width: 56em; margin: 0 auto; width: 90%;}
+
 
 p {font-size:100%;line-height:150%;}
 

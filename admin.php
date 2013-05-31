@@ -125,13 +125,22 @@ To show to not-logged-in users, look for $logged_in == 0;
 </head>
 
 <body>
-
+<div id="gvsu-header-wrapper">
+		<div id="gvsu-header">
+			<div id="gvsu-logo">
+				<a href="http://www.gvsu.edu/">
+					<img src="http://www.gvsu.edu/homepage/files/img/gvsu_logo.png" alt="Grand Valley State University" border="0">
+				</a>
+			</div>
+		</div>
+	</div>
+	<div id="wrapper">
 	<div class="line break">
 		<div class="span2of3 unit left">
 			<h2><a href="index.php" title="University Libraries System Status">University Libraries Status</a></h2>
 		</div> <!-- end span -->
 
-		<div class="span3 unit left">
+		<div class="span3 unit left login">
 			<?php echo '<p style="text-align:right;">' . ($logged_in == 1 ? '<a href="?logout" title="Log out">Log out</a></p>' : '</p>'); ?>
 		</div>
 	</div> <!-- end line -->
@@ -378,6 +387,7 @@ To show to not-logged-in users, look for $logged_in == 0;
 
 		</div> <!-- end span -->
 	</div> <!-- end line -->
+</div>
 	 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
  <script>
 

@@ -36,6 +36,16 @@
 </head>
 
 <body>
+	<div id="gvsu-header-wrapper">
+		<div id="gvsu-header">
+			<div id="gvsu-logo">
+				<a href="http://www.gvsu.edu/">
+					<img src="http://www.gvsu.edu/homepage/files/img/gvsu_logo.png" alt="Grand Valley State University" border="0">
+				</a>
+			</div>
+		</div>
+	</div>
+	<div id="wrapper">
 	<div class="line break">
 		<div class="span2of3 unit left">
 			<h2><a href="index.php">University Libraries Status</a></h2>
@@ -157,6 +167,7 @@
 			
 		</div> <!-- end span -->
 	</div> <!-- end line -->
+</div>
 </body>
 
 </html>
