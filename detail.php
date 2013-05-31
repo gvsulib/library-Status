@@ -83,7 +83,7 @@
 									<p class="time">' . date("D g:i a - n/j/y", $status_entries['status_timestamp']) . '</p>
 								</div>
 								<div style="float: right;">
-									<p class="name tag-system">' . $issue_entries['system_name'] . '</p>';
+									<p class="name tag-system">' . $system_name . '</p>';
 									
 									if ($status_entries['status_type_text'] == 'Outage') {
 										echo '<p class="name tag-outage">' . $status_entries['status_type_text'] . '</p>';
