@@ -126,7 +126,7 @@ To show to not-logged-in users, look for $logged_in == 0;
 
 <body>
 
-	<div class="line break" style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
+	<div class="line break">
 		<div class="span2of3 unit left">
 			<h2>University Libraries Status</h2>
 		</div> <!-- end span -->
