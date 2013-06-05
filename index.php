@@ -29,6 +29,7 @@
 </head>
 
 <body>
+
 	<div id="gvsu-header-wrapper">
 		<div id="gvsu-header">
 			<div id="gvsu-logo">
@@ -38,6 +39,7 @@
 			</div>
 		</div>
 	</div>
+
 	<div id="wrapper">
 
 	<div class="line break">
