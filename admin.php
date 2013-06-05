@@ -1,5 +1,6 @@
 <?php
 	session_start();
+	$_SESSION['location'] = 'http://' . $_SERVER['SERVER_NAME'] . "/status/admin.php";
 
 	include 'resources/secret/config.php';
 	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
@@ -10,76 +11,104 @@
 
 	date_default_timezone_set('America/Detroit');
 
+	$logged_in = 0; // By default, user is logged out
 
-	// reidsmam, fisherin
-	$_SESSION['username'] = 'earleyj'; // remove this
+	// Debug
+	//$_SESSION['username'] = 'earleyj';
 
-	$username = $_SESSION['username'];
-	$user_result=$db->query("SELECT user.user_id FROM user WHERE user.user_username = '$username'");
+	if(isset($_SESSION['username'])) { // User has logged in
 
-	while ($row = $user_result->fetch_assoc()) {
-		if ($row['user_id'] != ''){
-			$user_id = $row['user_id'];
-		}
-	}
-
-	// Is user a valif login
-	if ($user_id != '') {
-
-	$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
-
-	// Open or all issues
-	if ($_GET['issues'] == 'all') {
-		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC";
-	} else {
-		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
-	}
-
-	// new issue post
-	if ($_POST['submit_issue']) {
-
-		$issue_text = $_POST['issue_text'];
-		$system_id = $_POST['system_id'];
-		$status_type_id = $_POST['status_type_id'];
-
-		$now = time();
-
-		// Create new issue
-		$db->query("INSERT INTO issue_entries
-		VALUES ('','$system_id', $status_type_id, '$now', '0')");
-		$issue_id = $db->insert_id;
-
-		// Create a new status entry
-		$db->query("INSERT INTO status_entries
-		VALUES ('','$issue_id','$now','1','$status_type_id',$user_id,'$issue_text','0')");
-	}
-
-	// new status post
-	if ($_POST['submit_status']) {
-
-		$issue_id = $_POST['issue_id'];
-		$status_type_id = $_POST['status_type_id'];
-		$status_text = $_POST['status'];
-
-		$issue_resolved = $_POST['issue_resolved'];
-
-		$now = time();
-
-		$status_value = $status_type_id;
-		if ($issue_resolved == 'on') {
-			$status_value = 3;
-
-			//update issue end_time and close issue
-			$db->query("UPDATE issue_entries
-						SET issue_entries.end_time = '$now'
-						WHERE $issue_id = issue_entries.issue_id");
+		if (isset($_REQUEST['logout'])) {
+			$_SESSION = array();
+			session_destroy();
+			header('Location: index.php');
 		}
 
-		// Create a new status entry
-		$db->query("INSERT INTO status_entries
-		VALUES ('','$issue_id','$now','1','$status_value',$user_id,'$status_text','0')");
-	}
+		$username = $_SESSION['username'];
+		// User names are unique, so only need a single row
+		// Get all the bits from the user name so you don't have to ask again
+		$user_result=$db->query("SELECT * FROM user WHERE user_username = '$username' LIMIT 1");
 
+		if(($user_result) && ($user_result->num_rows > 0)) { // Query was successful, a user was found
+
+			$logged_in = 1; // Boolean to know if 
+
+			// Create the user object as $user.
+			// User id is then $loggedin_user->user_id
+			$loggedin_user = $user_result->fetch_object();
+
+			// Open or all issues
+			if(isset($_GET['issues']) && ($_GET['issues'] == 'all')) {
+				$all_issues = 1;
+				$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC";
+			} else {
+				$all_issues = 0;
+				$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
+			}
+
+			// new issue post
+			// Inside the loop so you can't submit without being logged in
+			if ($_POST['submit_issue']) {
+
+				$issue_text = $_POST['issue_text'];
+				$system_id = $_POST['system_id'];
+				$status_type_id = $_POST['status_type_id'];
+
+				$now = time();
+
+				// Create new issue
+				$db->query("INSERT INTO issue_entries
+				VALUES ('','$system_id', $status_type_id, '$now', '0')");
+				$issue_id = $db->insert_id;
+
+				// Create a new status entry
+				$db->query("INSERT INTO status_entries
+				VALUES ('','$issue_id','$now','1','$status_type_id',$loggedin_user->user_id,'$issue_text','0')");
+			}
+
+			// new status post
+			// Inside the loop so you can't submit without being logged in
+			if ($_POST['submit_status']) {
+
+				echo "We are trying here";
+
+				$issue_id = $_POST['issue_id'];
+				$status_type_id = $_POST['status_type_id'];
+				$status_text = $_POST['status'];
+
+				$issue_resolved = $_POST['issue_resolved'];
+
+				$now = time();
+
+				$status_value = $status_type_id;
+				if ($issue_resolved == 'on') {
+					$status_value = 3;
+
+					//update issue end_time and close issue
+					$db->query("UPDATE issue_entries
+								SET issue_entries.end_time = '$now'
+								WHERE $issue_id = issue_entries.issue_id");
+				}
+
+				// Create a new status entry
+				$db->query("INSERT INTO status_entries
+				VALUES ('','$issue_id','$now','1','$status_value',$loggedin_user->user_id,'$status_text','0')") or die(mysqli_error());
+			}
+
+		} // End loop for logged in user
+
+} else { // No $_SESSION['username'] variable, send to login script
+
+	// User has not logged in
+	header('Location: http://labs.library.gvsu.edu/login');
+
+}
+
+/*
+If you want to show something to logged-in users, check for $logged_in == 1
+
+To show to not-logged-in users, look for $logged_in == 0;
+*/
 ?>
 
 <!DOCTYPE html>
@@ -95,32 +124,40 @@
 
 </head>
 
- <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
- <script>
-
-	 $(document).ready(function() {
-
-		// Hide the items you don't want to show if JS is available
-		$(".comment-wrapper").hide();
-		
-		// Make the div toggle visible/invisible on click
-		$(".comment-toggle").click(function() {
-
-			$(this).next(".comment-wrapper").slideToggle(400);
-
-		});
-
-	});
-
-</script>
-
 <body>
-
-	<div class="line break" style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
-		<div class="span1 unit">
-			<h2>University Libraries Status</h2>
+<div id="gvsu-header-wrapper">
+		<div id="gvsu-header">
+			<div id="gvsu-logo">
+				<a href="http://www.gvsu.edu/">
+					<img src="http://www.gvsu.edu/homepage/files/img/gvsu_logo.png" alt="Grand Valley State University" border="0">
+				</a>
+			</div>
+		</div>
+	</div>
+	<div id="wrapper">
+	<div class="line break">
+		<div class="span2of3 unit left">
+			<h2><a href="index.php" title="University Libraries System Status">University Libraries Status</a></h2>
 		</div> <!-- end span -->
+
+		<div class="span3 unit left login">
+			<?php echo '<p style="text-align:right;">' . ($logged_in == 1 ? '<a href="?logout" title="Log out">Log out</a></p>' : '</p>'); ?>
+		</div>
 	</div> <!-- end line -->
+
+<?php 
+	if($logged_in != 1) {
+
+?>
+	<div class="line">
+		<div class="span1 unit">
+			<span class="lib-error">Whoops! You don't have access to this page. Think this is wrong? Email <a href="mailto:reidsmam@gvsu.edu">reidsmam@gvsu.edu</a></span>
+		</div>
+	</div>
+
+<?php
+	} else { // User is logged in, show the page
+?>
 
 	<!-- Form Submit Status -->
 	<div class="line lib-form box">
@@ -179,8 +216,8 @@
 		<div class="span1 unit">
 			<div class="lib-tabs">
 				<ul>
-					<li class="active"> <a href="admin.php">Open Issues</a></li>
-					<li><a href="admin.php?issues=all">All Issues</a></li>
+					<li<?php echo ($all_issues == 0 ? ' class="active">' : '>'); ?> <a href="admin.php">Open Issues</a></li>
+					<li<?php echo ($all_issues == 1 ? ' class="active">' : '>'); ?><a href="admin.php?issues=all">All Issues</a></li>
 				</ul>
 			</div>
 		</div>
@@ -347,26 +384,37 @@
 	<div class="line footer">
 		<div class="span1 unit">
 			
+			<p>Written by <a href="http://jonearley.net/">Jon Earley</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
 
 		</div> <!-- end span -->
 	</div> <!-- end line -->
+</div>
+	 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+ <script>
+
+	 $(document).ready(function() {
+
+		// Hide the items you don't want to show if JS is available
+		$(".comment-wrapper").hide();
+		
+		// Make the div toggle visible/invisible on click
+		$(".comment-toggle").click(function() {
+
+			$(this).next(".comment-wrapper").slideToggle(400);
+
+		});
+
+	});
+
+</script>
+
+<?php
+	} // End logged-in user loop
+?>
+
 </body>
 </html>
 
-<?php
-
-	} else {
-
-		echo '
-		<div class="line">
-			<div class="span1 unit">
-				<p>You do not have access here, sorry!</p>
-			</div> <!-- end span -->
-		</div> <!-- end line -->
-		';
-}
-
-?>
 
 
 

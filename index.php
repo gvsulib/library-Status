@@ -12,9 +12,8 @@
 	}
 
 	date_default_timezone_set('America/Detroit');
-
+	
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -30,17 +29,66 @@
 </head>
 
 <body>
-	<div class="line break" style="padding-top: 1em">
-		<div class="span1 unit">
-			<h2>University Libraries Status</h2>
+	<div id="gvsu-header-wrapper">
+		<div id="gvsu-header">
+			<div id="gvsu-logo">
+				<a href="http://www.gvsu.edu/">
+					<img src="http://www.gvsu.edu/homepage/files/img/gvsu_logo.png" alt="Grand Valley State University" border="0">
+				</a>
+			</div>
+		</div>
+	</div>
+	<div id="wrapper">
+
+	<div class="line break">
+		<div class="span2of3 unit left">
+			<h2><a href="index.php">University Libraries Status</a></h2>
 		</div> <!-- end span -->
+
+		<div class="span3 unit left login">
+			<?php echo '<p>' . (isset($_SESSION['username']) ? '<a href="?logout" title="Log out">Log out</a></p>' : '<a href="admin.php" title="Log in">Log in</a></p>'); ?>
+		</div>
 	</div> <!-- end line -->
 
-	<div class="line">
-		<div class="span1 unit">
+	<div class="line break">
+		<div class="span1 unit left">
 
-			<?php
-				// library status div
+			<?php 
+
+				$result = $db->query("SELECT * FROM systems ORDER BY system_name ASC");
+
+				while($row = $result->fetch_assoc())
+				{
+
+					$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
+													FROM issue_entries i
+													WHERE i.system_id = {$row['system_id']}");
+
+					$status = '<div class="lib-success" style="margin: 0;">
+						<p>All our systems are operational.</p>
+						</div>';
+
+					while ($rw = $system_result->fetch_assoc()) {
+						if ($rw['end_time'] == 0) { 
+							if ($rw['status_type_id'] == 2) { 
+								$status = '<div class="lib-error" style="margin: 0;">
+									<p>It seems we have a system outage.</p>
+									</div>';
+								break 2;
+							}
+							else {
+								$status = '<div class="lib-alert" style="margin: 0;">
+									<p>It seems we have a system wdisruption.</p>
+									</div>';
+								break 2;
+							}
+						}
+					} // end while
+
+				} // end system while
+
+				echo $status;
+
 			?>
 
 		</div> <!-- end span -->
@@ -49,21 +97,25 @@
 	<div class="line break">
 		<div class="span2 unit left">
 			<h3>Get Help</h3>
-			<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In posuere felis nec tortor. Pellentesque faucibus.</p>
+
+			<p>We&#8217;re available to help even if you&#8217;re off campus. Stop in at <a href="http://gvsu.edu/library/directions">any location</a>, or contact us during <a href="http://gvsu.edu/library/hours">Kirkhof library's regular hours</a>.</p>
 			<div class="lib-button-small-grey">
 
-				<a href='#' style="text-decoration: none;" onclick='window.open("https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489&identity=Librarian", "chat", "resizable=1,width=225,height=280"); return false;' ><span>Chat</span></a>
+				<a href='#' style="text-decoration: none;" onclick='window.open("https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489&identity=Librarian", "chat", "resizable=1,width=225,height=280"); return false;'><span>Chat</span></a>
 			</div>
+
 			<div class="lib-button-small-grey">
 				<a style="text-decoration: none;" href="mailto:library@gvsu.edu">Email</a>
 			</div>
 		</div> <!-- end span -->
+
 		<div class="span2 unit right">
 			<h3>Report a Problem</h3>
-			<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In posuere felis nec tortor. Pellentesque faucibus.</p>
+			<p>Having trouble with any of the University Library's online systems? Drop us a line and let us know. We&#8217;ll do our best to sort it out.</p>
 			<div class="lib-button-small-grey">
-				<a id="feedback-trigger">Report a Problem</a>
+				<a href="feedback.php" id="feedback-trigger">Report a Problem</a>
 			</div>
+
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 
@@ -83,7 +135,7 @@
 								<th style="text-align: right" >System</th>
 								<th style="text-align: center">Currently</th>
 
-								<?php foreach(range(0,6) as $cnt) {
+								<?php foreach(range(0,5) as $cnt) {
 										echo  '<th style="text-align: center;">' . date("M d", mktime(0, 0, 0, date("m")  , date("d")-$cnt, date("Y")))
 										. '</th>';
 										
@@ -132,7 +184,7 @@
 								if ($num_rows == 0) {
 
 									$cnt = 0;
-									foreach(range(0,6) as $cnt) {
+									foreach(range(0,5) as $cnt) {
 										echo '<td style="text-align: center">';
 										echo '<img src="resources/img/checkmark.png">';
 										echo '</td>';
@@ -144,7 +196,7 @@
 									$day = date('Ymd', time());
 
 									$cnt = 0;
-									foreach(range(0,6) as $cnt) {
+									foreach(range(0,5) as $cnt) {
 
 										echo'<td style="text-align: center">';
 
@@ -194,9 +246,10 @@
 
 	<div class="line break footer">
 		<div class="span1 unit break">
-			<p>Grand Valley State University Libraries</p>
+			<p>Written by <a href="http://jonearley.net/">Jon Earley</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
 		</div> <!-- end span -->
 	</div> <!-- end line -->
+</div>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
@@ -207,7 +260,9 @@ $(document).ready(function() {
 
 	$(".feedback").hide();
 
-	$("#feedback-trigger").click(function() {
+	$("#feedback-trigger").click(function(e) {
+
+		e.preventDefault();
 
 		$(".feedback").slideToggle(400);
 
