@@ -29,7 +29,7 @@
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 
-	<div class="lib-form" style="margin-top: 1em; max-width: 90%; align: center;">
+	<div class="lib-form" style="margin-top: 1em; max-width: 90%; margin: 0 auto;">
 		<form method="post" action="http://www.gvsu.edu/library/customemail-post.htm?keyId=9D7CB431-E6EB-A2DB-48089384265083C9">
 
 			<label for="name">Your Name:</label>
