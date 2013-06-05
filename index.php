@@ -67,20 +67,14 @@
 													WHERE i.system_id = {$row['system_id']}");
 
 					$status = '<div class="lib-success" style="margin: 0;">
-						<p>All our systems are operational.</p>
+						<p>All systems are online.</p>
 						</div>';
 
 					while ($rw = $system_result->fetch_assoc()) {
 						if ($rw['end_time'] == 0) { 
 							if ($rw['status_type_id'] == 2) { 
 								$status = '<div class="lib-error" style="margin: 0;">
-									<p>It seems we have a system outage.</p>
-									</div>';
-								break 2;
-							}
-							else {
-								$status = '<div class="lib-alert" style="margin: 0;">
-									<p>It seems we have a system wdisruption.</p>
+									<p>Uh-oh, we have a system down. You can bet that we&#8217;re working on it!</p>
 									</div>';
 								break 2;
 							}
