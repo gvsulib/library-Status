@@ -182,7 +182,7 @@
 									$cnt = 0;
 									foreach(range(0,5) as $cnt) {
 										echo '<td style="text-align: center">';
-										echo '<img alt="' . $rw['status_type_text'] . 'src="resources/img/checkmark.png">';
+										echo '<img alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark.png">';
 										echo '</td>';
 									}
 
@@ -196,7 +196,6 @@
 
 										echo'<td style="text-align: center">';
 
-										$day_status = '<img  alt="' . $rw['status_type_text'] . ' src="resources/img/checkmark.png">';
 
 										$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
 																FROM issue_entries i
@@ -208,17 +207,20 @@
 											$start_day = date('Ymd', $rw['start_time']);
 											$end_day = date('Ymd', $rw['end_time']);
 
+											// Moved inside the while loop for the alt tags
+											$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark.png">';
+
 											if ((( ($day-$cnt) >= $start_day) && ($rw['end_time'] == 0)) || 
 												(( ($day-$cnt) >= $start_day && ($day-$cnt-1) <= $end_day))) {
 
 												echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" style = "text-decoration: none;">';
 
 												if ($rw['status_type_id'] == 2) {
-													$day_status = '<b style= "color: red" title="' . $rw['status_type_text'] . '"">X</b>';
+													$day_status = '<b style= "color: red" title="' . $rw['status_type_text'] . '">X</b>';
 												}
 
 												else {
-													$day_status = '<img  alt="' . $rw['status_type_text'] . ' src="resources/img/checkmark-yellow.png">';
+													$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark-yellow.png">';
 												}
 											}
 										}
