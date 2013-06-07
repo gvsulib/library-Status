@@ -155,16 +155,17 @@
 								FROM issue_entries i, status_type s
 								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id");
 	
-								$currently = ' color: #149811">online'; // currently displayed
+								$currently = ' color: #147D11">Online'; // currently displayed. Color difference is WCAG2 AA compliant
 
 								// Display Day
 								while ($rw = $system_result->fetch_assoc()) {
 									if ($rw['end_time'] == 0) { 
 										if ($rw['status_type_id'] == 2) { 
-											$currently = ' color: red"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: red;">'.$rw['status_type_text'].'</a>';
+											// Color difference is WCAG2 AA compliant
+											$currently = '"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: #cb0000;">'.$rw['status_type_text'].'</a>';
 										}
 										else {
-											$currently = ' color: orange"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: orange;">'.$rw['status_type_text'].'</a>';
+											$currently = '"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: #147D11;">'.$rw['status_type_text'].'</a>';
 										}
 									}
 								}
@@ -220,7 +221,7 @@
 												}
 
 												else {
-													$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark-yellow.png">';
+													$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/minorissue.png">';
 												}
 											}
 										}
