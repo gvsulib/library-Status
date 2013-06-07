@@ -151,9 +151,9 @@
 								echo '<td style="text-align: right ">' . $row["system_name"] . '</td> ';
 								echo '<td class = "col2 name" style="text-align: center;';
 
-								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
-																FROM issue_entries i
-																WHERE i.system_id = {$row['system_id']}");
+								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text
+								FROM issue_entries i, status_type s
+								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id");
 	
 								$currently = ' color: #149811">online'; // currently displayed
 
@@ -161,10 +161,10 @@
 								while ($rw = $system_result->fetch_assoc()) {
 									if ($rw['end_time'] == 0) { 
 										if ($rw['status_type_id'] == 2) { 
-											$currently = ' color: red"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: red;">outage</a>';
+											$currently = ' color: red"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: red;">'.$rw['status_type_text'].'</a>';
 										}
 										else {
-											$currently = ' color: orange"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: orange;">Minor Issue</a>';
+											$currently = ' color: orange"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: orange;">'.$rw['status_type_text'].'</a>';
 										}
 									}
 								}
