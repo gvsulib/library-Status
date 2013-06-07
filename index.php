@@ -198,9 +198,9 @@
 										echo'<td style="text-align: center">';
 
 
-										$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
-																FROM issue_entries i
-																WHERE i.system_id = {$row['system_id']}");
+										$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text
+								FROM issue_entries i, status_type s
+								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id");
 
 										// Display Day
 										while ($rw = $system_result->fetch_assoc()) {
@@ -217,11 +217,11 @@
 												echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" style = "text-decoration: none;">';
 
 												if ($rw['status_type_id'] == 2) {
-													$day_status = '<b style= "color: red" title="' . $rw['status_type_text'] . '">X</b>';
+													$day_status = '<b style= "color: red" title="' . $rw['status_type_text'] . '">X</b>';	
 												}
 
 												else {
-													$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/minorissue.png">';
+													$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/minorissue.png" style="position:relative;top:.1em;">';
 												}
 											}
 										}
