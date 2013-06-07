@@ -164,7 +164,7 @@
 											$currently = ' color: red"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: red;">outage</a>';
 										}
 										else {
-											$currently = ' color: orange"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: orange;">Disruption</a>';
+											$currently = ' color: orange"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: orange;">Minor Issue</a>';
 										}
 									}
 								}
