@@ -40,7 +40,7 @@ $result = $db->query("SELECT s.status_id, s.status_id, s.status_timestamp, s.sta
 	
 	if($result) {
 
-		$obj = $result->fetch_object();
+		while($obj = $result->fetch_object()) {
 
 		// Add the entry to the feed
 
@@ -54,6 +54,7 @@ echo '<item>
 </item>
 ';		
 
+		}
 	}
 
 	
