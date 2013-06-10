@@ -243,6 +243,12 @@
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 
+	<div class="line break">
+		<div class="span1 unit">
+			<p class="right">Subscribe: <a href="http://feeds.feedburner.com/gvsulibstatus" title="Subscribe to the RSS feed">RSS</a> | <a href="http://feedburner.google.com/fb/a/mailverify?uri=gvsulibstatus&amp;loc=en_US" title="Subscribe to updates via Email">Email</a>
+		</div>
+	</div>
+
 	<div class="line break footer">
 		<div class="span1 unit break">
 			<p>Written by <a href="http://jonearley.net/">Jon Earley</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
