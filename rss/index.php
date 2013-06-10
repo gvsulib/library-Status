@@ -44,8 +44,8 @@ $result = $db->query("SELECT s.status_id, s.status_id, s.status_timestamp, s.sta
 
 		// Add the entry to the feed
 
-echo "<item> 
-<title>$obj->status_type_text for $obj->system_name</title>
+echo '<item> 
+<title>' . $obj->status_type_text . ' for ' . $obj->system_name . '</title>
 <link>http://labs.library.gvsu.edu/status/detail.php?system_id=' . $obj->system_id . '&amp;day=' . date("Ymd", $obj->status_timestamp) . '</link>
 <description><![CDATA[' . Markdown($obj->status_text) . ']]></description>
 <author>' . $obj->user_email . ' (' . $obj->user_fn . ' ' . $obj->user_ln . ')</author>
