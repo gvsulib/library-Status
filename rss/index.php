@@ -47,7 +47,7 @@ $result = $db->query("SELECT s.status_id, s.status_id, s.status_timestamp, s.sta
 echo '<item> 
 <title>' . $obj->status_type_text . ' for ' . $obj->system_name . '</title>
 <link>http://labs.library.gvsu.edu/status/detail.php?system_id=' . $obj->system_id . '&amp;day=' . date("Ymd", $obj->status_timestamp) . '</link>
-<description><![CDATA[' . Markdown($obj->status_text) . ']]></description>
+<description><![CDATA[' . $obj->status_text . ']]></description>
 <author>' . $obj->user_email . ' (' . $obj->user_fn . ' ' . $obj->user_ln . ')</author>
 <pubDate>' . date('D, d M Y g:i:s O', $obj->status_timestamp) . '</pubDate>
 <guid>http://labs.library.gvsu.edu/status/detail.php?system_id=' . $obj->system_id . '&amp;day=' . date("Ymd", $obj->status_timestamp) . '</guid> 
