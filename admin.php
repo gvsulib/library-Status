@@ -206,10 +206,12 @@ To show to not-logged-in users, look for $logged_in == 0;
 					</select>
 				</div>
 
+				<div style="float: right">
+					
+					<label style="overflow:auto; padding-top: .2em; ">When:</label>
 
-				<div class="right">
-					<label>When:</label>
-					<input type="text" name="when" value = "Now" style="font-size: 1em; font">
+					<input type="text" name="when" value = "Now" style="width: 70%; font-size: .8em; font; color: #575757; float: right">
+
 				</div>
 
 
