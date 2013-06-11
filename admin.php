@@ -54,7 +54,13 @@
 				$system_id = $_POST['system_id'];
 				$status_type_id = $_POST['status_type_id'];
 
-				$now = time();
+				// If scheduled time chosen
+				if ($_POST['when'] != 'Now') { 
+					$now = strtotime($_POST['when']);
+					echo 'WHEN: ' . $_POST['when'];
+				} else { 
+					$now = time();
+				}
 
 				// Create new issue
 				$db->query("INSERT INTO issue_entries
@@ -70,7 +76,7 @@
 			// Inside the loop so you can't submit without being logged in
 			if ($_POST['submit_status']) {
 
-				echo "We are trying here";
+				//echo "We are trying here";
 
 				$issue_id = $_POST['issue_id'];
 				$status_type_id = $_POST['status_type_id'];
@@ -199,6 +205,13 @@ To show to not-logged-in users, look for $logged_in == 0;
 
 					</select>
 				</div>
+
+
+				<div class="right">
+					<label>When:</label>
+					<input type="text" name="when" value = "Now" style="font-size: 1em; font">
+				</div>
+
 
 				<div class = "span1 unit" style="float: left; padding-top: 1em">
 					<textarea style="font-size: 1em" name="issue_text" placeholder="Describe issue..."></textarea>
