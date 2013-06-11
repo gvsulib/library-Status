@@ -162,10 +162,10 @@
 									if ($rw['end_time'] == 0) { 
 										if ($rw['status_type_id'] == 2) { 
 											// Color difference is WCAG2 AA compliant
-											$currently = '"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: #cb0000;">'.$rw['status_type_text'].'</a>';
+											$currently = '"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day) .'" style = "text-decoration: none; color: #cb0000;">'.$rw['status_type_text'].'</a>';
 										}
 										else {
-											$currently = '"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt-1) .'" style = "text-decoration: none; color: #147D11;">'.$rw['status_type_text'].'</a>';
+											$currently = '"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day) .'" style = "text-decoration: none; color: #147D11;">'.$rw['status_type_text'].'</a>';
 										}
 									}
 								}
@@ -199,8 +199,8 @@
 
 
 										$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text
-								FROM issue_entries i, status_type s
-								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id");
+											FROM issue_entries i, status_type s
+											WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id");
 
 										// Display Day
 										while ($rw = $system_result->fetch_assoc()) {

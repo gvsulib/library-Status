@@ -66,96 +66,111 @@
 			<?php
 
 			echo '<h4>System Details</h4>';
+			echo '<span class="">' . date('M d, Y', strtotime($day)) . '</span>'; 
 
-			$issue_result = $db->query("SELECT issue_entries.issue_id FROM issue_entries WHERE issue_entries.system_id = $system_id ORDER BY issue_entries.issue_id DESC") or die(mysqli_error());
 
+
+			$issue_result = $db->query("SELECT issue_entries.start_time, issue_entries.end_time, issue_entries.issue_id FROM issue_entries WHERE issue_entries.system_id = $system_id ORDER BY issue_entries.issue_id DESC") or die(mysqli_error());
+
+			// loop issue's on day
 			while ($issue_entries = $issue_result->fetch_assoc()) {
 
-				$result = $db->query("SELECT s.status_id, s.issue_id, s.status_timestamp, s.status_public, s.status_user_id, s.status_text, s.status_delete, u.user_id, u.user_fn, u.user_ln, st.status_type_id, st.status_type_text
-					FROM status_entries s, user u, status_type st
-					WHERE s.issue_id = '{$issue_entries['issue_id']}' AND s.status_user_id = u.user_id AND s.status_type_id = st.status_type_id
-					ORDER BY s.status_timestamp ASC") or die(mysqli_error());
-
-				$num_rows = $result->num_rows;
-				$issue_id = $status_entries['issue_id'];
-
-				$rc = 0;
-
-				// display issues and check for comments
-				while ($status_entries = $result->fetch_assoc()) {
-
-					$rc++;
-
-					// first post
-					if ($rc == 1) {
-
-						echo '
-						<!-- Issue -->
-						<div class = "line">
-							<div class="issue-box">
-								<div class="span1 unit issue">
-									<div style="float: left;">
-										<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
-										<p class="time">' . date("D g:i a - n/j/y", $status_entries['status_timestamp']) . '</p>
-									</div>
-									<div style="float: right;">
-										<p class="name tag-system">' . $system_name . '</p>';
-										
-										if ($status_entries['status_type_text'] == 'Outage') {
-											echo '<p class="name tag-outage">' . $status_entries['status_type_text'] . '</p>';
-										} else if ($status_entries['status_type_text'] == 'Disruption') {
-											echo '<p class="name tag-disruption">' . $status_entries['status_type_text'] . '</p>';
-										} else {
-											echo '<p class="name tag-resolution">' . $status_entries['status_type_text'] . '</p>';
-										}
-
-										echo '
-									</div>
-									<p class="comment-text">' . $status_entries['status_text'] . '</p>
-								</div> <!-- end span --> ';
-
-								//echo '<br>ISSUE ID: ' . $status_entries['issue_id'];
-								//echo '<br>STATUS TYPE ID: ' . $status_entries['status_type_id'];
+				$issue_id = $issue_entries['issue_id'];
+				$start_day = date('Ymd', $issue_entries['start_time']);
+				$end_day = date('Ymd', $issue_entries['end_time']);
 
 
-					// list last comment
-					} else if ($num_rows = $rc) {
-						echo '
-						<div class="span1 unit comment-box">
-							<div style="float: left;">
-								<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
-								<p class="time">' . date("D g:i a - n/j/y", $status_entries["status_timestamp"]) . '</p>
-							</div>
-							<div style="float: right;">';
-								
-								if ($status_entries['status_type_id'] == '3') {
-									echo '<p class="name tag-resolution" style="margin-right: 1.3em">Resolved</p>';
-								}
 
-								echo '
-							</div>
-							<p class ="comment-text">' . $status_entries['status_text'] . '</p>
-						</div> <!-- end span --> ';
+				// only generate issues for specific day
+				if ((($day >= $start_day) && ($issue_entries['end_time'] == '0')) ||
+				    (($day >= $start_day) && ($day <= $end_day))) {
 
-					} else if ($num_rows >= 2) {
-						echo '
-						<div class="span1 unit comment-box">
-							<div style="float: left;">
-								<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
-								<p class="time">' . date("D g:i a - n/j/y", $status_entries["status_timestamp"]) . '</p>
-							</div>
-							<p class ="comment-text">' . $status_entries['status_text'] . '</p>
-						</div> <!-- end span --> ';
-					}
 
-				} // close status loop
+					$result = $db->query("SELECT s.status_id, s.issue_id, s.status_timestamp, s.status_public, s.status_user_id, s.status_text, s.status_delete, u.user_id, u.user_fn, u.user_ln, st.status_type_id, st.status_type_text
+						FROM status_entries s, user u, status_type st
+						WHERE s.issue_id = '{$issue_entries['issue_id']}' AND s.status_user_id = u.user_id AND s.status_type_id = st.status_type_id
+						ORDER BY s.status_timestamp ASC") or die(mysqli_error());
 
-				// close comment wrapper
-					echo '</div>';
+					$num_rows = $result->num_rows;
+					
+					$rc = 0;
 
-				echo '
+					// display issues and check for comments
+					while ($status_entries = $result->fetch_assoc()) {
+
+						$rc++;
+
+						// first post
+						if ($rc == 1) {
+
+							echo '
+							<!-- Issue -->
+							<div class = "line">
+								<div class="issue-box">
+									<div class="span1 unit issue">
+										<div style="float: left;">
+											<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
+											<p class="time">' . date("D g:i a - n/j/y", $status_entries['status_timestamp']) . '</p>
+										</div>
+										<div style="float: right;">
+											<p class="name tag-system">' . $system_name . '</p>';
+											
+											if ($status_entries['status_type_text'] == 'Outage') {
+												echo '<p class="name tag-outage">' . $status_entries['status_type_text'] . '</p>';
+											} else if ($status_entries['status_type_text'] == 'Disruption') {
+												echo '<p class="name tag-disruption">' . $status_entries['status_type_text'] . '</p>';
+											} else {
+												echo '<p class="name tag-resolution">' . $status_entries['status_type_text'] . '</p>';
+											}
+
+											echo '
+										</div>
+										<p class="comment-text">' . $status_entries['status_text'] . '</p>
+									</div> <!-- end span --> ';
+
+									//echo '<br>ISSUE ID: ' . $status_entries['issue_id'];
+									//echo '<br>STATUS TYPE ID: ' . $status_entries['status_type_id'];
+
+
+						// list last comment
+						} else if ($num_rows = $rc) {
+							echo '
+							<div class="span1 unit comment-box">
+								<div style="float: left;">
+									<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
+									<p class="time">' . date("D g:i a - n/j/y", $status_entries["status_timestamp"]) . '</p>
+								</div>
+								<div style="float: right;">';
+									
+									if ($status_entries['status_type_id'] == '3') {
+										echo '<p class="name tag-resolution" style="margin-right: 1.3em">Resolved</p>';
+									}
+
+									echo '
+								</div>
+								<p class ="comment-text">' . $status_entries['status_text'] . '</p>
+							</div> <!-- end span --> ';
+
+						} else if ($num_rows >= 2) {
+							echo '
+							<div class="span1 unit comment-box">
+								<div style="float: left;">
+									<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
+									<p class="time">' . date("D g:i a - n/j/y", $status_entries["status_timestamp"]) . '</p>
+								</div>
+								<p class ="comment-text">' . $status_entries['status_text'] . '</p>
+							</div> <!-- end span --> ';
+						}
+
+					} // close status loop
+
+					// close comment wrapper
+
+					echo '
 							</div> 
 						</div> <!-- close issue line -->';
+
+				}
 
 			} // close issue loop
 
