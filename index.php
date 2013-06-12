@@ -244,7 +244,19 @@
 	</div> <!-- end line -->
 
 	<div class="line break">
-		<div class="span1 unit">
+		<div class="left unit span2">
+
+			<p>
+
+			<img alt="Online" src="resources/img/checkmark.png"> Online
+
+			<img alt="Minor Issue" src="resources/img/minorissue.png" style="padding-left: 1em;"> Minor Issue
+
+			<b style= "color: red; padding-left: 1em;" title="' . $rw['status_type_text'] . '">X</b> Outage</p>
+
+		</div>
+
+		<div class="left unit span2">
 			<p class="right">Subscribe: <a href="http://feeds.feedburner.com/gvsulibstatus" title="Subscribe to the RSS feed">RSS</a> | <a href="http://feedburner.google.com/fb/a/mailverify?uri=gvsulibstatus&amp;loc=en_US" title="Subscribe to updates via Email">Email</a>
 		</div>
 	</div>
