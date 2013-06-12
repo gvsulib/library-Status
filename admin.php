@@ -57,7 +57,6 @@
 				// If scheduled time chosen
 				if ($_POST['when'] != 'Now') { 
 					$now = strtotime($_POST['when']);
-					echo 'WHEN: ' . $_POST['when'];
 				} else { 
 					$now = time();
 				}
