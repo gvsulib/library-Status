@@ -216,7 +216,7 @@ To show to not-logged-in users, look for $logged_in == 0;
 					</style>
 					
 					<label style="padding-top: .2em; ">When:</label>
-					<input type="text" name="when" value = "Now" style="width: 70%; font-size: .8em; font; color: #575757; float: right">
+					<input type="text" name="when" value = "Now" style="width: 70%; font-size: .8em; font; color: #575757; display: inline">
 
 				</div>
 
