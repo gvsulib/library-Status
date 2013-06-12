@@ -10,6 +10,11 @@ h4 {
 	-webkit-margin-after: .6em;
 }
 
+.when_box { clear: left; float: none; }
+
+	@media screen and (min-width: 725px) {
+		.when_box { clear: none; float: right;}
+	}
 
 .unit {
 	padding: 0px;

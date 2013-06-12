@@ -80,7 +80,6 @@
 				$end_day = date('Ymd', $issue_entries['end_time']);
 
 
-
 				// only generate issues for specific day
 				if ((($day >= $start_day) && ($issue_entries['end_time'] == '0')) ||
 				    (($day >= $start_day) && ($day <= $end_day))) {

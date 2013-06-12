@@ -153,7 +153,6 @@ To show to not-logged-in users, look for $logged_in == 0;
 
 <?php 
 	if($logged_in != 1) {
-
 ?>
 	<div class="line">
 		<div class="span1 unit">
@@ -206,10 +205,17 @@ To show to not-logged-in users, look for $logged_in == 0;
 					</select>
 				</div>
 
-				<div style="float: right">
-					
-					<label style="overflow:auto; padding-top: .2em; ">When:</label>
+				<div class="when_box">
 
+					<style>
+					.when_box { clear: left; float: none; }
+
+					@media screen and (min-width: 725px) {
+						.when_box { clear: none; float: right;}
+					}		
+					</style>
+					
+					<label style="padding-top: .2em; ">When:</label>
 					<input type="text" name="when" value = "Now" style="width: 70%; font-size: .8em; font; color: #575757; float: right">
 
 				</div>
