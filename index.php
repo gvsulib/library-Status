@@ -58,13 +58,15 @@
 			<?php 
 
 				$result = $db->query("SELECT * FROM systems ORDER BY system_name ASC");
+				$now = time();
 
 				while($row = $result->fetch_assoc())
 				{
 
 					$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
 													FROM issue_entries i
-													WHERE i.system_id = {$row['system_id']}");
+													WHERE i.system_id = {$row['system_id']}
+													AND i.start_time > '$now'");
 
 					$status = '<div class="lib-success" style="margin: 0;">
 						<p>All systems are online.</p>
