@@ -73,7 +73,9 @@
 						</div>';
 
 					while ($rw = $system_result->fetch_assoc()) {
-						if ($rw['end_time'] == 0) { 
+
+						// Check if there is a resolution or if a scheduled resolution has not happened yet
+						if (($rw['end_time'] == 0) || ($rw['end_time'] > $now)) { 
 							if ($rw['status_type_id'] == 2) { 
 								$status = '<div class="lib-error" style="margin: 0;">
 									<p>Uh-oh, we have a system down. You can bet that we&#8217;re working on it!</p>
@@ -162,7 +164,9 @@
 
 								// Display Day
 								while ($rw = $system_result->fetch_assoc()) {
-									if ($rw['end_time'] == 0) { 
+
+									// Check if there is no resolution or a scheduled resolution is still in the future
+									if (($rw['end_time'] == 0) || ($rw['end_time'] > $now)) { 
 										if ($rw['status_type_id'] == 2) { 
 											// Color difference is WCAG2 AA compliant
 											$currently = '"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day) .'" style = "text-decoration: none; color: #cb0000;">'.$rw['status_type_text'].'</a>';
