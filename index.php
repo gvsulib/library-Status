@@ -222,9 +222,10 @@
 											if ((( ($day-$cnt) >= $start_day) && (($rw['end_time'] == 0) || ($rw['end_time'] > $now))) || 
 												(( ($day-$cnt) >= $start_day && ($day-$cnt-1) <= $end_day))) {
 
-												echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" style = "text-decoration: none;">';
+												echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" data-type="' . $rw['status_type_id'] . '" style = "text-decoration: none;">';
 
 												if ($rw['status_type_id'] == 2) {
+
 													$day_status = '<b style= "color: red" title="' . $rw['status_type_text'] . '">X</b>';	
 												}
 
