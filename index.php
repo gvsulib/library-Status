@@ -226,11 +226,12 @@
 
 												if ($rw['status_type_id'] == 2) {
 
-													$day_status = '<b style= "color: red" title="' . $rw['status_type_text'] . '">X</b>';	
+													$day_status = '<b style= "color: red" title="' . $rw['status_type_text'] . '">X</b></a>';	
 												}
 
 												else {
-													$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/minorissue.png" style="position:relative;top:.1em;">';
+
+													$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/minorissue.png" style="position:relative;top:.1em;"></a>';
 												}
 											}
 										}
