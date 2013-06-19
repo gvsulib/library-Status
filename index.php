@@ -145,6 +145,7 @@
 						<?php
 
 							$result = $db->query("SELECT * FROM systems ORDER BY system_name ASC");
+							$now = time();
 
 							// loop through each system
 							while($row = $result->fetch_assoc())
@@ -155,7 +156,7 @@
 
 								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text
 								FROM issue_entries i, status_type s
-								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id");
+								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id AND i.start_time < '$now'");
 	
 								$currently = ' color: #147D11">Online'; // currently displayed. Color difference is WCAG2 AA compliant
 
