@@ -66,7 +66,7 @@
 					$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
 													FROM issue_entries i
 													WHERE i.system_id = {$row['system_id']}
-													AND i.start_time > '$now'");
+													AND i.start_time < '$now'");
 
 					$status = '<div class="lib-success" style="margin: 0;">
 						<p>All systems are online.</p>
