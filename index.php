@@ -214,11 +214,12 @@
 							
 											$start_day = date('Ymd', $rw['start_time']);
 											$end_day = date('Ymd', $rw['end_time']);
+											$now = time();
 
 											// Moved inside the while loop for the alt tags
 											$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark.png">';
 
-											if ((( ($day-$cnt) >= $start_day) && ($rw['end_time'] == 0)) || 
+											if ((( ($day-$cnt) >= $start_day) && (($rw['end_time'] == 0) || ($rw['end_time'] > $now)) || 
 												(( ($day-$cnt) >= $start_day && ($day-$cnt-1) <= $end_day))) {
 
 												echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" style = "text-decoration: none;">';
