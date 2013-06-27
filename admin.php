@@ -294,7 +294,7 @@ To show to not-logged-in users, look for $logged_in == 0;
 
 										echo '
 									</div>
-									<p class="comment-text">' . Markdown($status_entries['status_text']) . '</p>
+									<div class="comment-text">' . Markdown($status_entries['status_text']) . '</div>
 								</div> <!-- end span --> ';
 
 								//echo '<br>ISSUE ID: ' . $status_entries['issue_id'];
@@ -352,7 +352,7 @@ To show to not-logged-in users, look for $logged_in == 0;
 										<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
 										<p class="time">' . date("D g:i a - n/j/y", $status_entries["status_timestamp"]) . '</p>
 									</div>
-									<p class ="comment-text">' . Markdown($status_entries['status_text']) . '</p>
+									<div class ="comment-text">' . Markdown($status_entries['status_text']) . '</div>
 								</div> <!-- end span --> ';
 
 

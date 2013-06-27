@@ -126,7 +126,7 @@
 
 											echo '
 										</div>
-										<p class="comment-text">' . Markdown($status_entries['status_text']) . '</p>
+										<div class="comment-text">' . Markdown($status_entries['status_text']) . '</div>
 									</div> <!-- end span --> ';
 
 									//echo '<br>ISSUE ID: ' . $status_entries['issue_id'];
@@ -149,7 +149,7 @@
 
 									echo '
 								</div>
-								<p class ="comment-text">' . Markdown($status_entries['status_text']) . '</p>
+								<div class ="comment-text">' . Markdown($status_entries['status_text']) . '</div>
 							</div> <!-- end span --> ';
 
 						} else if ($num_rows >= 2) {
