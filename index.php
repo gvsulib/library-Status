@@ -216,6 +216,8 @@
 											$end_day = date('Ymd', $rw['end_time']);
 											$now = time();
 
+											echo '<!-- End day: ' . $end_day . ' -->';
+
 											// Moved inside the while loop for the alt tags
 											$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark.png">';
 
