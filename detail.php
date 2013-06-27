@@ -19,6 +19,8 @@
 		$system_name = $row['system_name'];
 	}
 
+	include ('resources/php/markdown.php');
+
 ?>
 
 
@@ -124,7 +126,7 @@
 
 											echo '
 										</div>
-										<p class="comment-text">' . $status_entries['status_text'] . '</p>
+										<p class="comment-text">' . Markdown($status_entries['status_text']) . '</p>
 									</div> <!-- end span --> ';
 
 									//echo '<br>ISSUE ID: ' . $status_entries['issue_id'];
@@ -147,7 +149,7 @@
 
 									echo '
 								</div>
-								<p class ="comment-text">' . $status_entries['status_text'] . '</p>
+								<p class ="comment-text">' . Markdown($status_entries['status_text']) . '</p>
 							</div> <!-- end span --> ';
 
 						} else if ($num_rows >= 2) {
