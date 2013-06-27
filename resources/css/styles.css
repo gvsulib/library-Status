@@ -208,14 +208,14 @@ a.lib-button-wide { color: #fff !important;}
 .lib-horizontal-list ul {font-size:.95em;margin-bottom:1em;}
 .lib-horizontal-list ul li {float:left;margin:1em 1em 0 0;padding:0 .7em 0 0;}
 
-ul.bullet-list,
-ol.number-list,
+.comment-text ul,
+.comment-text ol,
 dl.def-list {color:#555;margin-bottom:1.5em;line-height:1.4em;}
-ul.bullet-list{list-style-type:disc;padding-left:1.8em;}
-ol.number-list {list-style-type:decimal;padding-left:1.8em;}
+.comment-text ul {list-style-type:disc;padding-left:1.8em;}
+.comment-text ol {list-style-type:decimal;padding-left:1.8em;}
 
-.ul.bullet-list li,
-.ol.number-list li {margin:.5em 0;}
+.comment-text ul li,
+.comment-text ol li {margin:.5em 0;}
 
 .def-list dt {font-weight:bold;margin-top:.8em;color:#222;}
 .def-list dd {margin-bottom:.7em;border-left:.3em solid #dedede;padding-left:.5em;}
