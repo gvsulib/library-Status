@@ -222,7 +222,7 @@
 											$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark.png">';
 
 											if ((( ($day-$cnt) >= $start_day) && (($rw['end_time'] == 0) || ($rw['end_time'] > $now))) || 
-												(( ($day-$cnt) >= $start_day && ($day-$cnt-1) <= $end_day))) {
+												(( ($day-$cnt) >= $start_day && ($day-$cnt) <= $end_day))) {
 
 												$day_status = '<img alt="' . $rw['status_type_text'] . '" src="resources/img/minorissue.png" style="position:relative;top:.1em;"></a>';
 
