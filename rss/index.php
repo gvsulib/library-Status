@@ -14,15 +14,15 @@ date_default_timezone_set('America/Detroit');
 
 
 header("Content-type: text/xml"); 
-echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?> 
-<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">
+echo '<?xml version="1.0" encoding="UTF-8"?> 
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
 <channel>
 <title>GVSU University Libraries System Status</title>
 <link>http://gvsu.edu/library/status</link>
 <description>Current state of all online systems at Grand Valley State University Libraries</description>
 <language>en-us</language>
-<atom:link href=\"http://labs.library.gvsu.edu/status/rss\" rel=\"self\" type=\"application/rss+xml\" />
-"; 
+<atom:link href="http://labs.library.gvsu.edu/status/rss" rel="self" type="application/rss+xml" />
+'; 
 
 // Grab the last 10 status entries. 
 $result = $db->query("SELECT s.status_id, s.status_id, s.status_timestamp, s.status_text,
