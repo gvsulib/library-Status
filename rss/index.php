@@ -49,7 +49,7 @@ $result = $db->query("SELECT s.status_id, s.status_id, s.status_timestamp, s.sta
 echo '<item> 
 <title>' . $obj->status_type_text . ' for ' . $obj->system_name . '</title>
 <link>http://labs.library.gvsu.edu/status/detail.php?system_id=' . $obj->system_id . '&amp;day=' . date("Ymd", $obj->status_timestamp) . '</link>
-<description>' . $obj->status_text . '</description>
+<description>' . $description. '</description>
 <content:encoded><![CDATA[' . Markdown($obj->status_text) . ']]></content:encoded>
 <author>' . $obj->user_email . ' (' . $obj->user_fn . ' ' . $obj->user_ln . ')</author>
 <pubDate>' . date('D, d M Y g:i:s O', $obj->status_timestamp) . '</pubDate>
