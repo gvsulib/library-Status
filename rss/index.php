@@ -38,7 +38,7 @@ $result = $db->query("SELECT s.status_id, s.status_id, s.status_timestamp, s.sta
 					 AND s.status_type_id = st.status_type_id
 					 AND s.issue_id = ie.issue_id
 					 AND sy.system_id = ie.system_id
-					 AND s.status_timestamp > '$now'
+					 AND s.status_timestamp < '$now'
 					 ORDER BY status_timestamp DESC LIMIT 10");
 	
 	if($result) {
