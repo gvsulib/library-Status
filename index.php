@@ -48,7 +48,9 @@
 		</div> <!-- end span -->
 
 		<div class="span3 unit left login">
+
 			<?php echo '<p>' . (isset($_SESSION['username']) ? '<a href="?logout" title="Log out">Log out</a></p>' : '<a href="admin.php" title="Log in">Log in</a></p>'); ?>
+
 		</div>
 	</div> <!-- end line -->
 
@@ -57,7 +59,7 @@
 
 			<?php 
 
-				$result = $db->query("SELECT * FROM systems ORDER BY system_name ASC");
+				$result = $db->query("SELECT * FROM systems ORDER BY system_category ASC, system_name ASC");
 				$now = time();
 
 				while($row = $result->fetch_assoc())
@@ -131,27 +133,83 @@
 								<th colspan="9">Library Status</th>
 							</tr>
 
-							<tr colspan="9" class="lib-row-headings name">
-								<th style="text-align: right" >System</th>
-								<th style="text-align: center">Currently</th>
-
-								<?php foreach(range(0,5) as $cnt) {
-										echo  '<th style="text-align: center;">' . date("M d", mktime(0, 0, 0, date("m")  , date("d")-$cnt, date("Y")))
-										. '</th>';
-										
-									}?>
-							</tr>
-						</thead>
 
 						<!-- load system names -->
 						<?php
 
-							$result = $db->query("SELECT * FROM systems ORDER BY system_name ASC");
+							$table_cnt = 0;
+							$system_category_cnt = 0;
+
+							$result = $db->query("SELECT * FROM systems ORDER BY system_category ASC, system_name ASC");
 							$now = time();
 
 							// loop through each system
 							while($row = $result->fetch_assoc())
-							{
+							{	
+
+								// Load multiple tables
+								if ($row["system_category"] == 1) {
+									if ($table_cnt == 0) {
+
+										// Close previous table
+										echo '</tbody>
+										</table>';
+
+										// Start new table
+										echo '<div class="lib-table" style="margin-top: 1.5em; margin-bottom: 1em;">
+											<table>	
+												<tbody>
+
+													<thead>
+														<tr>
+															<th colspan="9">Building</th>
+														</tr>';
+
+
+										?>
+
+										<tr colspan="9" class="lib-row-headings name">
+										<th style="text-align: right">Area</th>
+										<th style="text-align: center">Currently</th>
+
+										<?php foreach(range(0,5) as $cnt) {
+										echo  '<th style="text-align: center;">' . date("M d", mktime(0, 0, 0, date("m")  , date("d")-$cnt, date("Y")))
+											. '</th>';
+											
+										}?>
+
+
+										<?php
+									}
+
+									$table_cnt++;
+								}
+
+
+								if ($system_category_cnt == 0) {
+
+								?>
+									<tr colspan="9" class="lib-row-headings name">
+									<th style="text-align: right">System</th>
+									<th style="text-align: center">Currently</th>
+
+									<?php foreach(range(0,5) as $cnt) {
+										echo  '<th style="text-align: center;">' . date("M d", mktime(0, 0, 0, date("m")  , date("d")-$cnt, date("Y")))
+											. '</th>';
+											
+									}?>
+
+									</tr>
+									</thead>
+
+								<?php
+
+								}
+
+								$system_category_cnt++;
+
+
+
 								echo '<tr>';
 								echo '<td style="text-align: right ">' . $row["system_name"] . '</td> ';
 								echo '<td class = "col2 name" style="text-align: center;';
@@ -300,4 +358,3 @@ $(document).ready(function() {
 </body>
 
 </html>
-

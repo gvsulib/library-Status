@@ -15,7 +15,9 @@
 
 	$logged_in = 0; // By default, user is logged out
 
-	// Debug
+	// User Debug
+	//$_SESSION['username'] = 'dewindl';
+	//$_SESSION['username'] = 'durhamja';
 	//$_SESSION['username'] = 'earleyj';
 
 	if(isset($_SESSION['username'])) { // User has logged in
@@ -33,7 +35,18 @@
 
 		if(($user_result) && ($user_result->num_rows > 0)) { // Query was successful, a user was found
 
-			$logged_in = 1; // Boolean to know if 
+
+			while($row = $user_result->fetch_assoc()) {
+				$user_access = $row["user_access"];
+				$user_id = $row["user_id"];
+
+				echo 'username: ' . $username;
+				echo '<br>user_id: ' . $user_id;
+				echo '<br>user_access: ' . $user_access;
+			}
+
+
+			$logged_in = 1;
 
 			// Create the user object as $user.
 			// User id is then $loggedin_user->user_id
@@ -44,13 +57,33 @@
 				$all_issues = 1;
 				$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC";
 			} else {
+
+				// Display in all issues descending
+				if ($user_access == 9) {
+					$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
+
+				// Display Systems first
+				} else if ($user_access == 1) {
+					$issue_query = "SELECT i.issue_id, s.system_name, i.end_time, s.system_category
+						FROM issue_entries i, systems s
+						WHERE i.system_id = s.system_id AND (i.end_time BETWEEN 0 AND 0)
+						ORDER BY s.system_category ASC, i.issue_id DESC";
+
+				// Display Buildings first
+				} else if ($user_access == 2) {
+					$issue_query = "SELECT i.issue_id, s.system_name, i.end_time, s.system_category
+						FROM issue_entries i, systems s
+						WHERE i.system_id = s.system_id AND (i.end_time BETWEEN 0 AND 0)
+						ORDER BY s.system_category DESC, i.issue_id DESC";
+				}
+
 				$all_issues = 0;
-				$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
 			}
 
 			// new issue post
-			// Inside the loop so you can't submit without being logged in
 			if ($_POST['submit_issue']) {
+
+				echo 'inside new issue';
 
 				$issue_text = $_POST['issue_text'];
 				$system_id = $_POST['system_id'];
@@ -68,16 +101,17 @@
 				VALUES ('','$system_id', $status_type_id, '$now', '0')");
 				$issue_id = $db->insert_id;
 
-				// Create a new status entry
+				// Create a new status entry for issue
 				$db->query("INSERT INTO status_entries
-				VALUES ('','$issue_id','$now','1','$status_type_id',$loggedin_user->user_id,'$issue_text','0')");
+				VALUES ('','$issue_id','$now','1','$status_type_id','$user_id','$issue_text','0')");
 			}
 
-			// new status post
-			// Inside the loop so you can't submit without being logged in
+			// new status post$loggedin
 			if ($_POST['submit_status']) {
 
-				//echo "We are trying here";
+				echo 'inside new status';
+
+				echo '<br>status_type_id: ' . $status_type_id;
 
 				$issue_id = $_POST['issue_id'];
 				$status_type_id = $_POST['status_type_id'];
@@ -99,7 +133,7 @@
 
 				// Create a new status entry
 				$db->query("INSERT INTO status_entries
-				VALUES ('','$issue_id','$now','1','$status_value',$loggedin_user->user_id,'$status_text','0')") or die(mysqli_error());
+				VALUES ('','$issue_id','$now','1','$status_value','$user_id','$status_text','0')") or die(mysqli_error());
 			}
 
 		} // End loop for logged in user
@@ -111,11 +145,6 @@
 
 }
 
-/*
-If you want to show something to logged-in users, check for $logged_in == 1
-
-To show to not-logged-in users, look for $logged_in == 0;
-*/
 ?>
 
 <!DOCTYPE html>
@@ -179,11 +208,19 @@ To show to not-logged-in users, look for $logged_in == 0;
 
 						<!-- load system names -->
 						<?php
-							$result = $db->query("SELECT * FROM systems");
-							while($row = $result->fetch_assoc())
-							{
+						$result = $db->query("SELECT * FROM systems");
+
+						while($row = $result->fetch_assoc())
+						{
+							// Restrict issue submission on user access limits
+							if ($user_access == 1 && $row['system_category'] == 0) {
+								echo '<option value="' . $row["system_id"] . '">' . $row["system_name"] . '</option>';
+							} else if ($user_access == 2 && $row['system_category'] == 1) {
+								echo '<option value="' . $row["system_id"] . '">' . $row["system_name"] . '</option>';
+							} else if ($user_access == 9) {
 								echo '<option value="' . $row["system_id"] . '">' . $row["system_name"] . '</option>';
 							}
+						}
 						?>
 
 					</select>
@@ -297,10 +334,9 @@ To show to not-logged-in users, look for $logged_in == 0;
 									<div class="comment-text">' . Markdown($status_entries['status_text']) . '</div>
 								</div> <!-- end span --> ';
 
-								//echo '<br>ISSUE ID: ' . $status_entries['issue_id'];
-								//echo '<br>STATUS TYPE ID: ' . $status_entries['status_type_id'];
 
 								if ($rc == $num_rows) {
+									if (($user_access-1 == $issue_entries['system_category']) || $user_access == 9) {
 									?>
 
 									<div class="span1 unit comment-box lib-form">
@@ -324,6 +360,7 @@ To show to not-logged-in users, look for $logged_in == 0;
 									</div>
 
 									<?php
+									}
 								}
 
 								// comment show/hide
@@ -358,6 +395,7 @@ To show to not-logged-in users, look for $logged_in == 0;
 
 						// Add a comment
 						if ($rc == $num_rows && $status_entries['status_type_id'] != 3) {
+							if (($user_access-1 == $issue_entries['system_category']) || $user_access == 9) {
 							?>
 
 							<div class="span1 unit comment-box lib-form">
@@ -379,6 +417,7 @@ To show to not-logged-in users, look for $logged_in == 0;
 								</form>
 							</div>
 							<?php
+							}
 						}
 					}
 
