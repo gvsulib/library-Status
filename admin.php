@@ -80,8 +80,6 @@
 			// new issue post
 			if ($_POST['submit_issue']) {
 
-				echo 'inside new issue';
-
 				$issue_text = $_POST['issue_text'];
 				$system_id = $_POST['system_id'];
 				$status_type_id = $_POST['status_type_id'];
@@ -105,8 +103,6 @@
 
 			// new status post$loggedin
 			if ($_POST['submit_status']) {
-
-				echo 'inside new status';
 
 				echo '<br>status_type_id: ' . $status_type_id;
 
