@@ -40,9 +40,6 @@
 				$user_access = $row["user_access"];
 				$user_id = $row["user_id"];
 
-				echo 'username: ' . $username;
-				echo '<br>user_id: ' . $user_id;
-				echo '<br>user_access: ' . $user_access;
 			}
 
 
