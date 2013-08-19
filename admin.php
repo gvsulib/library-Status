@@ -237,14 +237,6 @@
 				</div>
 
 				<div class="when_box">
-
-					<style>
-					.when_box { clear: left; float: none; }
-
-					@media screen and (min-width: 725px) {
-						.when_box { clear: none; float: right;}
-					}		
-					</style>
 					
 					<label style="padding-top: .2em; ">When:</label>
 					<input type="text" name="when" value = "Now" style="width: 70%; font-size: .8em; font; color: #575757; display: inline">
@@ -252,11 +244,11 @@
 				</div>
 
 
-				<div class = "span1 unit" style="float: left; padding-top: 1em">
+				<div class = "span1 unit" style="float: left; padding: 1em 0">
 					<textarea style="font-size: 1em" name="issue_text" placeholder="Describe issue..."></textarea>
 				</div>
 
-				<input class="lib-button-small-grey" style="float: left;" name="submit_issue" type="submit" value="Submit Issue" />
+				<input class="status-button" style="float: left;" name="submit_issue" type="submit" value="Submit Issue" />
 
 			</form>
 
@@ -305,7 +297,7 @@
 						echo '
 						<!-- Issue -->
 						<div class = "line">
-							<div class="issue-box">
+							<div class="issue-box" style="margin-top: 1em;">
 								<div class="span1 unit issue">
 									<div style="float: left;">
 										<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
@@ -338,11 +330,20 @@
 
 											<textarea style="margin-top: .5em; max-width: 95%; height: 2em; font-size: 1em" name="status" placeholder="Add a comment"></textarea>
 
-											<div style = "padding: .5em;">
-												<input class="lib-button-small-grey" style="float: left; margin-top: 0em;" name="submit_status" type="submit" value="Submit Status" />
+											<div style = "padding-top: .5em;">
 
-												<label style="margin-left: 1em;" class="lib-inline">Issue Resolved:</label>
+												<input class="status-button" name="submit_status" type="submit" value="Post comment" />
+
+												<label style="margin-left: 1em;" class="lib-inline resolved">Issue Resolved:</label>
 												<input type="checkbox" name="issue_resolved">
+
+												<div class="when_box" style="margin-right: 1.2em;">
+												
+													<label style="padding-top: .2em; ">When:</label>
+													<input type="text" name="when" value = "Now" style="width: 70%; font-size: .8em; font; color: #575757; display: inline">
+
+												</div>
+
 											</div>
 
 											<input type="hidden" name="issue_id" value="<?php echo $status_entries['issue_id'] ?>" />
@@ -398,7 +399,7 @@
 									<textarea style="margin-top: .5em; max-width: 95%; height: 2em; font-size: 1em" name="status" placeholder="Add a comment"></textarea>
 
 									<div style = "padding: .5em;">
-										<input class="lib-button-small-grey" style="float: left; margin-top: 0em;" name="submit_status" type="submit" value="Submit Status" />
+										<input class="status-button" style="float: left; margin-top: 0em;" name="submit_status" type="submit" value="Post comment" />
 
 										<label style="margin-left: 1em;" class="lib-inline">Issue Resolved:</label>
 										<input type="checkbox" name="issue_resolved">
@@ -435,7 +436,7 @@
 
 	</div>
 
-	<div class="line footer">
+	<div class="line footer" style="padding-bottom: 3em;">
 		<div class="span1 unit">
 			
 			<p>Written by <a href="http://jonearley.net/">Jon Earley</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>

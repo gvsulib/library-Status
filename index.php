@@ -97,26 +97,22 @@
 	</div> <!-- end line -->
 
 	<div class="line break">
-		<div class="span2 unit left">
+		<div class="span2 unit left" style="margin-bottom: 1em;">
 			<h3>Get Help</h3>
 
 			<p>We&#8217;re available to help even if you&#8217;re off campus. Stop in at <a href="http://gvsu.edu/library/directions">any location</a>, or contact us during <a href="http://gvsu.edu/library/hours">The Mary Idema Pew Library's regular hours</a>.</p>
-			<div class="lib-button-small-grey">
 
-				<a href='#' style="text-decoration: none;" onclick='window.open("https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489&identity=Librarian", "chat", "resizable=1,width=225,height=280"); return false;'><span>Chat</span></a>
-			</div>
+			<a href='#' class="status-button" style="text-decoration: none; margin-right: .5em;" onclick='window.open("https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489&identity=Librarian", "chat", "resizable=1,width=225,height=280"); return false;'><span>Chat</span></a>
 
-			<div class="lib-button-small-grey">
-				<a style="text-decoration: none;" href="mailto:library@gvsu.edu">Email</a>
-			</div>
+			<a class="status-button" style="text-decoration: none;" href="mailto:library@gvsu.edu">Email</a>
+
 		</div> <!-- end span -->
 
 		<div class="span2 unit right">
 			<h3>Report a Problem</h3>
 			<p>Having trouble with any of the University Library's online systems? Drop us a line and let us know. We&#8217;ll do our best to sort it out.</p>
-			<div class="lib-button-small-grey">
-				<a href="feedback.php" id="feedback-trigger">Report a Problem</a>
-			</div>
+
+			<a href="feedback.php" class="status-button" id="feedback-trigger">Report a Problem</a>
 
 		</div> <!-- end span -->
 	</div> <!-- end line -->
@@ -310,6 +306,15 @@
 			</div>
 		</div> <!-- end span -->
 	</div> <!-- end line -->
+
+	<!--
+	<div class="line break">
+		<div class="prevNext">
+			<a href="#" class="prev ">&#8249; Earlier</a>
+			<a href="#" class="next">Next &#8250;</a>
+		</div>
+	</div>
+	-->
 
 	<div class="line break">
 		<div class="left unit span2">

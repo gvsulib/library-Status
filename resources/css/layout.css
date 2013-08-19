@@ -229,3 +229,77 @@ div.hover {
 	border: 1px solid #bbb;
 	border-top: none;
 }
+
+.prevNext_no {
+	border-top: 1px solid #bbb;
+	border-bottom: 1px solid #bbb;
+	padding: .5em 0;
+}
+
+.prev {
+
+}
+
+.next {
+	float: right;
+}
+
+
+.when_box { 
+	clear: left; 
+	float: none;
+}
+
+@media screen and (min-width: 725px) {
+	.when_box { 
+		clear: none; 
+		float: right;
+	}
+
+}
+
+.when-text {
+	width: 70%;
+	font-size: .8em;
+	color: #575757;
+	display: inline;
+}
+
+
+.resolved {
+	line-height: 1.7em;
+}
+
+
+.status-button {
+	background: #f6f6f6;
+	border: 1px solid #aaa;
+	border-top: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+	-moz-border-radius: .25em;
+	-webkit-border-radius: .25em;
+	border-radius: .25em;
+	color: #444;
+	display: inline-block;
+	font-weight: normal;
+	font-size: 1em;
+	text-decoration: none;
+	padding: .5em 1em;
+	cursor: pointer;
+	font-family: "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	float: left;
+	margin-top: 0em;
+	text-decoration: none;
+
+
+}
+
+
+
+
+
+
+
+
+
+
