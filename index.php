@@ -102,9 +102,9 @@
 
 			<p>We&#8217;re available to help even if you&#8217;re off campus. Stop in at <a href="http://gvsu.edu/library/directions">any location</a>, or contact us during <a href="http://gvsu.edu/library/hours">The Mary Idema Pew Library's regular hours</a>.</p>
 
-			<a href='#' class="status-button" style="text-decoration: none; margin-right: .5em;" onclick='window.open("https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489&identity=Librarian", "chat", "resizable=1,width=225,height=280"); return false;'><span>Chat</span></a>
+			<a href='#' class="status-button" style="text-decoration: none; margin-right: .5em; margin-top: .5em" onclick='window.open("https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489&identity=Librarian", "chat", "resizable=1,width=225,height=280"); return false;'><span>Chat</span></a>
 
-			<a class="status-button" style="text-decoration: none;" href="mailto:library@gvsu.edu">Email</a>
+			<a class="status-button" style="text-decoration: none; margin-top: .5em" href="mailto:library@gvsu.edu">Email</a>
 
 		</div> <!-- end span -->
 
@@ -112,7 +112,7 @@
 			<h3>Report a Problem</h3>
 			<p>Having trouble with any of the University Library's online systems? Drop us a line and let us know. We&#8217;ll do our best to sort it out.</p>
 
-			<a href="feedback.php" class="status-button" id="feedback-trigger">Report a Problem</a>
+			<a href="feedback.php" class="status-button" style="margin-top: .5em" id="feedback-trigger">Report a Problem</a>
 
 		</div> <!-- end span -->
 	</div> <!-- end line -->
