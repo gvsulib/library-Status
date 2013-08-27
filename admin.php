@@ -104,8 +104,6 @@
 			// new status post$loggedin
 			if ($_POST['submit_status']) {
 
-				echo '<br>status_type_id: ' . $status_type_id;
-
 				$issue_id = $_POST['issue_id'];
 				$status_type_id = $_POST['status_type_id'];
 				$status_text = $_POST['status'];
