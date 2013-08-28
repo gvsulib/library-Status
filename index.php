@@ -112,7 +112,7 @@
 	<a class="status-button" href="#" onclick="window.open('https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489',
    'chat', 'resizable=1,width=320,height=200'); return false;" style="margin-top:.5em; text-decoration: none; margin-right: 1em;"><span class="chat chat-online">Chat now </span> </a></div>
 <div class="libraryh3lp" style="display: none;">
-	<a class="status-button" href="http://gvsu.edu/chat" style="margin-top:.5em; text-decoration: none; margin-right: 1em;"><span class="chat chat-offline">Chat Offline</span></a></div>
+	<a class="status-button" href="http://gvsu.edu/chat" style="margin-top:.5em; text-decoration: none; margin-right: 1em;"><span class="chat chat-offline">Chat is Offline</span></a></div>
 
 			<a class="status-button" style="text-decoration: none; margin-top: .5em" href="mailto:library@gvsu.edu">Email</a>
 
