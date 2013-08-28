@@ -102,7 +102,17 @@
 
 			<p>We&#8217;re available to help even if you&#8217;re off campus. Stop in at <a href="http://gvsu.edu/library/directions">any location</a>, or contact us during <a href="http://gvsu.edu/library/hours">The Mary Idema Pew Library's regular hours</a>.</p>
 
-			<a href='#' class="status-button" style="text-decoration: none; margin-right: .5em; margin-top: .5em" onclick='window.open("https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489&identity=Librarian", "chat", "resizable=1,width=225,height=280"); return false;'><span>Chat</span></a>
+			<style type="text/css">
+.chat { display: inline-block; padding-left: 1.45em; }
+.chat-online { background-image: url(http://gvsu.edu/cms3/assets/741ECAAE-BD54-A816-71DAF591D1D7955C/chat-online.png); background-repeat:no-repeat;background-position:middle left;  }
+.chat-offline { background-image: url(http://gvsu.edu/cms3/assets/741ECAAE-BD54-A816-71DAF591D1D7955C/chat-offline.png); background-repeat:no-repeat;background-position:middle left; color: #575757 !important;}</style>
+<div class="needs-js">
+	&nbsp;</div>
+<div class="libraryh3lp" jid="gvsulibs-queue@chat.libraryh3lp.com" style="display: none;">
+	<a class="status-button" href="#" onclick="window.open('https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489',
+   'chat', 'resizable=1,width=320,height=200'); return false;"><span class="chat chat-online">Chat now </span> </a></div>
+<div class="libraryh3lp" style="display: none;">
+	<a class="status-button" href="http://gvsu.edu/chat"><span class="chat chat-offline">Chat Offline</span></a></div>
 
 			<a class="status-button" style="text-decoration: none; margin-top: .5em" href="mailto:library@gvsu.edu">Email</a>
 
@@ -340,7 +350,13 @@
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 </div>
-
+<script> 
+  (function() {
+    var x = document.createElement("script"); x.type = "text/javascript"; x.async = true;
+    x.src = (document.location.protocol === "https:" ? "https://" : "http://") + "libraryh3lp.com/js/libraryh3lp.js?multi,poll";
+    var y = document.getElementsByTagName("script")[0]; y.parentNode.insertBefore(x, y);
+  })();
+</script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
 
