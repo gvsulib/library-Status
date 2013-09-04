@@ -15,4 +15,4 @@ We realized we did not have an accessible place for system issues to be known an
 You can contribute to this project by anyway you wish, but if you find any bugs we encourage you to let us know.
 
 ## Contact
-Need help installing or have comments? Contact Jon Earley at @Jonathanearley
+Need help installing or have comments? Contact [Jon Earley](http://github.com/jonearley). 
