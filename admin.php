@@ -84,9 +84,9 @@
 
 				// Create a time one year back to see use to check if posting time is in range.
 				$time_check = time();
-				$time_check = strtotime('-1 years');
+				$time_check = strtotime('-1 minute');
 
-				// If time is something special or ready or for now.
+				// If time is something special or ready or for now and is within the last year.
 				if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
 					$time = strtotime($_POST['when']);
 				} else { 
@@ -95,7 +95,7 @@
 
 				// Create new issue
 				$db->query("INSERT INTO issue_entries
-				VALUES ('','$system_id', $status_type_id, '$now', '0')");
+				VALUES ('','$system_id', $status_type_id, '$time', '0')");
 				$issue_id = $db->insert_id;
 
 				// Create a new status entry for issue
@@ -112,7 +112,16 @@
 
 				$issue_resolved = $_POST['issue_resolved'];
 
-				$now = time();
+				// Create a time one year back to see use to check if posting time is in range.
+				$time_check = time();
+				$time_check = strtotime('-1 minute');
+
+				// If time is something special or ready or for now and is within the last year.
+				if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
+					$time = strtotime($_POST['when']);
+				} else { 
+					$time = time();
+				}
 
 				$status_value = $status_type_id;
 				if ($issue_resolved == 'on') {
@@ -120,7 +129,7 @@
 
 					//update issue end_time and close issue
 					$db->query("UPDATE issue_entries
-								SET issue_entries.end_time = '$now'
+								SET issue_entries.end_time = '$time'
 								WHERE $issue_id = issue_entries.issue_id");
 				}
 
