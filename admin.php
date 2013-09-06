@@ -84,7 +84,7 @@
 
 				// Create a time one year back to see use to check if posting time is in range.
 				$time_check = time();
-				$time_check = strtotime('-1 minute');
+				$time_check = strtotime('-1 month');
 
 				// If time is something special or ready or for now and is within the last year.
 				if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
@@ -114,7 +114,7 @@
 
 				// Create a time one year back to see use to check if posting time is in range.
 				$time_check = time();
-				$time_check = strtotime('-1 minute');
+				$time_check = strtotime('-1 month');
 
 				// If time is something special or ready or for now and is within the last year.
 				if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
