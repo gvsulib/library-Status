@@ -263,6 +263,7 @@
 								} else {
 
 									$day = date('Ymd', time());
+									$issue_flag = false;
 
 									$cnt = 0;
 									foreach(range(0,5) as $cnt) {
@@ -287,19 +288,22 @@
 											if ((( ($day-$cnt) >= $start_day) && (($rw['end_time'] == 0))) || 
 												(( ($day-$cnt) >= $start_day && ($day-$cnt) <= $end_day))) {
 
-												$day_status = '<img alt="' . $rw['status_type_text'] . '" src="resources/img/minorissue.png" style="position:relative;top:.1em;"></a>';
-
-												echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" data-type="' . $rw['end_time'] . '" style = "text-decoration: none;">';
-
 												if ($rw['status_type_id'] == 2) {
 													$day_status = '<b style= "color: #cb0000;" title="' . $rw['status_type_text'] . '">X</b></a>';
 
 												} else {
-													//echo '</a>';
+													$day_status = '<img alt="' . $rw['status_type_text'] . '" src="resources/img/minorissue.png" style="position:relative;top:.1em;"></a>';
+
+													$issue_flag = true;
+
+													echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" data-type="' . $rw['end_time'] . '" style = "text-decoration: none;">';
 												}
 											} else {
 												// Moved inside the while loop for the alt tags
-											$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark.png">';
+
+												if ($issue_flag != true) {
+													$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark.png">';
+												}
 											}
 										}
 
