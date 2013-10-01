@@ -117,7 +117,7 @@
 
 				$issue_id = $_POST['issue_id'];
 				$status_type_id = $_POST['status_type_id'];
-				$status_text = $_POST['status'];
+				$status_text = $db->real_escape_string($_POST['status']);
 
 				$issue_resolved = $_POST['issue_resolved'];
 
