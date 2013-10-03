@@ -228,6 +228,7 @@
 
 									// Check if there is no resolution or a scheduled resolution is still in the future
 									if (($rw['end_time'] == 0) || ($rw['end_time'] > $now) || ($rw['start_time'] > $now)) { 
+                                                                                $day = date('Ymd',$now);
 
 										//echo '<p>color</p>';
 
