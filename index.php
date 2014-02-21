@@ -264,7 +264,6 @@
 								} else {
 
 									$day = date('Ymd', time());
-									$issue_flag = false;
 
 									$cnt = 0;
 									foreach(range(0,5) as $cnt) {
@@ -285,12 +284,18 @@
 											$now = time();
 
 											echo '<!-- End day: ' . $end_day . ' -->';
+											$issue_flag = false;
 
 											if ((( ($day-$cnt) >= $start_day) && (($rw['end_time'] == 0))) || 
 												(( ($day-$cnt) >= $start_day && ($day-$cnt) <= $end_day))) {
 
 												if ($rw['status_type_id'] == 2) {
 													$day_status = '<b style= "color: #cb0000;" title="' . $rw['status_type_text'] . '">X</b></a>';
+
+													$issue_flag = true;
+
+													echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" data-type="' . $rw['end_time'] . '" style = "text-decoration: none;">';
+
 
 												} else {
 													$day_status = '<img alt="' . $rw['status_type_text'] . '" src="resources/img/minorissue.png" style="position:relative;top:.1em;"></a>';
