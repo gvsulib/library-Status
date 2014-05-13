@@ -15,10 +15,17 @@
 
 	$logged_in = 0; // By default, user is logged out
 
-	// User Debug
-	//$_SESSION['username'] = 'dewindl';
-	//$_SESSION['username'] = 'durhamja';
+
+
+
+
+	// Debug the user login by a force login
 	//$_SESSION['username'] = 'earleyj';
+
+
+
+
+
 
 	if(isset($_SESSION['username'])) { // User has logged in
 
@@ -80,25 +87,29 @@
 			// new issue post
 			if ($_POST['submit_issue']) {
 
-				$issue_text = $_POST['issue_text'];
+				$issue_text = $db->real_escape_string($_POST['issue_text']);
 				$system_id = $_POST['system_id'];
 				$status_type_id = $_POST['status_type_id'];
 
-				// If scheduled time chosen
-				if ($_POST['when'] != 'Now') { 
-					$now = strtotime($_POST['when']);
+				// Create a time one year back to see use to check if posting time is in range.
+				$time_check = time();
+				$time_check = strtotime('-1 month');
+
+				// If time is something special or ready or for now and is within the last year.
+				if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
+					$time = strtotime($_POST['when']);
 				} else { 
-					$now = time();
+					$time = time();
 				}
 
 				// Create new issue
 				$db->query("INSERT INTO issue_entries
-				VALUES ('','$system_id', $status_type_id, '$now', '0')");
+				VALUES ('','$system_id', $status_type_id, '$time', '0')");
 				$issue_id = $db->insert_id;
 
 				// Create a new status entry for issue
 				$db->query("INSERT INTO status_entries
-				VALUES ('','$issue_id','$now','1','$status_type_id','$user_id','$issue_text','0')");
+				VALUES ('','$issue_id','$time','1','$status_type_id','$user_id','$issue_text','0')");
 			}
 
 			// new status post$loggedin
@@ -110,7 +121,16 @@
 
 				$issue_resolved = $_POST['issue_resolved'];
 
-				$now = time();
+				// Create a time one year back to see use to check if posting time is in range.
+				$time_check = time();
+				$time_check = strtotime('-1 month');
+
+				// If time is something special or ready or for now and is within the last year.
+				if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
+					$time = strtotime($_POST['when']);
+				} else { 
+					$time = time();
+				}
 
 				$status_value = $status_type_id;
 				if ($issue_resolved == 'on') {
@@ -118,13 +138,13 @@
 
 					//update issue end_time and close issue
 					$db->query("UPDATE issue_entries
-								SET issue_entries.end_time = '$now'
+								SET issue_entries.end_time = '$time'
 								WHERE $issue_id = issue_entries.issue_id");
 				}
 
 				// Create a new status entry
 				$db->query("INSERT INTO status_entries
-				VALUES ('','$issue_id','$now','1','$status_value','$user_id','$status_text','0')") or die(mysqli_error());
+				VALUES ('','$issue_id','$time','1','$status_value','$user_id','$status_text','0')") or die(mysqli_error());
 			}
 
 		} // End loop for logged in user
@@ -289,7 +309,6 @@
 
 					$rc++;
 
-					// first post
 					if ($rc == 1) {
 
 						echo '
@@ -299,7 +318,7 @@
 								<div class="span1 unit issue">
 									<div style="float: left;">
 										<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
-										<p class="time">' . date("D g:i a - n/j/y", $status_entries['status_timestamp']) . '</p>
+										<p class="time">' . date("n/j/y - g:i a", $status_entries['status_timestamp']) . '</p>
 									</div>
 									<div style="float: right;">
 										<p class="name tag-system">' . $issue_entries['system_name'] . '</p>';
@@ -379,7 +398,7 @@
 								<div class="span1 unit comment-box">
 									<div style="float: left;">
 										<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
-										<p class="time">' . date("D g:i a - n/j/y", $status_entries["status_timestamp"]) . '</p>
+										<p class="time">' . date("n/j/y - g:i a", $status_entries["status_timestamp"]) . '</p>
 									</div>
 									<div class ="comment-text">' . Markdown($status_entries['status_text']) . '</div>
 								</div> <!-- end span --> ';

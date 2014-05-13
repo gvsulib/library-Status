@@ -12,7 +12,6 @@
 	}
 
 	date_default_timezone_set('America/Detroit');
-	
 ?>
 
 <!DOCTYPE html>
@@ -214,8 +213,6 @@
 
 								$system_category_cnt++;
 
-
-
 								echo '<tr>';
 								echo '<td style="text-align: right ">' . $row["system_name"] . '</td> ';
 								echo '<td class = "col2 name" style="text-align: center;';
@@ -231,6 +228,10 @@
 
 									// Check if there is no resolution or a scheduled resolution is still in the future
 									if (($rw['end_time'] == 0) || ($rw['end_time'] > $now) || ($rw['start_time'] > $now)) { 
+                                                                                $day = date('Ymd',$now);
+
+										//echo '<p>color</p>';
+
 										if ($rw['status_type_id'] == 2) { 
 											// Color difference is WCAG2 AA compliant
 											$currently = '"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day) .'" style = "text-decoration: none; color: #cb0000;">'.$rw['status_type_text'].'</a>';
@@ -240,6 +241,7 @@
 										}
 									}
 								}
+
 								echo $currently . '</td>'; // close currently displayed
 
 								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
@@ -271,7 +273,8 @@
 
 										$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text
 											FROM issue_entries i, status_type s
-											WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id");
+											WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id
+											ORDER BY i.end_time DESC");
 
 										// Display Day
 										while ($rw = $system_result->fetch_assoc()) {
@@ -281,22 +284,32 @@
 											$now = time();
 
 											echo '<!-- End day: ' . $end_day . ' -->';
+											$issue_flag = false;
 
-											// Moved inside the while loop for the alt tags
-											$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark.png">';
-
-											if ((( ($day-$cnt) >= $start_day) && (($rw['end_time'] == 0) || ($rw['end_time'] > $now))) || 
+											if ((( ($day-$cnt) >= $start_day) && (($rw['end_time'] == 0))) || 
 												(( ($day-$cnt) >= $start_day && ($day-$cnt) <= $end_day))) {
 
-												$day_status = '<img alt="' . $rw['status_type_text'] . '" src="resources/img/minorissue.png" style="position:relative;top:.1em;"></a>';
-
-												echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" data-type="' . $rw['end_time'] . '" style = "text-decoration: none;">';
-
 												if ($rw['status_type_id'] == 2) {
+													$day_status = '<b style= "color: #cb0000;" title="' . $rw['status_type_text'] . '">X</b></a>';
 
-													$day_status = '<b style= "color: red" title="' . $rw['status_type_text'] . '">X</b></a>';	
-												
-												} 
+													$issue_flag = true;
+
+													echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" data-type="' . $rw['end_time'] . '" style = "text-decoration: none;">';
+
+
+												} else {
+													$day_status = '<img alt="' . $rw['status_type_text'] . '" src="resources/img/minorissue.png" style="position:relative;top:.1em;"></a>';
+
+													$issue_flag = true;
+
+													echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" data-type="' . $rw['end_time'] . '" style = "text-decoration: none;">';
+												}
+											} else {
+												// Moved inside the while loop for the alt tags
+
+												if ($issue_flag != true) {
+													$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark.png">';
+												}
 											}
 										}
 

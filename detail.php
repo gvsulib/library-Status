@@ -111,7 +111,7 @@
 									<div class="span1 unit issue">
 										<div style="float: left;">
 											<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
-											<p class="time">' . date("D g:i a - n/j/y", $status_entries['status_timestamp']) . '</p>
+											<p class="time">' . date("n/j/y - g:i a", $status_entries['status_timestamp']) . '</p>
 										</div>
 										<div style="float: right;">
 											<p class="name tag-system">' . $system_name . '</p>';
@@ -139,7 +139,7 @@
 							<div class="span1 unit comment-box">
 								<div style="float: left;">
 									<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
-									<p class="time">' . date("D g:i a - n/j/y", $status_entries["status_timestamp"]) . '</p>
+									<p class="time">' . date("n/j/y - g:i a", $status_entries["status_timestamp"]) . '</p>
 								</div>
 								<div style="float: right;">';
 									
@@ -157,7 +157,7 @@
 							<div class="span1 unit comment-box">
 								<div style="float: left;">
 									<p class="name">' . $status_entries['user_fn'] . " " . $status_entries['user_ln'] .'</p>
-									<p class="time">' . date("D g:i a - n/j/y", $status_entries["status_timestamp"]) . '</p>
+									<p class="time">' . date("n/j/y - g:i a", $status_entries["status_timestamp"]) . '</p>
 								</div>
 								<p class ="comment-text">' . $status_entries['status_text'] . '</p>
 							</div> <!-- end span --> ';

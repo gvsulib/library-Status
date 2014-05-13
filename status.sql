@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: May 29, 2013 at 08:49 PM
+-- Generation Time: Sep 17, 2013 at 08:54 PM
 -- Server version: 5.5.29
 -- PHP Version: 5.4.10
 
@@ -11,7 +11,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 --
--- Database: `library_status`
+-- Database: `library_status_new`
 --
 
 -- --------------------------------------------------------
@@ -27,11 +27,14 @@ CREATE TABLE `issue_entries` (
   `start_time` int(13) NOT NULL,
   `end_time` int(13) NOT NULL,
   PRIMARY KEY (`issue_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=67 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=104 ;
 
 --
 -- Dumping data for table `issue_entries`
 --
+
+INSERT INTO `issue_entries` (`issue_id`, `system_id`, `status_type_id`, `start_time`, `end_time`) VALUES
+(103, 1, 1, 1379443981, 0);
 
 -- --------------------------------------------------------
 
@@ -49,12 +52,14 @@ CREATE TABLE `status_entries` (
   `status_text` text NOT NULL,
   `status_delete` tinyint(1) NOT NULL,
   PRIMARY KEY (`status_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=107 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=172 ;
 
 --
 -- Dumping data for table `status_entries`
 --
 
+INSERT INTO `status_entries` (`status_id`, `issue_id`, `status_timestamp`, `status_public`, `status_type_id`, `status_user_id`, `status_text`, `status_delete`) VALUES
+(171, 103, 1379443981, 1, 1, 1, 'Welcome to Library Status. We are [markdown](http://daringfireball.net/projects/markdown/basics) friendly.', 0);
 
 -- --------------------------------------------------------
 
@@ -87,9 +92,20 @@ CREATE TABLE `systems` (
   `system_id` int(10) NOT NULL AUTO_INCREMENT,
   `system_name` varchar(255) NOT NULL,
   `system_url` varchar(255) NOT NULL,
+  `system_category` int(11) NOT NULL COMMENT '0 = system; 1 = building',
   PRIMARY KEY (`system_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=14 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=23 ;
 
+--
+-- Dumping data for table `systems`
+--
+
+INSERT INTO `systems` (`system_id`, `system_name`, `system_url`, `system_category`) VALUES
+(1, 'Library Homepage', 'http://gvsu.edu/library', 0),
+(2, 'Document Delivery', '', 0),
+(3, 'Computer Availability', 'http://gvsu.edu/library/computers', 0),
+(4, 'Heating & Cooling', '', 1),
+(5, 'Network', '', 1);
 
 -- --------------------------------------------------------
 
@@ -118,16 +134,13 @@ CREATE TABLE `user` (
   `user_email` varchar(255) NOT NULL,
   `user_delete` tinyint(1) NOT NULL,
   `user_notifications` tinyint(1) NOT NULL,
+  `user_access` tinyint(4) NOT NULL COMMENT '0 = none, 1 = systems, 2= buildings, 9 = all',
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15 ;
 
 --
--- Constraints for dumped tables
+-- Dumping data for table `user`
 --
 
---
--- Constraints for table `system_users`
---
-ALTER TABLE `system_users`
-  ADD CONSTRAINT `system_users_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-  ADD CONSTRAINT `system_users_ibfk_2` FOREIGN KEY (`system_id`) REFERENCES `systems` (`system_id`);
+INSERT INTO `user` (`user_id`, `user_username`, `user_fn`, `user_ln`, `user_email`, `user_delete`, `user_notifications`, `user_access`) VALUES
+(1, 'earleyj', 'Jon', 'Earley', 'jonathan.a.earley@gmail.com', 0, 0, 9);
