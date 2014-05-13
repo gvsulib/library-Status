@@ -156,6 +156,8 @@ body { max-width: 100%; width: 100%; margin: 0; padding: 0;}
 
 p {font-size:100%;line-height:150%;}
 
+h1 {font-family: 'AlternateGothicFSNo3', Arial, sans-serif;font-size: 1.4em;font-weight: normal;margin: .3em 0;}
+
 h2,h3,h4,h5,h6 { color: #004875;margin:.8em 0;}
 
 h2,h3{font-family: 'AlternateGothicFSNo3', Arial, sans-serif;font-size: 1.5em;font-weight: normal;margin: .3em 0; }

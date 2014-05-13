@@ -1,5 +1,8 @@
 <?php
+session_start();
 	include 'resources/secret/config.php';
+	include ('resources/php/markdown.php');
+	
 	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
 	if ($db->connect_errno) {
     	printf("Connect failed: %s\n", $db->connect_error);
@@ -21,7 +24,6 @@
 	<title>GVSU University Libraries Status</title>
 
 	<link rel="stylesheet" type="text/css" href="resources/css/styles.css"/>
-	<link rel="stylesheet" type="text/css" href="http://gvsu.edu/cms3/assets/741ECAAE-BD54-A816-71DAF591D1D7955C/libui.css" />
 	<link rel="stylesheet" type="text/css" href="resources/css/layout.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -43,12 +45,12 @@
 
 	<div class="line break">
 		<div class="span2of3 unit left">
-			<h2><a href="index.php">University Libraries Status</a></h2>
+			<h1><a href="index.php">University Libraries Status</a></h1>
 		</div> <!-- end span -->
 
 		<div class="span3 unit left login">
 
-			<?php echo '<p>' . (isset($_SESSION['username']) ? '<a href="?logout" title="Log out">Log out</a></p>' : '<a href="admin.php" title="Log in">Log in</a></p>'); ?>
+			<?php echo '<p>' . (isset($_SESSION['username']) ? '<a href="?logout" title="Log out">Log out</a></p>' : '<a href="admin.php" title="Log in">Log in</a> | Subscribe: <a href="http://feeds.feedburner.com/gvsulibstatus" title="Subscribe to the RSS feed">RSS</a> | <a href="http://feedburner.google.com/fb/a/mailverify?uri=gvsulibstatus&amp;loc=en_US" title="Subscribe to updates via Email">Email</a></p>'); ?>
 
 		</div>
 	</div> <!-- end line -->
@@ -95,7 +97,7 @@
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 
-	<div class="line break">
+	<!--div class="line break">
 		<div class="span2 unit left" style="margin-bottom: 1em;">
 			<h3>Get Help</h3>
 
@@ -115,7 +117,7 @@
 
 			<a class="status-button" style="text-decoration: none; margin-top: .5em" href="mailto:library@gvsu.edu">Email</a>
 
-		</div> <!-- end span -->
+		</div>
 
 		<div class="span2 unit right">
 			<h3>Report a Problem</h3>
@@ -124,104 +126,56 @@
 			<a href="feedback.php" class="status-button" style="margin-top: .5em" id="feedback-trigger">Report a Problem</a>
 
 		</div> <!-- end span -->
-	</div> <!-- end line -->
+	<!--/div> <!-- end line -->
+	
+	<style>
+	.status-table .heading { font-weight: bold; }
+	.status-heading dl dt { text-align: left !important;}
+	.status-table dt,
+	.status-table dd { display: inline-block; width:48%; padding: .7em 0;}
+	.status-table dl { border-bottom: 1px solid #ddd; width: 95%; }
+	.status-table dd { text-align: right;}
+	.issue-box { margin-bottom: 1.5em; padding-bottom: 1.5em; padding-top: 0; border-bottom: 2px solid #bbb;}
+	.issue-box h4 { margin-bottom: .4em; margin-top: 0; font-weight: bold;}
+	.issue-box .tagline { font-size: 90%; color: #575757;margin-top: 1em;clear:both;}
+	.comment-list { margin-top: .7em;padding-top: .7em;  border-top: 1px solid #ddd; }
+	.timestamp {display: inline-block; float: left; margin-right: .5em;line-height: 1.5em;}
+	h4 span { font-size: 14px; display: inline-block; padding: .4em; }
+	.tag-unresolved { background: #cb0000; color: white; }
+	.tag-resolved { background: green; color: white; }
+	</style>
 
-	<div class="line break">
-		<div class="span1 unit">
-
-			<div class="lib-table">
-				<table>	
-					<tbody>
-
-						<thead>
-							<tr>
-								<th colspan="9">Library Status</th>
-							</tr>
-
-
+	<div class="line break status-table">
+		<div class="span2 unit left">
+						
 						<!-- load system names -->
 						<?php
 
-							$table_cnt = 0;
-							$system_category_cnt = 0;
-
 							$result = $db->query("SELECT * FROM systems ORDER BY system_category ASC, system_name ASC");
 							$now = time();
+							$i = 0;
+							$system_count = $result->num_rows;
+							
+							// Calculate where to drop in the code for a second column
+							$half = round($system_count/2);
 
 							// loop through each system
 							while($row = $result->fetch_assoc())
-							{	
-
-								// Load multiple tables
-								if ($row["system_category"] == 1) {
-									if ($table_cnt == 0) {
-
-										// Close previous table
-										echo '</tbody>
-										</table>';
-
-										// Start new table
-										echo '<div class="lib-table" style="margin-top: 1.5em; margin-bottom: 1em;">
-											<table>	
-												<tbody>
-
-													<thead>
-														<tr>
-															<th colspan="9">Building</th>
-														</tr>';
-
-
-										?>
-
-										<tr colspan="9" class="lib-row-headings name">
-										<th style="text-align: right">Area</th>
-										<th style="text-align: center">Currently</th>
-
-										<?php foreach(range(0,5) as $cnt) {
-										echo  '<th style="text-align: center;">' . date("M d", mktime(0, 0, 0, date("m")  , date("d")-$cnt, date("Y")))
-											. '</th>';
-											
-										}?>
-
-
-										<?php
-									}
-
-									$table_cnt++;
+							{
+								
+								if($i == $half) {
+									echo '</div><div class="span2 unit right lastUnit">';
 								}
 
+								echo '<dl class="system">';
+								echo '<dt>' . $row["system_name"] . '</dt> ';
+								echo '<dd class = "col2 name"';
 
-								if ($system_category_cnt == 0) {
-
-								?>
-									<tr colspan="9" class="lib-row-headings name">
-									<th style="text-align: right">System</th>
-									<th style="text-align: center">Currently</th>
-
-									<?php foreach(range(0,5) as $cnt) {
-										echo  '<th style="text-align: center;">' . date("M d", mktime(0, 0, 0, date("m")  , date("d")-$cnt, date("Y")))
-											. '</th>';
-											
-									}?>
-
-									</tr>
-									</thead>
-
-								<?php
-
-								}
-
-								$system_category_cnt++;
-
-								echo '<tr>';
-								echo '<td style="text-align: right ">' . $row["system_name"] . '</td> ';
-								echo '<td class = "col2 name" style="text-align: center;';
-
-								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text
+								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text, i.issue_id
 								FROM issue_entries i, status_type s
 								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id AND i.start_time < '$now'");
 	
-								$currently = ' color: #147D11">Online'; // currently displayed. Color difference is WCAG2 AA compliant
+								$currently = ' style="color: #147D11">Online'; // currently displayed. Color difference is WCAG2 AA compliant
 
 								// Display Day
 								while ($rw = $system_result->fetch_assoc()) {
@@ -234,100 +188,24 @@
 
 										if ($rw['status_type_id'] == 2) { 
 											// Color difference is WCAG2 AA compliant
-											$currently = '"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day) .'" style = "text-decoration: none; color: #cb0000;">'.$rw['status_type_text'].'</a>';
+											// Changed GET requests to just grab issue ID, not day and system.
+											$currently = '><a href="detail.php?id='. $row['issue_id'] .'" style = "text-decoration: none; color: #cb0000;">'.$rw['status_type_text'].'</a>';
 										}
 										else {
-											$currently = '"><a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day) .'" style = "text-decoration: none; color: #147D11;">'.$rw['status_type_text'].'</a>';
+											$currently = '><a href="detail.php?id='. $row['issue_id'] .'" style = "text-decoration: none; color: #cb0000;">'.$rw['status_type_text'].'</a>';
 										}
 									}
 								}
 
-								echo $currently . '</td>'; // close currently displayed
+								echo $currently . '</dd>'; // close currently displayed
 
-								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
-																FROM issue_entries i
-																WHERE i.system_id = {$row['system_id']}");
-
-								$num_rows = $system_result->num_rows;
-
-								// If no issues, then all is well
-								if ($num_rows == 0) {
-
-									$cnt = 0;
-									foreach(range(0,5) as $cnt) {
-										echo '<td style="text-align: center">';
-										echo '<img alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark.png">';
-										echo '</td>';
-									}
-
-								// display specific status types
-								} else {
-
-									$day = date('Ymd', time());
-
-									$cnt = 0;
-									foreach(range(0,5) as $cnt) {
-
-										echo'<td style="text-align: center">';
-
-
-										$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text
-											FROM issue_entries i, status_type s
-											WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id
-											ORDER BY i.end_time DESC");
-
-										// Display Day
-										while ($rw = $system_result->fetch_assoc()) {
-							
-											$start_day = date('Ymd', $rw['start_time']);
-											$end_day = date('Ymd', $rw['end_time']);
-											$now = time();
-
-											echo '<!-- End day: ' . $end_day . ' -->';
-											$issue_flag = false;
-
-											if ((( ($day-$cnt) >= $start_day) && (($rw['end_time'] == 0))) || 
-												(( ($day-$cnt) >= $start_day && ($day-$cnt) <= $end_day))) {
-
-												if ($rw['status_type_id'] == 2) {
-													$day_status = '<b style= "color: #cb0000;" title="' . $rw['status_type_text'] . '">X</b></a>';
-
-													$issue_flag = true;
-
-													echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" data-type="' . $rw['end_time'] . '" style = "text-decoration: none;">';
-
-
-												} else {
-													$day_status = '<img alt="' . $rw['status_type_text'] . '" src="resources/img/minorissue.png" style="position:relative;top:.1em;"></a>';
-
-													$issue_flag = true;
-
-													echo '<a href="detail.php?system_id='. $row['system_id'] .'&day='. ($day-$cnt) .'" data-type="' . $rw['end_time'] . '" style = "text-decoration: none;">';
-												}
-											} else {
-												// Moved inside the while loop for the alt tags
-
-												if ($issue_flag != true) {
-													$day_status = '<img  alt="' . $rw['status_type_text'] . '" src="resources/img/checkmark.png">';
-												}
-											}
-										}
-
-										echo $day_status . "</td>"; // close currently displayed
-									}
-
-								} // end else if
-
-								echo '</tr>'; // close row
+								echo '</dl>'; // close row
+								$i++;
 							}
 
 						?>
 
-					</tbody>
-				</table>
-
 			</div>
-		</div> <!-- end span -->
 	</div> <!-- end line -->
 
 	<!--
@@ -338,24 +216,68 @@
 		</div>
 	</div>
 	-->
+	
+	<!-- Add blog-like view of incidents -->
+	<div style="clear: both; margin-top: 2em;"></div>	
+	<?php
+	
+		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC LIMIT 10";
+		
+			$issue_result = $db->query($issue_query);
+			$n_rows = $issue_result->num_rows;
 
-	<div class="line break">
-		<div class="left unit span2">
+			if ($n_rows > 0) {
 
-			<p>
+				while ($issue_entries = $issue_result->fetch_assoc()) {
 
-			<img alt="Online" src="resources/img/checkmark.png"> Online
+					$result = $db->query("SELECT s.status_id, s.issue_id, s.status_timestamp, s.status_public, s.status_user_id, s.status_text, s.status_delete, u.user_id, u.user_fn, u.user_ln, st.status_type_id, st.status_type_text
+						FROM status_entries s, user u, status_type st
+						WHERE s.issue_id = '{$issue_entries['issue_id']}' AND s.status_user_id = u.user_id AND s.status_type_id = st.status_type_id
+						ORDER BY s.status_timestamp ASC");
 
-			<img alt="Minor Issue" src="resources/img/minorissue.png" style="padding-left: 1em;"> Minor Issue
+					$num_rows = $result->num_rows;
+					$issue_id = $status_entries['issue_id'];
 
-			<b style= "color: red; padding-left: 1em;" title="' . $rw['status_type_text'] . '">X</b> Outage</p>
+					$rc = 0;
 
-		</div>
+					// display issues and check for comments
+					while ($status_entries = $result->fetch_assoc()) {
 
-		<div class="left unit span2">
-			<p class="right">Subscribe: <a href="http://feeds.feedburner.com/gvsulibstatus" title="Subscribe to the RSS feed">RSS</a> | <a href="http://feedburner.google.com/fb/a/mailverify?uri=gvsulibstatus&amp;loc=en_US" title="Subscribe to updates via Email">Email</a>
-		</div>
-	</div>
+						$rc++;
+
+						if ($rc == 1) {
+							
+							if($issue_entries['end_time'] > 0) {
+								$current_status = '<span class="tag-resolved">Resolved</span>';
+							} else {
+								$current_status = '<span class="tag-unresolved">Unresolved</span>';
+							}
+
+							echo '
+							<!-- Issue -->
+							<div class = "line issue-box span1">
+								<h4>' . $status_entries['status_type_text'] . ' for ' . $issue_entries['system_name'] . ' ' . $current_status .'</h4>
+								<div class="comment-text"><strong class="timestamp">[' . date("g:i a", $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>';
+								
+								$attribution = '<p class="tagline">This issue was reported at ' . date("g:i a n/j/y", $status_entries['status_timestamp']) . ' by ' . $status_entries['user_fn'] . '</p>';
+						
+						} else {
+									
+							// Comment wrapper
+							echo '<div class="comment-list">
+									<div class ="comment-text"><strong class="timestamp">[' . date("g:i a", $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
+								</div> <!-- end comment-list --> ';
+
+}
+
+	
+}echo $attribution . ' </div><!-- End .line -->';
+					} // close status loop
+				}
+			
+	
+	?>
+	
 
 	<div class="line break footer">
 		<div class="span1 unit break">
