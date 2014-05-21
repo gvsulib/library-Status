@@ -22,7 +22,19 @@ session_start();
 
 <head>
 	<title>GVSU University Libraries Status</title>
+	<style>
+	@font-face {
+	    font-family: 'AlternateGothicFSNo3';
+	    src: url('//gvsuliblabs.com/libs/fonts/AlternateGothicNo3-webfont.eot');
+	    src: url('//gvsuliblabs.com/libs/fonts/AlternateGothicNo3-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('//gvsuliblabs.com/libs/fonts/AlternateGothicNo3-webfont.woff') format('woff'),
+	         url('//gvsuliblabs.com/libs/fonts/AlternateGothicNo3-webfont.ttf') format('truetype'),
+	         url('//gvsuliblabs.com/libs/fonts/AlternateGothicNo3-webfont.svg#AlternateGothicFSNo3') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
 
+	}
+	</style>
 	<link rel="stylesheet" type="text/css" href="resources/css/styles.css"/>
 	<link rel="stylesheet" type="text/css" href="resources/css/layout.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -34,8 +46,8 @@ session_start();
 	<div id="gvsu-header-wrapper">
 		<div id="gvsu-header">
 			<div id="gvsu-logo">
-				<a href="http://www.gvsu.edu/">
-					<img src="http://www.gvsu.edu/homepage/files/img/gvsu_logo.png" alt="Grand Valley State University" border="0">
+				<a href="http://gvsu.edu/">
+					<img src="//gvsu.edu/homepage/files/img/gvsu_logo.png" alt="Grand Valley State University" border="0">
 				</a>
 			</div>
 		</div>
@@ -44,19 +56,21 @@ session_start();
 	<div id="wrapper">
 
 	<div class="line break">
-		<div class="span2of3 unit left">
+		<div class="span2 unit left">
 			<h1><a href="index.php">University Libraries Status</a></h1>
 		</div> <!-- end span -->
 
-		<div class="span3 unit left login">
-
-			<?php echo '<p>' . (isset($_SESSION['username']) ? '<a href="?logout" title="Log out">Log out</a></p>' : '<a href="admin.php" title="Log in">Log in</a> | Subscribe: <a href="http://feeds.feedburner.com/gvsulibstatus" title="Subscribe to the RSS feed">RSS</a> | <a href="http://feedburner.google.com/fb/a/mailverify?uri=gvsulibstatus&amp;loc=en_US" title="Subscribe to updates via Email">Email</a></p>'); ?>
-
+		<div class="span4 unit right lib-horizontal-list" style="text-align: right;">
+			<ul>
+				
+	
+					<li style="float:right;"><a href="feedback.php" class="lib-button-small" style="margin-top:-.5em" id="feedback-trigger">Report a Problem</a></li>
+						<li style="float:right;margin-right: 8%;"><?php  echo ((isset($_SESSION['username'])) ? '<a href="?logout" title="Log out" style="text-decoration: none; font-size: .9em;">Log out</a>' : '<a href="admin.php" title="Log in" style="text-decoration: none; font-size: .9em;">Log in</a>'); ?></li>
+			</ul>
 		</div>
 	</div> <!-- end line -->
 
 	<div class="line break">
-		<div class="span1 unit left">
 
 			<?php 
 
@@ -94,7 +108,6 @@ session_start();
 
 			?>
 
-		</div> <!-- end span -->
 	</div> <!-- end line -->
 
 	<!--div class="line break">
@@ -123,7 +136,7 @@ session_start();
 			<h3>Report a Problem</h3>
 			<p>Having trouble with any of the University Library's online systems? Drop us a line and let us know. We&#8217;ll do our best to sort it out.</p>
 
-			<a href="feedback.php" class="status-button" style="margin-top: .5em" id="feedback-trigger">Report a Problem</a>
+			
 
 		</div> <!-- end span -->
 	<!--/div> <!-- end line -->
@@ -218,7 +231,24 @@ session_start();
 	-->
 	
 	<!-- Add blog-like view of incidents -->
-	<div style="clear: both; margin-top: 2em;"></div>	
+	<div class="line lib-horizontal-list status-bar" style="clear: both; margin: 2em 0; padding: .75em 1%; background: #eee; border: 1px solid #bbb;">
+		
+		<div class="span3of4 unit left">
+			<ul>
+				<li><a href="/" class="status-button active" style="margin-top: -.5em" id="filter-recent">Show Recent</a></li>
+				<li><a href="/?status=unresolved" class="status-button" style="margin-top: -.5em" id="filter-unresolved">Show Unresolved</a></li>
+				<li><a href="/?status=resolved" class="status-button" style="margin-top: -.5em" id="filter-resolved">Show Resolved</a></li>
+			</ul>
+		</div>
+		
+		<div class="span4 unit right subscription-list" style="text-align:right;">
+			<p>Subscribe: <a href="http://feeds.feedburner.com/gvsulibstatus" title="Subscribe to the RSS feed">RSS</a>&nbsp;
+				//&nbsp;
+				<a href="http://feedburner.google.com/fb/a/mailverify?uri=gvsulibstatus&amp;loc=en_US" title="Subscribe to updates via Email">Email</a></p>
+		</div>
+		
+		
+	</div>	
 	<?php
 	
 		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC LIMIT 10";
@@ -297,7 +327,7 @@ session_start();
 
 $(document).ready(function() {
 
-	$("body").append('<div class="feedback lib-form"> <form method="post" action="http://www.gvsu.edu/library/customemail-post.htm?keyId=9D7CB431-E6EB-A2DB-48089384265083C9"> <label for="name">Your Name:</label> <input type="text" name="name" id="name" placeholder="Optional" /> <label for="feedback">Have an idea? See a problem?</label> <textarea name="feedback"></textarea> <div class="right"> <a href="index.php" style="display: inline-block; margin-right: 2em;">Cancel</a> <input class="lib-button" type="submit" value="Send Feedback" style="margin-top: 1em;" /> </div> </form> </div>');
+	$("body").append('<div class="feedback lib-form line"> <form method="post" action="http://www.gvsu.edu/library/customemail-post.htm?keyId=9D7CB431-E6EB-A2DB-48089384265083C9"> <div class="span2 unit left"><label for="name">Your Name:</label> <input type="text" name="name" id="name" placeholder="Optional" /></div><div class="span2 unit left lastUnit"><label for="email">Your Email:</label> <input type="text" name="email" id="email" placeholder="Optional" /></div><label for="feedback">Have an idea? See a problem?</label> <textarea name="feedback"></textarea> <div class="right"> <a href="index.php" style="display: inline-block; margin-right: 2em;">Cancel</a> <input class="lib-button" type="submit" value="Report a Problem" style="margin-top: 1em;" /> </div> </form> </div>');
 
 	$(".feedback").hide();
 

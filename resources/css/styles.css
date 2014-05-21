@@ -208,7 +208,7 @@ a.lib-button-wide { color: #fff !important;}
 
 .lib-horizontal-list { margin-top:1.5em;}
 .lib-horizontal-list ul {font-size:.95em;margin-bottom:1em;}
-.lib-horizontal-list ul li {float:left;margin:1em 1em 0 0;padding:0 .7em 0 0;}
+.lib-horizontal-list ul li {float:left;margin:1em 1% 0 0;padding:0 1% 0 0;}
 
 .comment-text ul,
 .comment-text ol,
