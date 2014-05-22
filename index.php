@@ -25,13 +25,6 @@ session_start();
     	printf("Connect failed: %s\n", $db->connect_error);
     	exit();
 	}
-
-	if ($db->connect_errno) {
-    	printf("Connect failed: %s\n", $db->connect_error);
-    	exit();
-	}
-	
-	
 	
 	if(isset($_SESSION['username'])) { // User has logged in
 
@@ -60,8 +53,6 @@ session_start();
 			// Create the user object as $user.
 			// User id is then $loggedin_user->user_id
 			$loggedin_user = $user_result->fetch_object();
-			
-			print_r($loggedin_user);
 	
 			// new issue post
 			if (isset($_POST['submit_issue'])) {
@@ -505,7 +496,7 @@ session_start();
 						
 					}
 	
-}echo $attribution . ' </div><!-- End .line -->';
+} echo $attribution . ' </div><!-- End .line -->';
 					} // close status loop
 				}
 			
@@ -519,13 +510,7 @@ session_start();
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 </div>
-<script> 
-  (function() {
-    var x = document.createElement("script"); x.type = "text/javascript"; x.async = true;
-    x.src = (document.location.protocol === "https:" ? "https://" : "http://") + "libraryh3lp.com/js/libraryh3lp.js?multi,poll";
-    var y = document.getElementsByTagName("script")[0]; y.parentNode.insertBefore(x, y);
-  })();
-</script>
+
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
 $(document).ready(function() {

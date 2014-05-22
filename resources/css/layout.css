@@ -327,7 +327,7 @@ div.hover {
 }
 .login {position: relative; top: 1em; right: 3%; }
 .login a { color: #fff; text-decoration: none;}
-
+.has-js { display: none; }
 .status-table .heading { font-weight: bold; }
 .status-heading dl dt { text-align: left !important;}
 .status-table dt,
