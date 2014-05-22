@@ -17,9 +17,12 @@ h1 a {
 	text-decoration: none;
 }
 
-h4 {
+h2 {
 	-webkit-margin-before: 0;
 	-webkit-margin-after: .6em;
+	font-size: 1.2em;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
 }
 
 .when_box { clear: left; float: none; }
@@ -325,5 +328,31 @@ div.hover {
 .login {position: relative; top: 1em; right: 3%; }
 .login a { color: #fff; text-decoration: none;}
 
+.status-table .heading { font-weight: bold; }
+.status-heading dl dt { text-align: left !important;}
+.status-table dt,
+.status-table dd { display: inline-block; width:48%; padding: .7em 0;}
+.status-table dl { border-bottom: 1px solid #ddd; width: 95%; }
+.status-table dd { text-align: right;}
+.issue-box { margin-bottom: 1.5em; padding-bottom: 1.5em; padding-top: 0; border-bottom: 2px solid #bbb;}
+.issue-box h4 { margin-bottom: .4em; margin-top: 0; font-weight: bold;}
+.issue-box .tagline { font-size: 90%; color: #575757;margin-top: 1em;clear:both;}
+.comment-list { margin-top: .7em;padding-top: .7em;  border-top: 1px solid #ddd; }
+.timestamp {display: inline-block; float: left; margin-right: .5em;line-height: 1.5em;}
+h2 span { font-size: 14px; display: inline-block; padding: .4em; }
+.tag-unresolved { background: #cb0000; color: white; }
+.tag-resolved { background: green; color: white; }
+.status-update { color: #0065A4; text-decoration: underline; font-size: .9em;margin-top: .5em; cursor: pointer; }
+legend { display: none;}
+form[name="status-form"] { background: #eee; padding: .5em 1%;}
+.lib-online { display: block;
+line-height: 1.5em;
+margin: .5em 0;
+padding: 1em 1.5em;
+background: none repeat scroll 0% 0% #008A00;
+border: 1px solid #8ACC66;
+text-align: left;
+color: #fff;}
+#message-update { position: absolute; top:0; left:0; right: 0; margin-left: auto; margin-right: auto;}
 
 

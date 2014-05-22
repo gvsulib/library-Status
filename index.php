@@ -1,5 +1,22 @@
 <?php
 session_start();
+	$_SESSION['location'] = 'http://localhost:8888/library-Status/';
+	
+	date_default_timezone_set('America/Detroit');
+	$logged_in = 0; // By default, user is logged out
+	
+	// Are you logged in?
+	
+	// Debug the user login by a force login
+	//$_SESSION['username'] = 'reidsmam';
+	
+	if(isset($_GET['login']) && !(isset($_SESSION['username']))) { // No $_SESSION['username'] variable, send to login script
+		
+		// User has not logged in
+		header('Location: http://labs.library.gvsu.edu/login');
+
+	}
+	
 	include 'resources/secret/config.php';
 	include ('resources/php/markdown.php');
 	
@@ -13,8 +30,129 @@ session_start();
     	printf("Connect failed: %s\n", $db->connect_error);
     	exit();
 	}
+	
+	
+	
+	if(isset($_SESSION['username'])) { // User has logged in
 
-	date_default_timezone_set('America/Detroit');
+		if (isset($_REQUEST['logout'])) {
+			$_SESSION = array();
+			session_destroy();
+			header('Location: index.php');
+		}
+
+		$username = $_SESSION['username'];
+		// User names are unique, so only need a single row
+		// Get all the bits from the user name so you don't have to ask again
+		$user_result=$db->query("SELECT * FROM user WHERE user_username = '$username' LIMIT 1");
+
+		if(($user_result) && ($user_result->num_rows > 0)) { // Query was successful, a user was found
+
+
+			while($row = $user_result->fetch_assoc()) {
+				$user_access = $row["user_access"];
+				$user_id = $row["user_id"];
+				$user_fn = $row["user_fn"];
+			}
+
+			$logged_in = 1;
+
+			// Create the user object as $user.
+			// User id is then $loggedin_user->user_id
+			$loggedin_user = $user_result->fetch_object();
+			
+			print_r($loggedin_user);
+	
+			// new issue post
+			if (isset($_POST['submit_issue'])) {
+
+				$issue_text = $db->real_escape_string($_POST['issue_text']);
+				$system_id = $_POST['system_id'];
+				$status_type_id = $_POST['status_type_id'];
+
+				// Create a time one year back to see use to check if posting time is in range.
+				$time_check = time();
+				$time_check = strtotime('-1 month');
+
+				// If time is something special or ready or for now and is within the last year.
+				if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
+					$time = strtotime($_POST['when']);
+				} else { 
+					$time = time();
+				}
+
+				// Create new issue
+				$db->query("INSERT INTO issue_entries
+				VALUES ('','$system_id', $status_type_id, '$time', '0')");
+				$issue_id = $db->insert_id;
+
+				// Create a new status entry for issue
+				$db->query("INSERT INTO status_entries
+				VALUES ('','$issue_id','$time','1','$status_type_id','$user_id','$issue_text','0')");
+				
+				$m = '<div class="lib-success">Your issue has been added.</div>';
+				
+			}
+
+			// new status post$loggedin
+			if (isset($_POST['submit_status'])) {
+
+				$issue_id = $_POST['issue_id'];
+				$status_type_id = $_POST['status_type_id'];
+				$status_text = $db->real_escape_string($_POST['status']);
+
+				$issue_resolved = $_POST['issue_resolved'];
+
+				// Create a time one year back to see use to check if posting time is in range.
+				$time_check = time();
+				$time_check = strtotime('-1 month');
+
+				// If time is something special or ready or for now and is within the last year.
+				if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
+					$time = strtotime($_POST['when']);
+				} else { 
+					$time = time();
+				}
+
+				$status_value = $status_type_id;
+				if ($issue_resolved == 1) {
+					$status_value = 3;
+
+					//update issue end_time and close issue
+					$db->query("UPDATE issue_entries
+								SET issue_entries.end_time = '$time'
+								WHERE $issue_id = issue_entries.issue_id");
+				}
+
+				// Create a new status entry
+				$db->query("INSERT INTO status_entries
+				VALUES ('','$issue_id','$time','1','$status_value','$user_id','$status_text','0')") or die($db->error);
+				
+				$m = '<div class="lib-success">Your status update has been added.</div>';
+			}
+
+		} // End loop for logged in user
+
+} 
+	
+		if(isset($_GET['thankyou'])) {
+			$m = '<div class="lib-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>';
+		}
+		
+		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC LIMIT 10";
+		$filter = 0; // Most Recent Filter is active
+		
+		if(isset($_GET['status']) && ($_GET['status'] == 'resolved')) {
+			$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id  AND issue_entries.end_time > 0 ORDER BY issue_entries.issue_id DESC";
+			$filter = 2; // Show Resolved
+		} 
+		
+		if(isset($_GET['status']) && ($_GET['status'] == 'unresolved')) {
+				$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
+				$filter = 1; // Show Unresolved
+		}
+	
+	
 ?>
 
 <!DOCTYPE html>
@@ -60,16 +198,96 @@ session_start();
 			<h1><a href="index.php">University Libraries Status</a></h1>
 		</div> <!-- end span -->
 
-		<div class="span4 unit right lib-horizontal-list" style="text-align: right;">
+		<div class="span2 unit right lib-horizontal-list" style="text-align: right;margin-top:.65em;">
 			<ul>
-				
-	
-					<li style="float:right;"><a href="feedback.php" class="lib-button-small" style="margin-top:-.5em" id="feedback-trigger">Report a Problem</a></li>
-						<li style="float:right;margin-right: 8%;"><?php  echo ((isset($_SESSION['username'])) ? '<a href="?logout" title="Log out" style="text-decoration: none; font-size: .9em;">Log out</a>' : '<a href="admin.php" title="Log in" style="text-decoration: none; font-size: .9em;">Log in</a>'); ?></li>
+
+					<li style="float:right;"><?php echo (($logged_in == 1) ? '<a href="#" class="status-button has-js issue-trigger" style="margin-top:-.5em" id="issue-trigger">Report an Issue</a>' : '<a href="feedback.php" class="lib-button-small issue-trigger" style="margin-top:-.5em" id="feedback-trigger">Report a Problem</a>'); ?></li>
+						<li style="float:right;margin-right: 8%;"><?php  echo (($logged_in == 1) ? 'Hello, ' . $user_fn . '&nbsp;//&nbsp;<a href="?logout" title="Log out" style="text-decoration: none; font-size: .9em;">Log out</a>' : '<a href="?login" title="Log in" style="text-decoration: none; font-size: .9em;">Log in</a>'); ?></li>
 			</ul>
 		</div>
 	</div> <!-- end line -->
+	<?php
+	
+		if(isset($m)) {
+			echo '<div id="message-update">' . $m . '</div>';
+		}
+		
+		if($logged_in == 1) {
+	
+	?>
+	<div class="line lib-form feedback">
+		<div class = "span1 unit">	
+			<div class = "span1 unit">	
+				<h4>Report an Issue</h4>
+			</div>
 
+			<form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" name="issue-form" onsubmit="return validateForm()">
+				<div style="float: left; padding-right: 1em;">
+					<label class="lib-inline">System:</label>
+					<select name="system_id">
+
+						<!-- load system names -->
+						<?php
+						$result = $db->query("SELECT * FROM systems");
+
+						while($row = $result->fetch_assoc())
+						{
+							// Restrict issue submission on user access limits
+							if ($user_access == 1 && $row['system_category'] == 0) {
+								echo '<option value="' . $row["system_id"] . '">' . $row["system_name"] . '</option>';
+							} else if ($user_access == 2 && $row['system_category'] == 1) {
+								echo '<option value="' . $row["system_id"] . '">' . $row["system_name"] . '</option>';
+							} else if ($user_access == 9) {
+								echo '<option value="' . $row["system_id"] . '">' . $row["system_name"] . '</option>';
+							}
+						}
+						?>
+
+					</select>
+				</div>
+
+				<div style="float: left;">
+					<label class="lib-inline">Status:</label>
+					<select name="status_type_id">
+
+						<!-- Load status types -->
+						<?php
+						$result = $db->query("SELECT * FROM status_type");
+						while($row = $result->fetch_assoc())
+						{
+							if ($row["status_type_id"] != 3)
+							echo '<option value="' . $row["status_type_id"] . '">' . $row["status_type_text"] . '</option>';
+						}
+						?>
+
+					</select>
+				</div>
+
+				<div class="when_box">
+					
+					<label style="padding-top: .2em; ">When:</label>
+					<input type="text" name="when" value = "Now" style="width: 70%; font-size: .8em; font; color: #575757; display: inline">
+
+				</div>
+
+
+				<div class = "span1 unit" style="float: left; padding: 1em 0">
+					<textarea style="font-size: 1em" name="issue_text" placeholder="Describe issue..."></textarea>
+				</div>
+
+				<input class="status-button" style="float: left;" name="submit_issue" type="submit" value="Submit Issue" />
+				
+				<div style="float: left; margin-left: 3%; margin-top: .8em; color: #0065A4; text-decoration: underline; cursor:pointer;" class="has-js issue-trigger" id="cancel-issue">Cancel</div>
+
+			</form>
+
+		</div> <!-- end span -->
+	</div> <!-- end line -->
+	
+	<?php
+}
+	?>
+	
 	<div class="line break">
 
 			<?php 
@@ -85,7 +303,7 @@ session_start();
 													WHERE i.system_id = {$row['system_id']}
 													AND i.start_time < '$now'");
 
-					$status = '<div class="lib-success" style="margin: 0;">
+					$status = '<div class="lib-online" style="margin: 0;">
 						<p>All systems are online.</p>
 						</div>';
 
@@ -109,55 +327,7 @@ session_start();
 			?>
 
 	</div> <!-- end line -->
-
-	<!--div class="line break">
-		<div class="span2 unit left" style="margin-bottom: 1em;">
-			<h3>Get Help</h3>
-
-			<p>We&#8217;re available to help even if you&#8217;re off campus. Stop in at <a href="http://gvsu.edu/library/directions">any location</a>, or contact us during <a href="http://gvsu.edu/library/hours">The Mary Idema Pew Library's regular hours</a>.</p>
-
-			<style type="text/css">
-.chat { display: inline-block; padding-left: 1.45em; }
-.chat-online { background-image: url(http://gvsu.edu/cms3/assets/741ECAAE-BD54-A816-71DAF591D1D7955C/chat-online.png); background-repeat:no-repeat;background-position:middle left;  }
-.chat-offline { background-image: url(http://gvsu.edu/cms3/assets/741ECAAE-BD54-A816-71DAF591D1D7955C/chat-offline.png); background-repeat:no-repeat;background-position:middle left; color: #575757 !important;}</style>
-<div class="needs-js">
-	&nbsp;</div>
-<div class="libraryh3lp" jid="gvsulibs-queue@chat.libraryh3lp.com" style="display: none;">
-	<a class="status-button" href="#" onclick="window.open('https://libraryh3lp.com/chat/gvsulibs-queue@chat.libraryh3lp.com?skin=16489',
-   'chat', 'resizable=1,width=320,height=200'); return false;" style="margin-top:.5em; text-decoration: none; margin-right: 1em;"><span class="chat chat-online">Chat now </span> </a></div>
-<div class="libraryh3lp" style="display: none;">
-	<a class="status-button" href="http://gvsu.edu/chat" style="margin-top:.5em; text-decoration: none; margin-right: 1em;"><span class="chat chat-offline">Chat is Offline</span></a></div>
-
-			<a class="status-button" style="text-decoration: none; margin-top: .5em" href="mailto:library@gvsu.edu">Email</a>
-
-		</div>
-
-		<div class="span2 unit right">
-			<h3>Report a Problem</h3>
-			<p>Having trouble with any of the University Library's online systems? Drop us a line and let us know. We&#8217;ll do our best to sort it out.</p>
-
-			
-
-		</div> <!-- end span -->
-	<!--/div> <!-- end line -->
 	
-	<style>
-	.status-table .heading { font-weight: bold; }
-	.status-heading dl dt { text-align: left !important;}
-	.status-table dt,
-	.status-table dd { display: inline-block; width:48%; padding: .7em 0;}
-	.status-table dl { border-bottom: 1px solid #ddd; width: 95%; }
-	.status-table dd { text-align: right;}
-	.issue-box { margin-bottom: 1.5em; padding-bottom: 1.5em; padding-top: 0; border-bottom: 2px solid #bbb;}
-	.issue-box h4 { margin-bottom: .4em; margin-top: 0; font-weight: bold;}
-	.issue-box .tagline { font-size: 90%; color: #575757;margin-top: 1em;clear:both;}
-	.comment-list { margin-top: .7em;padding-top: .7em;  border-top: 1px solid #ddd; }
-	.timestamp {display: inline-block; float: left; margin-right: .5em;line-height: 1.5em;}
-	h4 span { font-size: 14px; display: inline-block; padding: .4em; }
-	.tag-unresolved { background: #cb0000; color: white; }
-	.tag-resolved { background: green; color: white; }
-	</style>
-
 	<div class="line break status-table">
 		<div class="span2 unit left">
 						
@@ -182,13 +352,13 @@ session_start();
 
 								echo '<dl class="system">';
 								echo '<dt>' . $row["system_name"] . '</dt> ';
-								echo '<dd class = "col2 name"';
+								echo '<dd class = "col2 name"><a href="detail.php?system='. $row['system_id'] .'" style = "text-decoration: none;';
 
 								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text, i.issue_id
 								FROM issue_entries i, status_type s
 								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id AND i.start_time < '$now'");
 	
-								$currently = ' style="color: #147D11">Online'; // currently displayed. Color difference is WCAG2 AA compliant
+								$currently = 'color: #147D11">Online'; // currently displayed. Color difference is WCAG2 AA compliant
 
 								// Display Day
 								while ($rw = $system_result->fetch_assoc()) {
@@ -199,18 +369,12 @@ session_start();
 
 										//echo '<p>color</p>';
 
-										if ($rw['status_type_id'] == 2) { 
-											// Color difference is WCAG2 AA compliant
-											// Changed GET requests to just grab issue ID, not day and system.
-											$currently = '><a href="detail.php?id='. $row['issue_id'] .'" style = "text-decoration: none; color: #cb0000;">'.$rw['status_type_text'].'</a>';
-										}
-										else {
-											$currently = '><a href="detail.php?id='. $row['issue_id'] .'" style = "text-decoration: none; color: #cb0000;">'.$rw['status_type_text'].'</a>';
-										}
+										$currently = 'color: #cb0000;">'.$rw['status_type_text'];
+										
 									}
 								}
 
-								echo $currently . '</dd>'; // close currently displayed
+								echo $currently . '</a></dd>'; // close currently displayed
 
 								echo '</dl>'; // close row
 								$i++;
@@ -220,24 +384,15 @@ session_start();
 
 			</div>
 	</div> <!-- end line -->
-
-	<!--
-	<div class="line break">
-		<div class="prevNext">
-			<a href="#" class="prev ">&#8249; Earlier</a>
-			<a href="#" class="next">Next &#8250;</a>
-		</div>
-	</div>
-	-->
 	
 	<!-- Add blog-like view of incidents -->
 	<div class="line lib-horizontal-list status-bar" style="clear: both; margin: 2em 0; padding: .75em 1%; background: #eee; border: 1px solid #bbb;">
 		
 		<div class="span3of4 unit left">
 			<ul>
-				<li><a href="/" class="status-button active" style="margin-top: -.5em" id="filter-recent">Show Recent</a></li>
-				<li><a href="/?status=unresolved" class="status-button" style="margin-top: -.5em" id="filter-unresolved">Show Unresolved</a></li>
-				<li><a href="/?status=resolved" class="status-button" style="margin-top: -.5em" id="filter-resolved">Show Resolved</a></li>
+				<li><a href="index.php" class="status-button <?php echo ($filter == 0 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-recent"><?php echo ($filter == 0 ? 'Showing' : 'Show'); ?> Recent</a></li>
+				<li><a href="?status=unresolved" class="status-button <?php echo ($filter == 1 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-unresolved"><?php echo ($filter == 1 ? 'Showing' : 'Show'); ?> Unresolved</a></li>
+				<li><a href="?status=resolved" class="status-button <?php echo ($filter == 2 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($filter == 2 ? 'Showing' : 'Show'); ?> Resolved</a></li>
 			</ul>
 		</div>
 		
@@ -250,8 +405,6 @@ session_start();
 		
 	</div>	
 	<?php
-	
-		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC LIMIT 10";
 		
 			$issue_result = $db->query($issue_query);
 			$n_rows = $issue_result->num_rows;
@@ -266,7 +419,7 @@ session_start();
 						ORDER BY s.status_timestamp ASC");
 
 					$num_rows = $result->num_rows;
-					$issue_id = $status_entries['issue_id'];
+					$issue_id = $issue_entries['issue_id'];
 
 					$rc = 0;
 
@@ -279,27 +432,78 @@ session_start();
 							
 							if($issue_entries['end_time'] > 0) {
 								$current_status = '<span class="tag-resolved">Resolved</span>';
+								$resolved = 1;
 							} else {
 								$current_status = '<span class="tag-unresolved">Unresolved</span>';
+								$resolved = 0;
 							}
 
 							echo '
 							<!-- Issue -->
 							<div class = "line issue-box span1">
-								<h4>' . $status_entries['status_type_text'] . ' for ' . $issue_entries['system_name'] . ' ' . $current_status .'</h4>
-								<div class="comment-text"><strong class="timestamp">[' . date("g:i a", $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>';
+								' . ($logged_in == 1 && $resolved == 0 ? '<div class="right status-update has-js">Add Update</div>' : '') .'
+								<h2 id="issue_' . $issue_entries['issue_id'] . '"><a href="detail.php?id=' . $issue_entries['issue_id'] . '">' . $status_entries['status_type_text'] . ' for ' . $issue_entries['system_name'] . ' ' . $current_status .'</a></h2>
+								<div class="comment-text"><strong class="timestamp">[' . date("n/j @ g:i a", $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>';
 								
-								$attribution = '<p class="tagline">This issue was reported at ' . date("g:i a n/j/y", $status_entries['status_timestamp']) . ' by ' . $status_entries['user_fn'] . '</p>';
+								// Note the use of the date
+								$displayed_date = date("y-n-j", $status_entries['status_timestamp']);
+								
+								$attribution = '<p class="tagline">This issue was reported on ' . date("n/j/y", $status_entries['status_timestamp']) . ($resolved == 1 ? ' and resolved on ' . date('n/j/y', $issue_entries['end_time']) : '') .'.</p>';
 						
 						} else {
 									
 							// Comment wrapper
+							
+							// Do we need to show the date again?
+							$comment_date = date('y-n-j', $status_entries['status_timestamp']);
+							
+							if($displayed_date != $comment_date) {
+								$displayed_date = $comment_date;
+								$comment_time = date('n/j @ g:i a', $status_entries['status_timestamp']);
+							} else {
+								$comment_time = date('g:i a', $status_entries['status_timestamp']);
+							}
+							
 							echo '<div class="comment-list">
-									<div class ="comment-text"><strong class="timestamp">[' . date("g:i a", $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
+									<div class ="comment-text"><strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
 								</div> <!-- end comment-list --> ';
 
 }
 
+					// Add the comments entry if logged in and the item is unresolved
+					
+					if(($logged_in == 1) && ($resolved == 0)) {
+						
+						echo '<div class="lib-form add-comment-form" style="margin-top: .5em; padding-top: .5em; border-top: 1px dotted #bbb;">
+
+							<form action="' . $_SERVER['PHP_SELF'] . '" method="POST" name="status-form">
+								<fieldset>
+								<legend>Add a Status Update</legend>
+								<label for="status-' . $status_entries['issue_id'] . '" style="display:none;">Update Status</label>
+								<textarea style="margin-top: .5em; height: 5em; font-size: 1em" id="status-' . $status_entries['issue_id'] . '" name="status" placeholder="Update the Status of this Issue"></textarea>
+
+							<div class="line" style="margin-top:.5em;">
+								<div class="span2 right unit" style="text-align:right;">
+
+									<label style="margin-left: 1em;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
+									<input type="checkbox" name="issue_resolved" id="issue_resolved" value="1">
+									
+									<label class="lib-inline" for="comment-when-' . $status_entries['issue_id'] . '" >When</label>
+									<input type="text" style="width:6em; display:inline-block;" name="when" id="comment-when-' . $status_entries['issue_id'] . '" value="Now" />
+								</div>
+								<div class="left unit span4 lastUnit">
+									<input class="status-button" name="submit_status" type="submit" value="Update" />
+								</div>
+							</div>	
+								
+
+								<input type="hidden" name="issue_id" value="' .$status_entries['issue_id'] . '" />
+								<input type="hidden" name="status_type_id" value="' . $status_entries['status_type_id'] . '" />
+							</fieldset>
+							</form>
+						</div>';
+						
+					}
 	
 }echo $attribution . ' </div><!-- End .line -->';
 					} // close status loop
@@ -324,14 +528,46 @@ session_start();
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
-
 $(document).ready(function() {
+	
+	$('#message-update').css('position','fixed');
+	
+	setTimeout(function() {
+	    $('#message-update').fadeOut('slow');
+	}, 5000);
 
-	$("body").append('<div class="feedback lib-form line"> <form method="post" action="http://www.gvsu.edu/library/customemail-post.htm?keyId=9D7CB431-E6EB-A2DB-48089384265083C9"> <div class="span2 unit left"><label for="name">Your Name:</label> <input type="text" name="name" id="name" placeholder="Optional" /></div><div class="span2 unit left lastUnit"><label for="email">Your Email:</label> <input type="text" name="email" id="email" placeholder="Optional" /></div><label for="feedback">Have an idea? See a problem?</label> <textarea name="feedback"></textarea> <div class="right"> <a href="index.php" style="display: inline-block; margin-right: 2em;">Cancel</a> <input class="lib-button" type="submit" value="Report a Problem" style="margin-top: 1em;" /> </div> </form> </div>');
+<?php
+
+	if($logged_in == 1) {
+		
+?>
+
+	$(".feedback").hide();
+	$(".add-comment-form").hide();
+	$(".has-js").css("display","inline-block");
+	$(".issue-trigger").click(function(e) {
+
+		$(".feedback").slideToggle(400);
+
+	});
+	$(".status-update").click(function() {
+		console.log('Click');
+		$(this).parent("div.issue-box").find('div.add-comment-form').slideToggle(400);
+
+	});
+});
+
+<?php
+
+	} else {
+		
+?>
+
+	$("body").append('<div class="feedback lib-form line"> <form method="post" action="http://www.gvsu.edu/library/customemail-post.htm?keyId=9D7CB431-E6EB-A2DB-48089384265083C9"> <div class="span2 unit left"><label for="name">Your Name:</label> <input type="text" name="name" id="name" placeholder="Optional" /></div><div class="span2 unit left lastUnit"><label for="email">Your Email:</label> <input type="text" name="email" id="email" placeholder="Optional" /></div><label for="feedback">Have an idea? See a problem?</label> <textarea name="feedback"></textarea> <div class="right"> <div style="display: inline-block; margin-right: 2em; color: #0065A4; text-decoration: underline; cursor:pointer;" class="issue-trigger">Cancel</div> <input class="lib-button" type="submit" value="Report a Problem" style="margin-top: 1em;" /> </div> </form> </div>');
 
 	$(".feedback").hide();
 
-	$("#feedback-trigger").click(function(e) {
+	$(".issue-trigger").click(function(e) {
 
 		e.preventDefault();
 
@@ -339,6 +575,10 @@ $(document).ready(function() {
 
 	});
 });
+
+<?php 
+	}
+?>
 
 </script>
 </body>
