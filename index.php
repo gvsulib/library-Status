@@ -1,6 +1,8 @@
 <?php
 session_start();
-	$_SESSION['location'] = 'http://localhost:8888/library-Status/';
+$actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+
+	$_SESSION['location'] = $actual_url;
 	
 	date_default_timezone_set('America/Detroit');
 	$logged_in = 0; // By default, user is logged out
