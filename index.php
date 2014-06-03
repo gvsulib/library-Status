@@ -78,10 +78,14 @@ session_start();
 				$issue_id = $db->insert_id;
 
 				// Create a new status entry for issue
-				$db->query("INSERT INTO status_entries
-				VALUES ('','$issue_id','$time','1','$status_type_id','$user_id','$issue_text','0')");
+				if($db->query("INSERT INTO status_entries
+				VALUES ('','$issue_id','$time','1','$status_type_id','$user_id','$issue_text','0')")) {
+					$m = '<div class="lib-success">Your issue has been added.</div>';
+				} else {
+					$m = '<div class="lib-error">There was a problem adding your issue. ' . $db->error . '</div>';
+				}
 				
-				$m = '<div class="lib-success">Your issue has been added.</div>';
+				
 				
 			}
 
@@ -116,10 +120,14 @@ session_start();
 				}
 
 				// Create a new status entry
-				$db->query("INSERT INTO status_entries
-				VALUES ('','$issue_id','$time','1','$status_value','$user_id','$status_text','0')") or die($db->error);
+				if($db->query("INSERT INTO status_entries
+				VALUES ('','$issue_id','$time','1','$status_value','$user_id','$status_text','0')")) {
+						$m = '<div class="lib-success">Your status update has been added.</div>';
+				} else {
+						$m = '<div class="lib-error">There was a problem saving your update. ' . $db->error . '</div>';
+				}
 				
-				$m = '<div class="lib-success">Your status update has been added.</div>';
+			
 			}
 
 		} // End loop for logged in user
