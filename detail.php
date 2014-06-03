@@ -359,6 +359,7 @@
 										if ($rc == 1) {
 											
 											$time_format = 'n/j/y @ g:i a';
+											$status_type_id = $status_entries['status_type_id'];
 									
 											echo '
 											<!-- Issue -->
@@ -399,6 +400,7 @@
 											
 										
 									}
+									
 									if(($logged_in == 1) && ($resolved == 0)) {
 
 										echo '<div class="lib-form add-comment-form" style="margin-top: .5em; padding-top: .5em; border-top: 1px dotted #bbb;">
@@ -406,8 +408,8 @@
 											<form action="' . $actual_url . '" method="POST" name="status-form">
 												<fieldset>
 												<legend>Add a Status Update</legend>
-												<label for="status-' . $status_entries['issue_id'] . '" style="display:none;">Update Status</label>
-												<textarea style="margin-top: .5em; height: 5em; font-size: 1em" id="status-' . $status_entries['issue_id'] . '" name="status" placeholder="Update the Status of this Issue"></textarea>
+												<label for="status-' . $issue_entries['issue_id'] . '" style="display:none;">Update Status</label>
+												<textarea style="margin-top: .5em; height: 5em; font-size: 1em" id="status-' . $issue_entries['issue_id'] . '" name="status" placeholder="Update the Status of this Issue"></textarea>
 
 											<div class="line" style="margin-top:.5em;">
 												<div class="span2 right unit" style="text-align:right;">
@@ -415,8 +417,8 @@
 													<label style="margin-left: 1em;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
 													<input type="checkbox" name="issue_resolved" id="issue_resolved" value="1">
 
-													<label class="lib-inline" for="comment-when-' . $status_entries['issue_id'] . '" >When</label>
-													<input type="text" style="width:6em; display:inline-block;" name="when" id="comment-when-' . $status_entries['issue_id'] . '" value="Now" />
+													<label class="lib-inline" for="comment-when-' . $issue_entries['issue_id'] . '" >When</label>
+													<input type="text" style="width:6em; display:inline-block;" name="when" id="comment-when-' . $issue_entries['issue_id'] . '" value="Now" />
 												</div>
 												<div class="left unit span4 lastUnit">
 													<input class="status-button" name="submit_status" type="submit" value="Update" />
@@ -424,8 +426,8 @@
 											</div>	
 
 
-												<input type="hidden" name="issue_id" value="' .$status_entries['issue_id'] . '" />
-												<input type="hidden" name="status_type_id" value="' . $status_entries['status_type_id'] . '" />
+												<input type="hidden" name="issue_id" value="' .$issue_entries['issue_id'] . '" />
+												<input type="hidden" name="status_type_id" value="' . $status_type_id . '" />
 											</fieldset>
 											</form>
 										</div>';
