@@ -263,14 +263,7 @@ session_start();
 
 						while($row = $result->fetch_assoc())
 						{
-							// Restrict issue submission on user access limits
-							if ($user_access == 1 && $row['system_category'] == 0) {
-								echo '<option value="' . $row["system_id"] . '">' . $row["system_name"] . '</option>';
-							} else if ($user_access == 2 && $row['system_category'] == 1) {
-								echo '<option value="' . $row["system_id"] . '">' . $row["system_name"] . '</option>';
-							} else if ($user_access == 9) {
-								echo '<option value="' . $row["system_id"] . '">' . $row["system_name"] . '</option>';
-							}
+							echo '<option value="' . $row["system_id"] . '">' . $row["system_name"] . '</option>';
 						}
 						?>
 
@@ -323,7 +316,7 @@ session_start();
 
 			<?php
 
-				$result = $db->query("SELECT * FROM systems ORDER BY system_category ASC, system_name ASC");
+				$result = $db->query("SELECT * FROM systems ORDER BY system_name ASC");
 				$now = time();
 
 				while($row = $result->fetch_assoc())
@@ -365,7 +358,7 @@ session_start();
 						<!-- load system names -->
 						<?php
 
-							$result = $db->query("SELECT * FROM systems ORDER BY system_category ASC, system_name ASC");
+							$result = $db->query("SELECT * FROM systems ORDER BY system_name ASC");
 							$now = time();
 							$i = 0;
 							$system_count = $result->num_rows;
