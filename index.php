@@ -4,6 +4,7 @@ session_start();
 
 	date_default_timezone_set('America/Detroit');
 	$logged_in = 0; // By default, user is logged out
+	$m = NULL; // By default, there are no messages
 
 	// Are you logged in?
 
@@ -140,6 +141,33 @@ session_start();
 			$m = '<div class="lib-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>';
 		}
 
+	/*
+		A non-logged-in user has submitted a problem report. Check for basic bad
+		bits and then send the email.
+	*/
+
+		if(isset($_POST['problem-report'])) {
+
+
+
+			// First, let's see if you're a bot that added something to the honeypot
+			if(!($_POST['bot_check'] == NULL) || !($_POST['bot_check'] == '')) {
+
+				$m = '<div class="lib-error">Whoops! That entry looks like something a spam bot would do. Don&#8217;t fill in the last field if you are a real person.</div>';
+
+			} else {
+
+				echo 'Getting this far';
+
+				$name = stripslashes($_POST['name']);
+				$email = stripslashes($_POST['email']);
+				$message = stripslashes($_POST['feedback']);
+
+				send_email($name, $email, $message);
+			}
+
+		}
+
 		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC LIMIT 10";
 		$filter = 0; // Most Recent Filter is active
 
@@ -154,13 +182,15 @@ session_start();
 		}
 
 
+
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-	<title>GVSU University Libraries Status</title>
+	<title><?php echo $library_name; ?> Status</title>
 	<style>
 	@font-face {
 	    font-family: 'AlternateGothicFSNo3';
@@ -182,11 +212,11 @@ session_start();
 
 <body>
 
-	<div id="gvsu-header-wrapper">
-		<div id="gvsu-header">
-			<div id="gvsu-logo">
-				<a href="http://gvsu.edu/">
-					<img src="//gvsu.edu/homepage/files/img/gvsu_logo.png" alt="Grand Valley State University" border="0">
+	<div id="header-wrapper" style="<?php echo 'background-color:' . $banner_color . ';'; ?>">
+		<div id="header">
+			<div id="logo">
+				<a href="<?php echo $header_url; ?>">
+					<img src="<?php echo $header_image; ?>" alt="Grand Valley State University" border="0">
 				</a>
 			</div>
 		</div>
@@ -196,7 +226,7 @@ session_start();
 
 	<div class="line break">
 		<div class="span2 unit left">
-			<h1><a href="index.php">University Libraries Status</a></h1>
+			<h1><a href="index.php"><?php echo $library_name; ?> Status</a></h1>
 		</div> <!-- end span -->
 
 		<div class="span2 unit right lib-horizontal-list" style="text-align: right;margin-top:.65em;">
@@ -398,9 +428,9 @@ session_start();
 		</div>
 
 		<div class="span4 unit right subscription-list" style="text-align:right;">
-			<p>Subscribe: <a href="http://feeds.feedburner.com/gvsulibstatus" title="Subscribe to the RSS feed">RSS</a>&nbsp;
+			<p>Subscribe: <a href="<?php echo $rss_url; ?>" title="Subscribe to the RSS feed">RSS</a>&nbsp;
 				//&nbsp;
-				<a href="http://feedburner.google.com/fb/a/mailverify?uri=gvsulibstatus&amp;loc=en_US" title="Subscribe to updates via Email">Email</a></p>
+				<a href="<?php echo $email_subscription_url; ?>" title="Subscribe to updates via Email">Email</a></p>
 		</div>
 
 
@@ -518,7 +548,7 @@ session_start();
 
 	<div class="line break footer">
 		<div class="span1 unit break">
-			<p>Written by <a href="http://jonearley.net/">Jon Earley</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
+			<p>Written by <a href="http://jonearley.net/">Jon Earley</a> and <a href="http://matthewreidsma.com" title="Matthew Reidsma Writes about Libraries, Technology, and the Web">Matthew Reidsma</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 </div>
@@ -560,7 +590,7 @@ $(document).ready(function() {
 
 ?>
 
-	$("body").append('<div class="feedback lib-form line"> <form method="post" action="http://www.gvsu.edu/library/customemail-post.htm?keyId=9D7CB431-E6EB-A2DB-48089384265083C9"> <div class="span2 unit left"><label for="name">Your Name:</label> <input type="text" name="name" id="name" placeholder="Optional" /></div><div class="span2 unit left lastUnit"><label for="email">Your Email:</label> <input type="text" name="email" id="email" placeholder="Optional" /></div><label for="feedback">Have an idea? See a problem?</label> <textarea name="feedback"></textarea> <div class="right"> <div style="display: inline-block; margin-right: 2em; color: #0065A4; text-decoration: underline; cursor:pointer;" class="issue-trigger">Cancel</div> <input class="lib-button" type="submit" value="Report a Problem" style="margin-top: 1em;" /> </div> </form> </div>');
+	$("body").append('<div class="feedback lib-form line"> <form method="post" action=""> <div class="span2 unit left"><label for="name">Your Name:</label> <input type="text" name="name" id="name" placeholder="Optional" /></div><div class="span2 unit left lastUnit"><label for="email">Your Email:</label> <input type="text" name="email" id="email" placeholder="Optional" /></div><label for="feedback">Have an idea? See a problem?</label> <textarea name="feedback"></textarea><input name="bot_check" style="display: none;" /> <div class="right"> <div style="display: inline-block; margin-right: 2em; color: #0065A4; text-decoration: underline; cursor:pointer;" class="issue-trigger">Cancel</div> <input class="lib-button" type="submit" value="Report a Problem" name="problem-report" style="margin-top: 1em;" /> </div> </form> </div>');
 
 	$(".feedback").hide();
 

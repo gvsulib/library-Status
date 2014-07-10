@@ -7,12 +7,9 @@
 	email address.
 */
 
-function send_email($name,$email,$message,$bot_check) {
+function send_email($name,$email,$message) {
 
-// Set default variables for sending emails
-	$to_email = 'mreidsma@post.harvard.edu';
-	$from_email = 'reidsmam@gvsu.edu';
-	$email_subject = 'Testing';
+	global $m, $to_email, $from_email, $email_subject;
 
 	// If there is an error, the message suggests calling the library. Add your
 	// Library's phone number here.
@@ -23,14 +20,14 @@ function send_email($name,$email,$message,$bot_check) {
 	see the README for information on how to check for emails on the client side
 	with JavaScript.
 */
-// require_field($email, "Email address");
+//require_field($email, "email address");
 
 /*
 	Uncomment the following line if you want to require names. You should also
 	see the README for information on how to check for names on the client side
 	with JavaScript.
 */
-// require_field($name, "Name");
+//require_field($name, "name");
 
 	// Build the headers
 	$headers = "From: " . $from_email . "\r\n";
@@ -48,6 +45,8 @@ function send_email($name,$email,$message,$bot_check) {
 	$error_report = $message;
 	$error_report .= "\n\n" . 'From: ' . $name;
 	$error_report .= "\n" . 'Email: ' . $email;
+
+	echo $error_report;
 
 	// Attempt to send the mail, then set the message variable $m to success or
 	// error.
@@ -67,6 +66,9 @@ function send_email($name,$email,$message,$bot_check) {
 */
 
 function is_valid_email($email) {
+
+	global $m;
+
   return preg_match('#^[a-z0-9.!\#$%&\'*+-/=?^_`{|}~]+@([0-9.]+|([^\s]+\.+[a-z]{2,6}))$#si', $email);
 }
 
@@ -77,6 +79,9 @@ function is_valid_email($email) {
 */
 
 function contains_bad_str($str_to_test) {
+
+	global $m;
+
   $bad_strings = array(
                 "content-type:"
                 ,"mime-version:"
@@ -103,6 +108,9 @@ function contains_bad_str($str_to_test) {
 */
 
 function contains_newlines($str_to_test) {
+
+	global $m;
+
    if(preg_match("/(%0A|%0D|\\n+|\\r+)/i", $str_to_test) != 0) {
      $m = '<div class="lib-error">Your email address was formatted in a way that looks a lot like what a spambot would do if they wanted to send out a zillion emails.  Try again without the naughty bits.</div>';
      exit;
@@ -114,6 +122,8 @@ function contains_newlines($str_to_test) {
 	prompts the user to supply it before continuing.
 */
 function require_field($value, $key) {
+
+	global $m;
 
 	if(($value == NULL) || ($value == "")) {
 		$m = '<div class="lib-error">Please include your ' . $key . '.</div>';
