@@ -1,31 +1,33 @@
 <?php
 session_start();
 	$_SESSION['location'] = 'http://localhost:8888/library-Status/';
-	
+
 	date_default_timezone_set('America/Detroit');
 	$logged_in = 0; // By default, user is logged out
-	
+
 	// Are you logged in?
-	
+
 	// Debug the user login by a force login
-	//$_SESSION['username'] = 'reidsmam';
-	
+	$_SESSION['username'] = 'reidsmam';
+
 	if(isset($_GET['login']) && !(isset($_SESSION['username']))) { // No $_SESSION['username'] variable, send to login script
-		
+
 		// User has not logged in
 		header('Location: http://labs.library.gvsu.edu/login');
 
 	}
-	
-	include 'resources/secret/config.php';
-	include ('resources/php/markdown.php');
-	
+
+	// Include additional libraries that make this work
+	require 'resources/secret/config.php';
+	require 'resources/php/functions.php';
+	require 'resources/php/markdown.php';
+
 	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
 	if ($db->connect_errno) {
     	printf("Connect failed: %s\n", $db->connect_error);
     	exit();
 	}
-	
+
 	if(isset($_SESSION['username'])) { // User has logged in
 
 		if (isset($_REQUEST['logout'])) {
@@ -53,7 +55,7 @@ session_start();
 			// Create the user object as $user.
 			// User id is then $loggedin_user->user_id
 			$loggedin_user = $user_result->fetch_object();
-	
+
 			// new issue post
 			if (isset($_POST['submit_issue'])) {
 
@@ -68,7 +70,7 @@ session_start();
 				// If time is something special or ready or for now and is within the last year.
 				if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
 					$time = strtotime($_POST['when']);
-				} else { 
+				} else {
 					$time = time();
 				}
 
@@ -84,9 +86,9 @@ session_start();
 				} else {
 					$m = '<div class="lib-error">There was a problem adding your issue. ' . $db->error . '</div>';
 				}
-				
-				
-				
+
+
+
 			}
 
 			// new status post$loggedin
@@ -105,7 +107,7 @@ session_start();
 				// If time is something special or ready or for now and is within the last year.
 				if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
 					$time = strtotime($_POST['when']);
-				} else { 
+				} else {
 					$time = time();
 				}
 
@@ -126,32 +128,32 @@ session_start();
 				} else {
 						$m = '<div class="lib-error">There was a problem saving your update. ' . $db->error . '</div>';
 				}
-				
-			
+
+
 			}
 
 		} // End loop for logged in user
 
-} 
-	
+}
+
 		if(isset($_GET['thankyou'])) {
 			$m = '<div class="lib-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>';
 		}
-		
+
 		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC LIMIT 10";
 		$filter = 0; // Most Recent Filter is active
-		
+
 		if(isset($_GET['status']) && ($_GET['status'] == 'resolved')) {
 			$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id  AND issue_entries.end_time > 0 ORDER BY issue_entries.issue_id DESC";
 			$filter = 2; // Show Resolved
-		} 
-		
+		}
+
 		if(isset($_GET['status']) && ($_GET['status'] == 'unresolved')) {
 				$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
 				$filter = 1; // Show Unresolved
 		}
-	
-	
+
+
 ?>
 
 <!DOCTYPE html>
@@ -206,17 +208,17 @@ session_start();
 		</div>
 	</div> <!-- end line -->
 	<?php
-	
+
 		if(isset($m)) {
 			echo '<div id="message-update">' . $m . '</div>';
 		}
-		
+
 		if($logged_in == 1) {
-	
+
 	?>
 	<div class="line lib-form feedback">
-		<div class = "span1 unit">	
-			<div class = "span1 unit">	
+		<div class = "span1 unit">
+			<div class = "span1 unit">
 				<h4>Report an Issue</h4>
 			</div>
 
@@ -263,7 +265,7 @@ session_start();
 				</div>
 
 				<div class="when_box">
-					
+
 					<label style="padding-top: .2em; ">When:</label>
 					<input type="text" name="when" value = "Now" style="width: 70%; font-size: .8em; font; color: #575757; display: inline">
 
@@ -275,21 +277,21 @@ session_start();
 				</div>
 
 				<input class="status-button" style="float: left;" name="submit_issue" type="submit" value="Submit Issue" />
-				
+
 				<div style="float: left; margin-left: 3%; margin-top: .8em; color: #0065A4; text-decoration: underline; cursor:pointer;" class="has-js issue-trigger" id="cancel-issue">Cancel</div>
 
 			</form>
 
 		</div> <!-- end span -->
 	</div> <!-- end line -->
-	
+
 	<?php
 }
 	?>
-	
+
 	<div class="line break">
 
-			<?php 
+			<?php
 
 				$result = $db->query("SELECT * FROM systems ORDER BY system_category ASC, system_name ASC");
 				$now = time();
@@ -309,8 +311,8 @@ session_start();
 					while ($rw = $system_result->fetch_assoc()) {
 
 						// Check if there is a resolution or if a scheduled resolution has not happened yet
-						if (($rw['end_time'] == 0) || ($rw['end_time'] > $now)) { 
-							if ($rw['status_type_id'] == 2) { 
+						if (($rw['end_time'] == 0) || ($rw['end_time'] > $now)) {
+							if ($rw['status_type_id'] == 2) {
 								$status = '<div class="lib-error" style="margin: 0;">
 									<p>Uh-oh, we have a system down. You can bet that we&#8217;re working on it!</p>
 									</div>';
@@ -326,10 +328,10 @@ session_start();
 			?>
 
 	</div> <!-- end line -->
-	
+
 	<div class="line break status-table">
 		<div class="span2 unit left">
-						
+
 						<!-- load system names -->
 						<?php
 
@@ -337,14 +339,14 @@ session_start();
 							$now = time();
 							$i = 0;
 							$system_count = $result->num_rows;
-							
+
 							// Calculate where to drop in the code for a second column
 							$half = round($system_count/2);
 
 							// loop through each system
 							while($row = $result->fetch_assoc())
 							{
-								
+
 								if($i == $half) {
 									echo '</div><div class="span2 unit right lastUnit">';
 								}
@@ -356,20 +358,20 @@ session_start();
 								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text, i.issue_id
 								FROM issue_entries i, status_type s
 								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id AND i.start_time < '$now'");
-	
+
 								$currently = 'color: #147D11">Online'; // currently displayed. Color difference is WCAG2 AA compliant
 
 								// Display Day
 								while ($rw = $system_result->fetch_assoc()) {
 
 									// Check if there is no resolution or a scheduled resolution is still in the future
-									if (($rw['end_time'] == 0) || ($rw['end_time'] > $now) || ($rw['start_time'] > $now)) { 
+									if (($rw['end_time'] == 0) || ($rw['end_time'] > $now) || ($rw['start_time'] > $now)) {
                                                                                 $day = date('Ymd',$now);
 
 										//echo '<p>color</p>';
 
 										$currently = 'color: #cb0000;">'.$rw['status_type_text'];
-										
+
 									}
 								}
 
@@ -383,10 +385,10 @@ session_start();
 
 			</div>
 	</div> <!-- end line -->
-	
+
 	<!-- Add blog-like view of incidents -->
 	<div class="line lib-horizontal-list status-bar" style="clear: both; margin: 2em 0; padding: .75em 1%; background: #eee; border: 1px solid #bbb;">
-		
+
 		<div class="span3of4 unit left">
 			<ul>
 				<li><a href="index.php" class="status-button <?php echo ($filter == 0 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-recent"><?php echo ($filter == 0 ? 'Showing' : 'Show'); ?> Recent</a></li>
@@ -394,17 +396,17 @@ session_start();
 				<li><a href="?status=resolved" class="status-button <?php echo ($filter == 2 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($filter == 2 ? 'Showing' : 'Show'); ?> Resolved</a></li>
 			</ul>
 		</div>
-		
+
 		<div class="span4 unit right subscription-list" style="text-align:right;">
 			<p>Subscribe: <a href="http://feeds.feedburner.com/gvsulibstatus" title="Subscribe to the RSS feed">RSS</a>&nbsp;
 				//&nbsp;
 				<a href="http://feedburner.google.com/fb/a/mailverify?uri=gvsulibstatus&amp;loc=en_US" title="Subscribe to updates via Email">Email</a></p>
 		</div>
-		
-		
-	</div>	
+
+
+	</div>
 	<?php
-		
+
 			$issue_result = $db->query($issue_query);
 			$n_rows = $issue_result->num_rows;
 
@@ -428,9 +430,9 @@ session_start();
 						$rc++;
 
 						if ($rc == 1) {
-							
+
 							$status_type_id = $status_entries['status_type_id'];
-							
+
 							if($issue_entries['end_time'] > 0) {
 								$current_status = '<span class="tag-resolved">Resolved</span>';
 								$resolved = 1;
@@ -445,26 +447,26 @@ session_start();
 								' . ($logged_in == 1 && $resolved == 0 ? '<div class="right status-update has-js">Add Update</div>' : '') .'
 								<h2 id="issue_' . $issue_entries['issue_id'] . '"><a href="detail.php?id=' . $issue_entries['issue_id'] . '">' . $status_entries['status_type_text'] . ' for ' . $issue_entries['system_name'] . ' ' . $current_status .'</a></h2>
 								<div class="comment-text"><strong class="timestamp">[' . date("n/j @ g:i a", $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>';
-								
+
 								// Note the use of the date
 								$displayed_date = date("y-n-j", $status_entries['status_timestamp']);
-								
+
 								$attribution = '<p class="tagline">This issue was reported on ' . date("n/j/y", $status_entries['status_timestamp']) . ($resolved == 1 ? ' and resolved on ' . date('n/j/y', $issue_entries['end_time']) : '') .'.</p>';
-						
+
 						} else {
-									
+
 							// Comment wrapper
-							
+
 							// Do we need to show the date again?
 							$comment_date = date('y-n-j', $status_entries['status_timestamp']);
-							
+
 							if($displayed_date != $comment_date) {
 								$displayed_date = $comment_date;
 								$comment_time = date('n/j @ g:i a', $status_entries['status_timestamp']);
 							} else {
 								$comment_time = date('g:i a', $status_entries['status_timestamp']);
 							}
-							
+
 							echo '<div class="comment-list">
 									<div class ="comment-text"><strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
 								</div> <!-- end comment-list --> ';
@@ -472,9 +474,9 @@ session_start();
 }
 
 					// Add the comments entry if logged in and the item is unresolved
-					
+
 					if(($logged_in == 1) && ($resolved == 0)) {
-						
+
 						echo '<div class="lib-form add-comment-form" style="margin-top: .5em; padding-top: .5em; border-top: 1px dotted #bbb;">
 
 							<form action="' . $_SERVER['PHP_SELF'] . '" method="POST" name="status-form">
@@ -488,31 +490,31 @@ session_start();
 
 									<label style="margin-left: 1em;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
 									<input type="checkbox" name="issue_resolved" id="issue_resolved" value="1">
-									
+
 									<label class="lib-inline" for="comment-when-' . $issue_entries['issue_id'] . '" >When</label>
 									<input type="text" style="width:6em; display:inline-block;" name="when" id="comment-when-' . $issue_entries['issue_id'] . '" value="Now" />
 								</div>
 								<div class="left unit span4 lastUnit">
 									<input class="status-button" name="submit_status" type="submit" value="Update" />
 								</div>
-							</div>	
-								
+							</div>
+
 
 								<input type="hidden" name="issue_id" value="' .$issue_entries['issue_id'] . '" />
 								<input type="hidden" name="status_type_id" value="' . $status_type_id . '" />
 							</fieldset>
 							</form>
 						</div>';
-						
+
 					}
-	
+
 } echo $attribution . ' </div><!-- End .line -->';
 					} // close status loop
 				}
-			
-	
+
+
 	?>
-	
+
 
 	<div class="line break footer">
 		<div class="span1 unit break">
@@ -524,9 +526,9 @@ session_start();
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
 $(document).ready(function() {
-	
+
 	$('#message-update').css('position','fixed');
-	
+
 	setTimeout(function() {
 	    $('#message-update').fadeOut('slow');
 	}, 5000);
@@ -534,7 +536,7 @@ $(document).ready(function() {
 <?php
 
 	if($logged_in == 1) {
-		
+
 ?>
 
 	$(".feedback").hide();
@@ -555,7 +557,7 @@ $(document).ready(function() {
 <?php
 
 	} else {
-		
+
 ?>
 
 	$("body").append('<div class="feedback lib-form line"> <form method="post" action="http://www.gvsu.edu/library/customemail-post.htm?keyId=9D7CB431-E6EB-A2DB-48089384265083C9"> <div class="span2 unit left"><label for="name">Your Name:</label> <input type="text" name="name" id="name" placeholder="Optional" /></div><div class="span2 unit left lastUnit"><label for="email">Your Email:</label> <input type="text" name="email" id="email" placeholder="Optional" /></div><label for="feedback">Have an idea? See a problem?</label> <textarea name="feedback"></textarea> <div class="right"> <div style="display: inline-block; margin-right: 2em; color: #0065A4; text-decoration: underline; cursor:pointer;" class="issue-trigger">Cancel</div> <input class="lib-button" type="submit" value="Report a Problem" style="margin-top: 1em;" /> </div> </form> </div>');
@@ -571,7 +573,7 @@ $(document).ready(function() {
 	});
 });
 
-<?php 
+<?php
 	}
 ?>
 
