@@ -8,7 +8,7 @@ session_start();
 	// Are you logged in?
 
 	// Debug the user login by a force login
-	$_SESSION['username'] = 'reidsmam';
+	//$_SESSION['username'] = 'reidsmam';
 
 	if(isset($_GET['login']) && !(isset($_SESSION['username']))) { // No $_SESSION['username'] variable, send to login script
 
