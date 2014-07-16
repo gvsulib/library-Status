@@ -106,6 +106,18 @@ I'm assuming here that you have a server somewhere that not only has PHP and MyS
 8. Save the file as config.php.
 9. Now your setup is done! Test out your app by visiting it in your browser.
 
+### Further Configuration
+
+----
+
+Library Status also provides an interface for sending along problem reports to any email address. By default, names and email addresses are optional. (The form does include a honey pot and some robust naughtiness checking before sending emails, so spam is minimized if not eliminated.) If you want to require email address and/or names when folks submit tickets, you can do so with the following steps:
+
+1. Open resources/php/functions.php in your favorite text editor, and uncomment the relevant line(s) for making the fields required: line 23 for email addresses, line 30 for names.
+2. In feedback.php, edit the form fields to have the attribute `required="required"`, which will tell modern browsers to require the field. (This form is your submission form is JavaScript fails or is not enabled by the user.)
+3. Open up index.php and look for the small bit of jQuery code at the end of the file (line 586). Here you'll also need to add the `required="required"` attribute.
+4. You'll probably want to add some client-side form validation, since form contents are not currently repopulated if they fail server validation. While modern browsers will work well with the `required` attribute, not all browsers support this.
+
+We'll be making the failed submission recovery more user-friendly in future releases. Feel free to help our if you can!
 
 ### Roadmap  
 

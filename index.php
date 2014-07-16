@@ -216,7 +216,7 @@ session_start();
 		<div id="header">
 			<div id="logo">
 				<a href="<?php echo $header_url; ?>">
-					<img src="<?php echo $header_image; ?>" alt="Grand Valley State University" border="0">
+					<img src="<?php echo $header_image; ?>" alt="<?php echo $library_name; ?>" border="0">
 				</a>
 			</div>
 		</div>
