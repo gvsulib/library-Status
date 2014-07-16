@@ -1,5 +1,7 @@
 <?php
 session_start();
+error_reporting(0);
+
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 
 	$_SESSION['location'] = $actual_url;
