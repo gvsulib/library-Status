@@ -4,7 +4,6 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 	$_SESSION['location'] = $actual_url;
 	
-email
 	date_default_timezone_set('America/Detroit');
 	$logged_in = 0; // By default, user is logged out
 	$m = NULL; // By default, there are no messages
