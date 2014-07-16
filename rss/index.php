@@ -28,7 +28,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
 $result = $db->query("SELECT s.status_id, s.status_id, s.status_timestamp, s.status_text,
 							u.user_fn, u.user_ln, u.user_email,
 							st.status_type_text,
-							sy.system_name, sy.system_id
+							sy.system_name, sy.system_id,
+							ie.issue_id
 					 FROM status_entries s, user u, status_type st, systems sy, issue_entries ie
 					 WHERE s.status_delete != 1
 					 AND u.user_id = s.status_user_id
@@ -48,12 +49,12 @@ $result = $db->query("SELECT s.status_id, s.status_id, s.status_timestamp, s.sta
 
 echo '<item> 
 <title>' . $obj->status_type_text . ' for ' . $obj->system_name . '</title>
-<link>http://labs.library.gvsu.edu/status/detail.php?system_id=' . $obj->system_id . '&amp;day=' . date("Ymd", $obj->status_timestamp) . '</link>
+<link>http://labs.library.gvsu.edu/status/detail.php?id=' . $obj->issue_id . '</link>
 <description>' . $description. '</description>
 <content:encoded><![CDATA[' . Markdown($obj->status_text) . ']]></content:encoded>
 <author>' . $obj->user_email . ' (' . $obj->user_fn . ' ' . $obj->user_ln . ')</author>
 <pubDate>' . date('D, d M Y g:i:s O', $obj->status_timestamp) . '</pubDate>
-<guid>http://labs.library.gvsu.edu/status/detail.php?system_id=' . $obj->system_id . '&amp;day=' . date("Ymd", $obj->status_timestamp) . '</guid> 
+<guid>http://labs.library.gvsu.edu/status/detail.php?id=' . $obj->issue_id . '</guid> 
 </item>
 ';		
 

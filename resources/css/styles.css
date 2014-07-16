@@ -1,6 +1,6 @@
 /* Reset styles */
 
-/* http://meyerweb.com/eric/tools/css/reset/ 
+/* http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126
    License: none (public domain)
 */
@@ -14,8 +14,8 @@ b, u, i, center,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
 	margin: 0;
@@ -26,7 +26,7 @@ time, mark, audio, video {
 	vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure, 
+article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
 	display: block;
 }
@@ -55,7 +55,7 @@ table {border-collapse: collapse;border-spacing: 0; }
 .codeblock{ background: #464646;border: solid #121212;border-radius: .366em;color: white;padding: 1.25em;
 border-width: 2px 0 2px;}
 pre {white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;line-height:1.5em;}
-	
+
 /* Grid styles : Based on Nicole Sullivan's OOCSS grids */
 
 .line{overflow:hidden;*overflow:visible;*zoom:1;clear:both;}
@@ -71,7 +71,7 @@ pre {white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;whi
 /* End erase */
 
 @media screen and (min-width: 450px) {
-.span4{width:49%;padding:.5em 1% .5em 0;}	
+.span4{width:49%;padding:.5em 1% .5em 0;}
 .left{float:left;}
 .right{float:right;}
 }
@@ -82,7 +82,7 @@ pre {white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;whi
 
 
 /* Begin erase */
-.size1of4,.size1of4{width:49%;}	
+.size1of4,.size1of4{width:49%;}
 .size1of3{width:32%;}
 .size2of3{width:65%;}
 /* End erase */
@@ -104,50 +104,45 @@ pre {white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;whi
 /* Typography styles */
 
 .login p {
-	 text-align: right; 
-	 font-size: .9em; 
+	 text-align: right;
+	 font-size: .9em;
 	 margin-top: 1em;
 }
 
-a { 
+a {
 	color: #00549d;
 }
 
 h2 a { text-decoration: none;}
 
-.lib-button-small-grey a { 
-	color: #333 !important; 
+.lib-button-small-grey a {
+	color: #333 !important;
 	text-decoration: none;
 }
-
-#gvsu-header-wrapper {
-    background: #0065a4;
-    color: #363636;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 12px;
-    width: 100%;
-    height: 10em;
-    text-align: center;
+#header-wrapper {
+  height: 7em;
+  width: 100%;
 }
-#gvsu-header-wrapper img, #gvsu-header-wrapper embed, #gvsu-header-wrapper object, #gvsu-header-wrapper video {
+
+#header-wrapper img {
 	max-width: 100%;
 }
-#gvsu-header-wrapper .gvsu-clear {
+#header-wrapper .gvsu-clear {
 	clear: both;
 }
 
-#gvsu-header-wrapper #gvsu-header {
+#header-wrapper #header {
 	width: 100%;
 	margin: 0 auto;
 }
 
 /* ------------ header ------------ */
-#gvsu-header-wrapper #gvsu-logo {
+#header-wrapper #logo {
 	padding: 1.167em 0 0.75em 0.25em; /* 14 0 9 3 */
 	margin: 0;
 	float: left;
 	margin-left: .5em;
-	
+
 }
 
 body { max-width: 100%; width: 100%; margin: 0; padding: 0;}
@@ -259,7 +254,7 @@ dl.def-list {color:#555;margin-bottom:1.5em;line-height:1.4em;}
 form.lib-simple-form input[type="text"] {width: 98%;padding: .2em 1%;height: 1.8em;font-size: 1.2em;border: none; display: inline; }
 
 form.lib-book-form select { width: 25%; display: block; float: left;}
-	
+
 form.lib-book-form input[type="text"] {
 	width: 71%;
 	margin-left: 1%;
@@ -267,10 +262,10 @@ form.lib-book-form input[type="text"] {
 	font-size: 1.4em;
 	padding: .333em 1%;
 }
-	
+
 form.lib-simple-form input[type="submit"] {
 	position: relative;
-	
+
 }
 
 /* Status Message Styles */
@@ -290,7 +285,7 @@ form.lib-simple-form input[type="submit"] {
 
 /* Media Queries */
 
-@media screen and (min-width: 40.625em) { 
+@media screen and (min-width: 40.625em) {
 
 .lib-tabs a span { display: inline; }
 
