@@ -159,8 +159,6 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 			} else {
 
-				echo 'Getting this far';
-
 				$name = stripslashes($_POST['name']);
 				$email = stripslashes($_POST['email']);
 				$message = stripslashes($_POST['feedback']);

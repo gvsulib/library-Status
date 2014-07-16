@@ -46,8 +46,6 @@ function send_email($name,$email,$message) {
 	$error_report .= "\n\n" . 'From: ' . $name;
 	$error_report .= "\n" . 'Email: ' . $email;
 
-	echo $error_report;
-
 	// Attempt to send the mail, then set the message variable $m to success or
 	// error.
 	if($m == NULL) { // There have been no errors, send the email
