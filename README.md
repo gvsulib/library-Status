@@ -8,6 +8,8 @@ Libraries rely on a number of different online and other software tools to provi
 
 We added the ability to subscribe to updated with RSS or email (using Feedburner), and included the ability to report new problems right from the interface. By making the tool visible on the public web and making it the place to go to report problems, we make sure that everyone has a chance to see the current health of our systems.
 
+![GVSU Library Status App](resources/img/status_app.png)
+
 You can view GVSU's Library Status app live at [http://gvsu.edu/library/status](http://gvsu.edu/library/status).
 
 ### Features
