@@ -587,8 +587,14 @@ $(document).ready(function() {
 
 	$("body").append('<div class="feedback lib-form line"> <form method="post" action=""> <div class="span2 unit left"><label for="name">Your Name:</label> <input type="text" name="name" id="name" placeholder="Optional" /></div><div class="span2 unit left lastUnit"><label for="email">Your Email:</label> <input type="text" name="email" id="email" placeholder="Optional" /></div><label for="feedback">Have an idea? See a problem?</label> <textarea name="feedback"></textarea><input name="bot_check" style="display: none;" /> <div class="right"> <div style="display: inline-block; margin-right: 2em; color: #0065A4; text-decoration: underline; cursor:pointer;" class="issue-trigger">Cancel</div> <input class="lib-button" type="submit" value="Report a Problem" name="problem-report" style="margin-top: 1em;" /> </div> </form> </div>');
 
-	$(".feedback").hide();
+<?php
 
+if(isset($_GET['problem'])) { // Force problem form to open
+	
+} else {
+
+?>
+	$(".feedback").hide();
 	$(".issue-trigger").click(function(e) {
 
 		e.preventDefault();
@@ -596,6 +602,12 @@ $(document).ready(function() {
 		$(".feedback").slideToggle(400);
 
 	});
+<?php
+
+}
+
+?>
+	
 });
 
 <?php
