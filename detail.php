@@ -196,9 +196,9 @@
 </head>
 
 <body>
-	<div id="gvsu-header-wrapper">
-		<div id="gvsu-header">
-			<div id="gvsu-logo">
+	<div id="header-wrapper">
+		<div id="header">
+			<div id="logo">
 				<a href="http://www.gvsu.edu/">
 					<img src="http://www.gvsu.edu/homepage/files/img/gvsu_logo.png" alt="Grand Valley State University" border="0">
 				</a>
