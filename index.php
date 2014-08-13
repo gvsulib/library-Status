@@ -436,6 +436,8 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 			$n_rows = $issue_result->num_rows;
 
 			if ($n_rows > 0) {
+				
+				echo '<div>'; //weird hack
 
 				while ($issue_entries = $issue_result->fetch_assoc()) {
 
@@ -453,6 +455,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 					while ($status_entries = $result->fetch_assoc()) {
 
 						$rc++;
+						echo $rc;
 
 						if ($rc == 1) {
 
