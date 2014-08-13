@@ -455,7 +455,6 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 					while ($status_entries = $result->fetch_assoc()) {
 
 						$rc++;
-						echo $rc;
 
 						if ($rc == 1) {
 
