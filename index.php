@@ -491,8 +491,19 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 								// Note the use of the date
 								$displayed_date = date("y-n-j", $status_entries['status_timestamp']);
+								$attribution_verb = ' was reported on ' . date("n/j/y", $status_entries['status_timestamp']) . ($resolved == 1 ? ' and resolved on ' . date('n/j/y', $issue_entries['end_time']) : '');
+								
+								if($issue_entries['status_type_id'] == 4) { // Maintenance
+									$attribution_verb = ' is scheduled from ' . date("h:ia n/j/y", $status_entries['status_timestamp']) . ' until ' . date('h:ia n/j/y', $issue_entries['end_time']);
+								}
 
-								$attribution = '<p class="tagline">This issue was reported on ' . date("n/j/y", $status_entries['status_timestamp']) . ($resolved == 1 ? ' and resolved on ' . date('n/j/y', $issue_entries['end_time']) : '') .'.</p>';
+								if($issue_entries['status_type_id'] == 5) { // Update
+										$attribution_verb = ' happened on ' . date("n/j/y", $status_entries['status_timestamp']);
+								}
+								
+								$attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
+								
+								
 
 						} else {
 
