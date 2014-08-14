@@ -1,6 +1,6 @@
 <?php
 session_start();
-error_reporting(0);
+//error_reporting(0);
 
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 
@@ -181,16 +181,16 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 		}
 
-		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC LIMIT 10";
+		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time, issue_entries.status_type_id FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC LIMIT 10";
 		$filter = 0; // Most Recent Filter is active
 
 		if(isset($_GET['status']) && ($_GET['status'] == 'resolved')) {
-			$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id  AND issue_entries.end_time > 0 ORDER BY issue_entries.issue_id DESC";
+			$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time, issue_entries.status_type_id FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id  AND issue_entries.end_time > 0 ORDER BY issue_entries.issue_id DESC";
 			$filter = 2; // Show Resolved
 		}
 
 		if(isset($_GET['status']) && ($_GET['status'] == 'unresolved')) {
-				$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
+				$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time, issue_entries.status_type_id FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
 				$filter = 1; // Show Unresolved
 		}
 
@@ -462,7 +462,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 					$issue_id = $issue_entries['issue_id'];
 
 					$rc = 0;
-
+					$attribution = NULL;
 					// display issues and check for comments
 					while ($status_entries = $result->fetch_assoc()) {
 						$rc++;
@@ -472,7 +472,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 							if($issue_entries['end_time'] > 0) {
 								$resolved = 1;
-								if($issue_result['status_type_id'] != 4) {
+								if($issue_entries['status_type_id'] != 4) {
 									$current_status = '<span class="tag-resolved">Resolved</span>';
 								} else {
 									$current_status = '<span class="tag-maintenance">Maintenance</span>';
@@ -549,9 +549,9 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 						
 
 					}
-				} if(isset($attribution)) {
-					echo $attribution . ' </div><!-- End .line -->';
-				}
+				} 	if($attribution != NULL) {
+						echo $attribution . ' </div><!-- End .line -->';
+					}
 					 
 			} // close status loop
 				}
