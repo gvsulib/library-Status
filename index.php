@@ -391,7 +391,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 								}
 
 								echo '<dl class="system">';
-								echo '<dt><a href="detail.php?system='. $row['system_id'] . '">' . $row["system_name"] . '</a></dt> ';
+								echo '<dt><a href="detail.php?system='. $row['system_id'] . '" style="text-decoration: none;">' . $row["system_name"] . '</a></dt> ';
 								echo '<dd class = "col2 name"><a href="detail.php?system='. $row['system_id'] .'" style = "text-decoration: none;';
 
 								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text, i.issue_id
