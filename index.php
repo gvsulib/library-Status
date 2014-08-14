@@ -1,6 +1,6 @@
 <?php
 session_start();
-//error_reporting(0);
+error_reporting(0);
 
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 
@@ -285,7 +285,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 				<div style="float: left;">
 					<label class="lib-inline">Status:</label>
-					<select name="status_type_id">
+					<select name="status_type_id" id="#status_type_id">
 
 						<!-- Load status types -->
 						<?php
@@ -593,7 +593,7 @@ $(document).ready(function() {
 	if($logged_in == 1) {
 
 ?>
-
+	$(".end-time-box").hide();
 	$(".feedback").hide();
 	$(".add-comment-form").hide();
 	$(".has-js").css("display","inline-block");
@@ -606,6 +606,13 @@ $(document).ready(function() {
 		console.log('Click');
 		$(this).parent("div.issue-box").find('div.add-comment-form').slideToggle(400);
 
+	});
+	$("#status_type_id").change(function(){
+	    if ($("#status_type_id").val() == "4") {
+	       $('.end-time-box').show();
+	    } else {
+	       $('.end-time-box').hide();
+	    }
 	});
 });
 
@@ -632,6 +639,7 @@ if(isset($_GET['problem'])) { // Force problem form to open
 		$(".feedback").slideToggle(400);
 
 	});
+	
 <?php
 
 }

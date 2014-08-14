@@ -62,10 +62,20 @@
 				} else { 
 					$time = time();
 				}
+				
+				$end_time = 0;
+				
+				if($status_type_id == 4) { // Scheduled Maintenance
+					$end_time = strtotime($_POST['end_time']);
+				} 
+				
+				if($status_type_id == 5) { // Update
+					$end_time = $time;
+				}
 
 				// Create new issue
 				$db->query("INSERT INTO issue_entries
-				VALUES ('','$system_id', $status_type_id, '$time', '0')");
+				VALUES ('','$system_id', $status_type_id, '$time', '$end_time')");
 				$issue_id = $db->insert_id;
 
 				// Create a new status entry for issue
@@ -131,16 +141,16 @@
 			$system_name = $row['system_name'];
 		}
 		
-		$issue_query = 'SELECT issue_entries.start_time, issue_entries.end_time, issue_entries.issue_id FROM issue_entries WHERE issue_entries.system_id = ' . $system_id . ' ORDER BY issue_entries.issue_id DESC';
+		$issue_query = 'SELECT issue_entries.start_time, issue_entries.end_time, issue_entries.issue_id, issue_entries.status_type_id FROM issue_entries WHERE issue_entries.system_id = ' . $system_id . ' ORDER BY issue_entries.issue_id DESC';
 		$filter = 0; // All Filter is active
 		
 		if(isset($_GET['status']) && ($_GET['status'] == 'resolved')) {
-			$issue_query = 'SELECT issue_entries.start_time, issue_entries.end_time, issue_entries.issue_id FROM issue_entries WHERE issue_entries.system_id = ' . $system_id . ' AND issue_entries.end_time > 0 ORDER BY issue_entries.issue_id DESC';
+			$issue_query = 'SELECT issue_entries.start_time, issue_entries.end_time, issue_entries.issue_id, issue_entries.status_type_id FROM issue_entries WHERE issue_entries.system_id = ' . $system_id . ' AND issue_entries.end_time > 0 ORDER BY issue_entries.issue_id DESC';
 			$filter = 2; // Show Resolved
 		} 
 		
 		if(isset($_GET['status']) && ($_GET['status'] == 'unresolved')) {
-				$issue_query = 'SELECT issue_entries.start_time, issue_entries.end_time, issue_entries.issue_id FROM issue_entries WHERE issue_entries.system_id = ' . $system_id . ' AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC';
+				$issue_query = 'SELECT issue_entries.start_time, issue_entries.end_time, issue_entries.issue_id, issue_entries.status_type_id FROM issue_entries WHERE issue_entries.system_id = ' . $system_id . ' AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC';
 				$filter = 1; // Show Unresolved
 		}
 	} 
@@ -261,7 +271,7 @@
 
 						<div style="float: left;">
 							<label class="lib-inline">Status:</label>
-							<select name="status_type_id">
+							<select name="status_type_id" id="status_type_id">
 
 								<!-- Load status types -->
 								<?php
@@ -278,8 +288,12 @@
 
 						<div class="when_box">
 
-							<label style="padding-top: .2em; ">When:</label>
+							<label style="padding-top: .2em; " for="when">When:</label>
 							<input type="text" name="when" value = "Now" style="width: 70%; font-size: .8em; font; color: #575757; display: inline">
+							<div class="end-time-box">
+								<label style="padding-top: .2em;" for="end_time">Ends:</label>
+								<input type="text" name="end_time"  style="width: 70%; font-size: .8em; font; color: #575757; display: inline">
+							</div>
 
 						</div>
 
@@ -334,8 +348,12 @@
 								$end_day = date('Ymd', $issue_entries['end_time']);
 
 									if($issue_entries['end_time'] > 0) {
-										$current_status = '<span class="tag-resolved">Resolved</span>';
 										$resolved = 1;
+										if($issue_entries['status_type_id'] != 4) {
+											$current_status = '<span class="tag-resolved">Resolved</span>';
+										} else {
+											$current_status = '<span class="tag-maintenance">Maintenance</span>';
+										}
 									} else {
 										$current_status = '<span class="tag-unresolved">Unresolved</span>';
 										$resolved = 0;
@@ -369,9 +387,19 @@
 														<div class="comment-text"><strong class="timestamp">[' . date($time_format, $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>';
 
 														// Note the use of the date
+														// Note the use of the date
 														$displayed_date = date("y-n-j", $status_entries['status_timestamp']);
+														$attribution_verb = ' was reported on ' . date("n/j/y", $status_entries['status_timestamp']) . ($resolved == 1 ? ' and resolved on ' . date('n/j/y', $issue_entries['end_time']) : '');
 
-														$attribution = '<p class="tagline">This issue was reported on ' . date("n/j/y", $status_entries['status_timestamp']) . ($resolved == 1 ? ' and resolved on ' . date('n/j/y', $issue_entries['end_time']) : '') .'.</p>';
+														if($issue_entries['status_type_id'] == 4) { // Maintenance
+															$attribution_verb = ' is scheduled from ' . date("h:ia n/j/y", $status_entries['status_timestamp']) . ' until ' . date('h:ia n/j/y', $issue_entries['end_time']);
+														}
+
+														if($issue_entries['status_type_id'] == 5) { // Update
+																$attribution_verb = ' happened on ' . date("n/j/y", $status_entries['status_timestamp']);
+														}
+
+														$attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
 
 
 										// list last comment
@@ -568,7 +596,7 @@
 		if($logged_in == 1) {
 
 	?>
-
+		$('.end-time-box').hide();
 		$(".feedback").hide();
 		$(".add-comment-form").hide();
 		$(".has-js").css("display","inline-block");
@@ -581,6 +609,16 @@
 			console.log('Click');
 			$(this).parent("div.issue-box").find('div.add-comment-form').slideToggle(400);
 
+		});
+		
+		
+		
+		$("#status_type_id").change(function(){
+		    if ($("#status_type_id").val() == "4") {
+		       $('.end-time-box').show();
+		    } else {
+		       $('.end-time-box').hide();
+		    }
 		});
 	});
 
