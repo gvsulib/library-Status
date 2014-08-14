@@ -474,7 +474,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 							if($issue_entries['end_time'] > 0) {
 								$resolved = 1;
-								if($issue_entries['status_type_id'] != 4) {
+								if($issue_entries['issue_type_id'] != 4) {
 									$current_status = '<span class="tag-resolved">Resolved</span>';
 								} else {
 									$current_status = '<span class="tag-maintenance">Maintenance</span>';
