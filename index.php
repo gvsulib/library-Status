@@ -382,7 +382,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text, i.issue_id
 								FROM issue_entries i, status_type s
-								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id AND i.start_time < '$now'");
+								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id AND i.start_time < '$now' ORDER BY i.status_type_id DESC");
 
 								$currently = 'color: #147D11">Online'; // currently displayed. Color difference is WCAG2 AA compliant
 
