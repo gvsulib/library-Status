@@ -285,7 +285,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 				<div style="float: left;">
 					<label class="lib-inline">Status:</label>
-					<select name="status_type_id" id="#status_type_id">
+					<select name="status_type_id" id="status_type_id">
 
 						<!-- Load status types -->
 						<?php
