@@ -196,11 +196,11 @@
 </head>
 
 <body>
-	<div id="gvsu-header-wrapper">
-		<div id="gvsu-header">
-			<div id="gvsu-logo">
-				<a href="http://www.gvsu.edu/">
-					<img src="http://www.gvsu.edu/homepage/files/img/gvsu_logo.png" alt="Grand Valley State University" border="0">
+	<div id="header-wrapper" style="<?php echo 'background-color:' . $banner_color . ';'; ?>">
+		<div id="header">
+			<div id="logo">
+				<a href="<?php echo $header_url; ?>">
+					<img src="<?php echo $header_image; ?>" alt="<?php echo $library_name; ?>" border="0">
 				</a>
 			</div>
 		</div>
@@ -210,7 +210,7 @@
 
 		<div class="line break">
 			<div class="span2 unit left">
-				<h1><a href="index.php">University Libraries Status</a></h1>
+				<h1><a href="index.php"><?php echo $library_name; ?> Status</a></h1>
 			</div> <!-- end span -->
 
 			<div class="span2 unit right lib-horizontal-list" style="text-align: right;margin-top:.65em;">
