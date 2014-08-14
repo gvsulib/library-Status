@@ -67,6 +67,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 				$issue_text = $db->real_escape_string($_POST['issue_text']);
 				$system_id = $_POST['system_id'];
 				$status_type_id = $_POST['status_type_id'];
+					
 
 				// Create a time one year back to see use to check if posting time is in range.
 				$time_check = time();
@@ -78,10 +79,20 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 				} else {
 					$time = time();
 				}
+				
+				$end_time = 0;
+				
+				if($status_type_id == 4) { // Scheduled Maintenance
+					$end_time = strtotime($_POST['end_time']);
+				} 
+				
+				if($status_type_id == 5) { // Update
+					$end_time = $time;
+				}
 
 				// Create new issue
 				$db->query("INSERT INTO issue_entries
-				VALUES ('','$system_id', $status_type_id, '$time', '0')");
+				VALUES ('','$system_id', $status_type_id, '$time', '$end_time')");
 				$issue_id = $db->insert_id;
 
 				// Create a new status entry for issue
@@ -291,9 +302,12 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 				<div class="when_box">
 
-					<label style="padding-top: .2em; ">When:</label>
+					<label style="padding-top: .2em; " for="when">When:</label>
 					<input type="text" name="when" value = "Now" style="width: 70%; font-size: .8em; font; color: #575757; display: inline">
-
+					<div class="end-time-box">
+						<label style="padding-top: .2em;" for="end_time">Ends:</label>
+						<input type="text" name="end_time"  style="width: 70%; font-size: .8em; font; color: #575757; display: inline">
+					</div>
 				</div>
 
 
@@ -434,7 +448,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 			$issue_result = $db->query($issue_query);
 			$n_rows = $issue_result->num_rows;
-
+			
 			if ($n_rows > 0) {
 
 				while ($issue_entries = $issue_result->fetch_assoc()) {
@@ -451,16 +465,18 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 					// display issues and check for comments
 					while ($status_entries = $result->fetch_assoc()) {
-
 						$rc++;
-
 						if ($rc == 1) {
 
 							$status_type_id = $status_entries['status_type_id'];
 
 							if($issue_entries['end_time'] > 0) {
-								$current_status = '<span class="tag-resolved">Resolved</span>';
 								$resolved = 1;
+								if($issue_entries['issue_type_id'] != 4) {
+									$current_status = '<span class="tag-resolved">Resolved</span>';
+								} else {
+									$current_status = '<span class="tag-maintenance">Maintenance</span>';
+								}
 							} else {
 								$current_status = '<span class="tag-unresolved">Unresolved</span>';
 								$resolved = 0;
@@ -496,7 +512,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 									<div class ="comment-text"><strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
 								</div> <!-- end comment-list --> ';
 
-}
+						}
 
 					// Add the comments entry if logged in and the item is unresolved
 
@@ -530,11 +546,14 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 							</fieldset>
 							</form>
 						</div>';
+						
 
 					}
-
-} echo $attribution . ' </div><!-- End .line -->';
-					} // close status loop
+				} if(isset($attribution)) {
+					echo $attribution . ' </div><!-- End .line -->';
+				}
+					 
+			} // close status loop
 				}
 
 

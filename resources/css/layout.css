@@ -342,6 +342,7 @@ div.hover {
 h2 span { font-size: 14px; display: inline-block; padding: .4em; }
 .tag-unresolved { background: #cb0000; color: white; }
 .tag-resolved { background: green; color: white; }
+.tag-maintenance { background: orange; color: white; }
 .status-update { color: #0065A4; text-decoration: underline; font-size: .9em;margin-top: .5em; cursor: pointer; }
 legend { display: none;}
 form[name="status-form"] { background: #eee; padding: .5em 1%;}
