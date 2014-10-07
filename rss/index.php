@@ -48,7 +48,7 @@ echo '<item>
 <description>' . $description. '</description>
 <content:encoded><![CDATA[' . Markdown($obj->status_text) . ']]></content:encoded>
 <author>' . $obj->user_email . ' (' . $obj->user_fn . ' ' . $obj->user_ln . ')</author>
-<pubDate>' . date('D, d M Y g:i:s O', $obj->status_timestamp) . '</pubDate>
+<pubDate>' . date('D, d M Y h:i:s O', $obj->status_timestamp) . '</pubDate>
 <guid>http://labs.library.gvsu.edu/status/detail.php?id=' . $obj->issue_id . '</guid> 
 </item>
 ';		
