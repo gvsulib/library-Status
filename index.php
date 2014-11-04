@@ -152,9 +152,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 }
 
-		if(isset($_GET['thankyou'])) {
-			$m = '<div class="lib-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>';
-		}
+		
 
 	/*
 		A non-logged-in user has submitted a problem report. Check for basic bad
@@ -166,7 +164,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 
 			// First, let's see if you're a bot that added something to the honeypot
-			if(!($_POST['bot_check'] == NULL) || !($_POST['bot_check'] == '')) {
+			if(strlen($_POST['bot_check']) > 0) {
 
 				$m = '<div class="lib-error">Whoops! That entry looks like something a spam bot would do. Don&#8217;t fill in the last field if you are a real person.</div>';
 
@@ -176,7 +174,8 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 				$email = stripslashes($_POST['email']);
 				$message = stripslashes($_POST['feedback']);
 
-				send_email($name, $email, $message);
+				send_email($name, $email, $message); 
+				$m = '<div class="lib-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>'; 
 			}
 
 		}
@@ -194,7 +193,9 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 				$filter = 1; // Show Unresolved
 		}
 
-
+         		if(isset($_GET['thankyou'])) {
+			$m = '<div class="lib-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>';
+		}
 
 
 ?>
