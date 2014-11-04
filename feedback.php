@@ -64,7 +64,7 @@ require 'resources/php/functions.php';
 
 			<label for="feedback">Have an idea? See a problem?</label>
 			<textarea name="feedback"></textarea>
-			<input type="text" name="bot-check" style="display:none;" />
+			<input type="text" name="bot_check" style="display:none;" />
 
 			<div class="right">
 				<a href="index.php" style="display: inline-block; margin-right: 2em;">Cancel</a>
