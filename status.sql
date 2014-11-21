@@ -129,6 +129,7 @@ CREATE TABLE `system_users` (
 CREATE TABLE `user` (
   `user_id` int(10) NOT NULL AUTO_INCREMENT,
   `user_username` varchar(255) NOT NULL,
+  `password` varchar(40) NULL,
   `user_fn` varchar(255) NOT NULL,
   `user_ln` varchar(255) NOT NULL,
   `user_email` varchar(255) NOT NULL,
@@ -137,10 +138,3 @@ CREATE TABLE `user` (
   `user_access` tinyint(4) NOT NULL COMMENT '0 = none, 1 = systems, 2= buildings, 9 = all',
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15 ;
-
---
--- Dumping data for table `user`
---
-
-INSERT INTO `user` (`user_id`, `user_username`, `user_fn`, `user_ln`, `user_email`, `user_delete`, `user_notifications`, `user_access`) VALUES
-(1, 'earleyj', 'Jon', 'Earley', 'jonathan.a.earley@gmail.com', 0, 0, 9);
