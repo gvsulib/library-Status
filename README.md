@@ -43,6 +43,8 @@ There are two ways to install Library Status: with or without git.
     * *$to_email*: The email you'd like the problem reports to be sent to. (We have ours go to Asana, our project management app.) If you want them to go to multiple emails, separate them with commas.
     * *$from_email*: The email address your problem reports will be sent from.
     * *$email_subject*: The subject line of your problem report email address.
+    * *$use_native_login: Use native login or not. If false, $non_native_login_url must be set.
+    * *$non_native_login_url: URL to redirect to the non-native login system of your choosing.  
 4. Save the file as resources/secret/config.php.
 5. You'll currently need to connect some sort of login system to the status app. The status app at GVSU currently works with our campus CAS (Central Authentication System). You can use any kind of authentication, provided that your authenticator sets a $_SESSION['username'] variable. This is how the app knows whether you are logged in or not. There are ways to do this [with EZProxy](http://matthew.reidsrow.com/articles/20), and we have a [native login on the roadmap](https://github.com/gvsulib/library-Status/issues/7). (If you have experience connecting apps to campus LDAP systems, consider contributing that feature!)
 6. Now upload all of the files to your server, where you want them to live.
@@ -105,6 +107,8 @@ I'm assuming here that you have a server somewhere that not only has PHP and MyS
     * *$to_email*: The email you'd like the problem reports to be sent to. (We have ours go to Asana, our project management app.) If you want them to go to multiple emails, separate them with commas.
     * *$from_email*: The email address your problem reports will be sent from.
     * *$email_subject*: The subject line of your problem report email address.
+    * *$use_native_login: Use native login or not. If false, $non_native_login_url must be set.
+    * *$non_native_login_url: URL to redirect to the non-native login system of your choosing.
 8. Save the file as config.php.
 9. Now your setup is done! Test out your app by visiting it in your browser.
 
