@@ -16,6 +16,10 @@ error_reporting(0);
 			session_destroy();
 		}
 		header('Location: index.php');	
+	} else {
+		if ($use_native_login == false) {
+			header('Location: '. $non_native_login_url);
+		}
 	}
 	if ($_POST){
 		$formUsername = $_POST['username'];
@@ -84,7 +88,9 @@ error_reporting(0);
 				<div class="line">
 					<div class="left span2 unit">
 						<label for="password">Password</label>
-						<input name="password" type="password"/>
+						<input name="password" id="password" type="password"/>
+						<label for="show">Show Password?</label>
+						<input name="show" id="show" type="checkbox">
 					</div>
 				</div>
 				<div class="line">
@@ -96,5 +102,11 @@ error_reporting(0);
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 	</div>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script>
+	jQuery("#show").click(function(){
+		jQuery("#password").prop('type', this.checked ? 'text' : 'password');
+	});
+	</script>
 	</body>
 </html>

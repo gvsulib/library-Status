@@ -92,7 +92,6 @@ CREATE TABLE `systems` (
   `system_id` int(10) NOT NULL AUTO_INCREMENT,
   `system_name` varchar(255) NOT NULL,
   `system_url` varchar(255) NOT NULL,
-  `system_category` int(11) NOT NULL COMMENT '0 = system; 1 = building',
   PRIMARY KEY (`system_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=23 ;
 
@@ -100,12 +99,12 @@ CREATE TABLE `systems` (
 -- Dumping data for table `systems`
 --
 
-INSERT INTO `systems` (`system_id`, `system_name`, `system_url`, `system_category`) VALUES
-(1, 'Library Homepage', 'http://gvsu.edu/library', 0),
+INSERT INTO `systems` (`system_id`, `system_name`, `system_url`,) VALUES
+(1, 'Library Homepage', 'http://gvsu.edu/library'),
 (2, 'Document Delivery', '', 0),
-(3, 'Computer Availability', 'http://gvsu.edu/library/computers', 0),
-(4, 'Heating & Cooling', '', 1),
-(5, 'Network', '', 1);
+(3, 'Computer Availability', 'http://gvsu.edu/library/computers'),
+(4, 'Heating & Cooling', ''),
+(5, 'Network', '');
 
 -- --------------------------------------------------------
 
