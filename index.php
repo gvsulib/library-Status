@@ -13,19 +13,25 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 	// Are you logged in?
 
 	// Debug the user login by a force login
-	//$_SESSION['username'] = 'reidsmam';
-
-	if(isset($_GET['login']) && !(isset($_SESSION['username']))) { // No $_SESSION['username'] variable, send to login script
-
-		// User has not logged in
-		header('Location: http://labs.library.gvsu.edu/login');
-
-	}
+	//$_SESSION['username'] = 'bloomj';
 
 	// Include additional libraries that make this work
 	require 'resources/secret/config.php';
 	require 'resources/php/functions.php';
 	require 'resources/php/markdown.php';
+
+	if(isset($_GET['login']) && !(isset($_SESSION['username']))) { // No $_SESSION['username'] variable, send to login script
+
+		// User has not logged in
+		if ($use_native_login == true){
+			header('Location: login.php');
+		} else {
+			header('Location: ' . $not_native_login_url);
+		}
+
+	}
+
+	
 
 	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
 	if ($db->connect_errno) {

@@ -92,7 +92,6 @@ CREATE TABLE `systems` (
   `system_id` int(10) NOT NULL AUTO_INCREMENT,
   `system_name` varchar(255) NOT NULL,
   `system_url` varchar(255) NOT NULL,
-  `system_category` int(11) NOT NULL COMMENT '0 = system; 1 = building',
   PRIMARY KEY (`system_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=23 ;
 
@@ -100,12 +99,12 @@ CREATE TABLE `systems` (
 -- Dumping data for table `systems`
 --
 
-INSERT INTO `systems` (`system_id`, `system_name`, `system_url`, `system_category`) VALUES
-(1, 'Library Homepage', 'http://gvsu.edu/library', 0),
+INSERT INTO `systems` (`system_id`, `system_name`, `system_url`,) VALUES
+(1, 'Library Homepage', 'http://gvsu.edu/library'),
 (2, 'Document Delivery', '', 0),
-(3, 'Computer Availability', 'http://gvsu.edu/library/computers', 0),
-(4, 'Heating & Cooling', '', 1),
-(5, 'Network', '', 1);
+(3, 'Computer Availability', 'http://gvsu.edu/library/computers'),
+(4, 'Heating & Cooling', ''),
+(5, 'Network', '');
 
 -- --------------------------------------------------------
 
@@ -129,6 +128,7 @@ CREATE TABLE `system_users` (
 CREATE TABLE `user` (
   `user_id` int(10) NOT NULL AUTO_INCREMENT,
   `user_username` varchar(255) NOT NULL,
+  `password` varchar(40) NULL,
   `user_fn` varchar(255) NOT NULL,
   `user_ln` varchar(255) NOT NULL,
   `user_email` varchar(255) NOT NULL,
@@ -137,10 +137,3 @@ CREATE TABLE `user` (
   `user_access` tinyint(4) NOT NULL COMMENT '0 = none, 1 = systems, 2= buildings, 9 = all',
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15 ;
-
---
--- Dumping data for table `user`
---
-
-INSERT INTO `user` (`user_id`, `user_username`, `user_fn`, `user_ln`, `user_email`, `user_delete`, `user_notifications`, `user_access`) VALUES
-(1, 'earleyj', 'Jon', 'Earley', 'jonathan.a.earley@gmail.com', 0, 0, 9);

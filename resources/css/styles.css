@@ -244,6 +244,7 @@ dl.def-list {color:#555;margin-bottom:1.5em;line-height:1.4em;}
 
 .lib-form label{font-size:.8em;margin: .6em 0;display:inline-block;color: #333;font-weight: bold;text-transform: uppercase;}
 .lib-form input[type="text"],
+.lib-form input[type="password"],
 .lib-form textarea{width:98%;border:1px solid #ddd;font-size:1.1em;padding:.4em 1%;display:block;}
 .lib-form input[type="radio"],
 .lib-form input[type="checkbox"]{margin-top:.7em;}
