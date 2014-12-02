@@ -44,13 +44,12 @@ There are two ways to install Library Status: with or without git.
     * *$from_email*: The email address your problem reports will be sent from.
     * *$email_subject*: The subject line of your problem report email address.
     * *$use_native_login: Use native login or not. If false, $non_native_login_url must be set.
-    * *$non_native_login_url: URL to redirect to the non-native login system of your choosing.  
+    * *$non_native_login_url: URL to redirect to the non-native login system of your choosing. Be sure that your login system sets a $_SESSION['username'] variable. This is how the app knows whether you are logged in or not. There are ways to do this [with EZProxy](http://matthew.reidsrow.com/articles/20). (If you have experience connecting apps to campus LDAP systems, consider contributing that feature!)
 4. Save the file as resources/secret/config.php.
-5. You'll currently need to connect some sort of login system to the status app. The status app at GVSU currently works with our campus CAS (Central Authentication System). You can use any kind of authentication, provided that your authenticator sets a $_SESSION['username'] variable. This is how the app knows whether you are logged in or not. There are ways to do this [with EZProxy](http://matthew.reidsrow.com/articles/20), and we have a [native login on the roadmap](https://github.com/gvsulib/library-Status/issues/7). (If you have experience connecting apps to campus LDAP systems, consider contributing that feature!)
-6. Now upload all of the files to your server, where you want them to live.
-7. On your server, open up phpMyAdmin or the like, and create a database called status.
-8. Import the file status.sql into your new database, and watch it magically populate the tables.
-9. To get started, you need to populate some of the database tables. You'll need to add at least one user who can post and update statuses, and you'll need to add your list of systems. Here are the specific tables and fields to work on:
+5. Now upload all of the files to your server, where you want them to live.
+6. On your server, open up phpMyAdmin or the like, and create a database called status.
+7. Import the file status.sql into your new database, and watch it magically populate the tables.
+8. To get started, you need to populate some of the database tables. You'll need to add at least one user who can post and update statuses, and you'll need to add your list of systems. Here are the specific tables and fields to work on:
     * Table **systems**. We have added a few sample systems so you can see how this works. For each system you would like to show, add an entry with:
       * *system_id* will be automatically updated by the database. Just leave it blank.
       * *system_name*: the display name of the system. (e.g. Library catalog)
@@ -58,13 +57,14 @@ There are two ways to install Library Status: with or without git.
     * Table **user**. You'll need at least one user who can log in and update the statuses.
       * *user_id* will be automatically updated by the database. Just leave it blank.
       * *user_username* must match whatever username your authentication system will pass to the status app.
+      * *password can be NULL, as it is only used with the native login system.
       * *user_fn* is the user's first name.
       * *user_ln* is the user's last name.
       * *user_email* is the user's email address.
       * *user_delete* is a boolean value. 0 is false (not deleted). Someday we will add the ability to "delete" users without removing their records for the database. You can do this manually by setting this value to 1 (true).
       * *user_notifications* is a boolean value for toggling notifications on or off. It is currently unused.
       * *user_access* is a way to set different access levels for users. Currently, set users at 9, which is full access. In a future release we will add user restrictions.
-10. Now load the status app in your browser and test it out!
+9. Now load the status app in your browser and test it out!
 
 #### With Git/Github
 
@@ -85,14 +85,14 @@ I'm assuming here that you have a server somewhere that not only has PHP and MyS
     * Table **user**. You'll need at least one user who can log in and update the statuses.
         * *user_id* will be automatically updated by the database. Just leave it blank.
         * *user_username* must match whatever username your authentication system will pass to the status app.
+        * *password can be NULL, as it is only used with the native login system.
         * *user_fn* is the user's first name.
         * *user_ln* is the user's last name.
         * *user_email* is the user's email address.
         * *user_delete* is a boolean value. 0 is false (not deleted). Someday we will add the ability to "delete" users without removing their records for the database. You can do this manually by setting this value to 1 (true).
         * *user_notifications* is a boolean value for toggling notifications on or off. It is currently unused.
         * *user_access* is a way to set different access levels for users. Currently, set users at 9, which is full access. In a future release we will add user restrictions.
-6. You'll currently need to connect some sort of login system to the status app. The status app at GVSU currently works with our campus CAS (Central Authentication System). You can use any kind of authentication, provided that your authenticator sets a $_SESSION['username'] variable. This is how the app knows whether you are logged in or not. There are ways to do this [with EZProxy](http://matthew.reidsrow.com/articles/20), and we have a [native login on the roadmap](https://github.com/gvsulib/library-Status/issues/7). (If you have experience connecting apps to campus LDAP systems, consider contributing that feature!)
-7. Now you need to update the configuration of the app. In your ssh window, navigate to `resources/secret/config.sample.php`. You'll want to edit this file, so open it up in your editor of choice, for example:  
+6. Now you need to update the configuration of the app. In your ssh window, navigate to `resources/secret/config.sample.php`. You'll want to edit this file, so open it up in your editor of choice, for example:  
 
     `nano config.sample.php`
 
@@ -108,9 +108,9 @@ I'm assuming here that you have a server somewhere that not only has PHP and MyS
     * *$from_email*: The email address your problem reports will be sent from.
     * *$email_subject*: The subject line of your problem report email address.
     * *$use_native_login: Use native login or not. If false, $non_native_login_url must be set.
-    * *$non_native_login_url: URL to redirect to the non-native login system of your choosing.
-8. Save the file as config.php.
-9. Now your setup is done! Test out your app by visiting it in your browser.
+    * *$non_native_login_url: URL to redirect to the non-native login system of your choosing. Be sure that your login system sets a $_SESSION['username'] variable. This is how the app knows whether you are logged in or not. There are ways to do this [with EZProxy](http://matthew.reidsrow.com/articles/20). (If you have experience connecting apps to campus LDAP systems, consider contributing that feature!)
+7. Save the file as config.php.
+8. Now your setup is done! Test out your app by visiting it in your browser.
 
 ### Further Configuration
 
