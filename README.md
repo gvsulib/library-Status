@@ -35,8 +35,10 @@ There are two ways to install Library Status: with or without git.
 2. Now upload all of the files to your server, where you want them to live.
 3. In your browser, open up phpMyAdmin or the like, and create a database called status (or whatever you want, but we recommend status).
 4. In your browser, navigate to the folder on your server that you uploaded the files. This will begin the installation wizard.
-5. Follow the instructions in the installatino wizard.
-6. Once complete, you should be at your main Library Status homepage. Feel free to log in and start using your new Library Status Monitor!
+5. If you see the following in your browser, you're in good shape:
+![Installation Wizard](resources/img/install.png)
+6. Follow the instructions in the installatino wizard.
+7. Once complete, you should be at your main Library Status homepage. Feel free to log in and start using your new Library Status Monitor!
 
 #### With Git/Github
 
