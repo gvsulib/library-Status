@@ -35,8 +35,8 @@ There are two ways to install Library Status: with or without git.
 2. Open up the file resources/secret/config.sample.php in your favorite text editor (not Word!)
 3. First, fill in your database connection details. (For host, you might need to consult your host's documentation. It's often just localhost, but not always.) For database table, put "status". You'll need the username and password of the username that has permissions to connect to the database. This is often the same as the username and password you use to log into the server, but not always. If in doubt, check the help section at your web host. Next, you can set the following parameters to help customize the tool for your institution:
     * *$library_name*: This is the name of your library, as it will display at the top of the app (and in the &lt;title&gt; element).
-    * *$header_image*: The URL of the logo you'd like to appear in the upper left hand corner.
-    * *$header_url*: The URL you'd like the logo to link to. This should be a 255x75 image file, preferably PNG.
+    * *$header_image*: The URL of the logo you'd like to appear in the upper left hand corner. This should be a 255x75 image file, preferably PNG.
+    * *$header_url*: The URL you'd like the logo to link to. 
     * *$banner_color*: The hex value of the background color you'd like the banner to be.
     * *$rss_url*: The URL of the RSS feed folks will subscribe to. The Library status app has it's own RSS feed, but you may want to route that through something like [feedburner](http://feedburner.com) to gather stats.
     * *$email_subscription_url*: The URL for folks to subscribe via email. We use feedburner for this service.

@@ -1,4 +1,6 @@
 <?php
+if (!file_exists('resources/secret/config.php')){header('location: install/index.php');}
+
 session_start();
 error_reporting(0);
 
@@ -202,8 +204,6 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
          		if(isset($_GET['thankyou'])) {
 			$m = '<div class="lib-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>';
 		}
-
-
 ?>
 
 <!DOCTYPE html>
