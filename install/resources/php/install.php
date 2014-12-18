@@ -1,8 +1,8 @@
 <?php
 session_start();
-if (isset($_GET['done']){
+if (isset($_GET['done'])){
 	finishInstall();
-	header('location: ../index.php');
+	header('location: ../../index.php');
 }
 foreach($_POST as $key=>$value){
 	$_SESSION[$key] = $value;
@@ -11,7 +11,7 @@ $toGoTo = $_POST['step'] + $_POST['go'];
 if ($toGoTo < 1) {
 	die();
 }
-else if ($toGoTo == 5) {
+else if ($toGoTo == 6) {
 	doInstall();
 } else {
 	header("location: ../../step$toGoTo.php");
@@ -40,7 +40,7 @@ function doInstall(){
 	}
 }
 function finishInstall(){
-	array_map('unlink', ( glob( "." ) ? glob( "." ) : array() ) );
+	exec('mv ../../install ../../_install');
 	$indexRedir = "<?php header('location: ../index.php');?>";
 	file_put_contents('../../index.php', $indexRedir);
 }

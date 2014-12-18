@@ -38,12 +38,6 @@ CREATE TABLE `systems` (
   `system_url` varchar(255) NOT NULL,
   PRIMARY KEY (`system_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6;
-INSERT INTO `systems` (`system_id`, `system_name`, `system_url`) VALUES
-(1, 'Library Homepage', 'http://gvsu.edu/library'),
-(2, 'Document Delivery', ''),
-(3, 'Computer Availability', 'http://gvsu.edu/library/computers'),
-(4, 'Heating & Cooling', ''),
-(5, 'Network', '');
 CREATE TABLE `system_users` (
   `system_id` int(10) NOT NULL,
   `user_id` int(10) NOT NULL,

@@ -1,4 +1,8 @@
-<?php session_start(); $_SESSION = array(); session_destroy();?>
+<?php
+if (file_exists("../reosources/secret/config.php")){
+	header('location: ../index.php');
+}
+session_start(); $_SESSION = array(); session_destroy();?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

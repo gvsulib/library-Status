@@ -44,18 +44,12 @@ There are two ways to install Library Status: with or without git.
 
 I'm assuming here that you have a server somewhere that not only has PHP and MySQL, but also Git. I also assume you know a bit about ssh, and that you have [Git ssh keys](https://help.github.com/articles/generating-ssh-keys) set up on your server. If that doesn't make sense, you can shoot me an email or maybe try the other installation method.
 
-1. Fork the [Library Status repository](http://github.com/gvsulib/library-Status), so that you have a version in your own Github account. (If you don't have an account, you'll need to sign up for one. It's free!). If "forking" doesn't make any sense to you, don't worry! Github has excellent online help, and [they will walk you through it](https://help.github.com/articles/fork-a-repo).
-2. Now you'll want to ssh in to your server, and navigate to the parent directory of where you want the status app to live.
-3.  Clone your new fork of the library status app, replacing YOUR_USERNAME with your Git username:  
-
-    `git clone git@github.com:YOUR_USERNAME/library-Status.git`
-
-4. Now you'll need to create the MySQL database. Call it 'status', or something else if you'd like.
-5. In your browser, navigate to the folder that you cloned the repo into.
-6. If you see the following in your browser, you're in good shape:
+1. Fork this repo into your GitHub acccount, and clone it on to your server.
+2. Navigate to the app in your browser.
+3. If you see the following in your browser, you're in good shape:
 ![Installation Wizard](resources/img/install.png)
-6. Follow the instructions in the installation wizard.
-7. Once complete, you should be at your main Library Status homepage. Feel free to log in and start using your new Library Status Monitor!
+4. Follow the instructions in the installation wizard.
+5. Once complete, you should be at your main Library Status homepage. Feel free to log in and start using your new Library Status Monitor!
 ### Further Configuration
 
 ----
