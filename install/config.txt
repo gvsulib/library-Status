@@ -23,4 +23,8 @@ $email_subject = '{{email-subject}}';
 //Native login or not
 $use_native_login = {{login-native-login}};
 $non_native_login_url = '{{login-non-native-login-url}}';
+
+//Recaptcha API Keys
+$recaptchaSiteKey = '{{recaptchaSiteKey}}';
+$recaptchaSecretKey = '{{recaptchaSecretKey}}';
 ?>

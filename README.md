@@ -27,6 +27,8 @@ You can view GVSU's Library Status app live at [http://gvsu.edu/library/status](
 
 Library Status requires a server running PHP 5.4 or up and MySQL. If you don't have a server like this avalable, a basic hosting package from [Dreamhost](http://dreamhost.com) or something similar would work.
 
+You'll also need a Google account to retreive Recaptcha API keys. You can get those [here](https://www.google.com/recaptcha/admin).
+
 There are two ways to install Library Status: with or without git.
 
 #### Download the files from Github, upload to your server

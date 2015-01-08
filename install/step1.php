@@ -36,10 +36,28 @@ session_start();
 		<div id="wrapper">
 			<div class="line break">
 				<div class="left">
-					<h1>Step 1: Database Information</h1>
+					<h1>Step 1: Recaptcha and Database</h1>
 					<form class="lib-form" action="resources/php/install.php" method="POST">
 					<input type="hidden" name="step" value="1">
 					<input type="hidden" id="go" name="go">
+						<div class="line">
+							<div class="left span1of2 unit">
+								<label for="recaptchaSiteKey">Recaptcha Site Key</label>
+								<input name="recaptchaSiteKey" id="recaptchaSiteKey" type="text" value="<?php echo $_SESSION['recaptchaSiteKey']?>">
+							</div>
+							<div class="left span2of2 unit">
+								<abbr data-text="Recaptcha Site Key retreived from http://google.com/recaptcha/admin">(?)</abbr>
+							</div>
+						</div>
+						<div class="line">
+							<div class="left span1of2 unit">
+								<label for="recaptchaSecretKey">Recaptcha Secret Key</label>
+								<input name="recaptchaSecretKey" id="recaptchaSecretKey" type="text" value="<?php echo $_SESSION['recaptchaSecretKey']?>">
+							</div>
+							<div class="left span2of2 unit">
+								<abbr data-text="Recaptcha Secret Key retreived from http://google.com/recaptcha/admin">(?)</abbr>
+							</div>
+						</div>
 						<div class="line">
 							<div class="left span1of2 unit">
 								<label for="db-host">MySQL Host</label>
