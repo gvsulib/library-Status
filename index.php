@@ -1,4 +1,6 @@
 <?php
+if (!file_exists('resources/secret/config.php')){header('location: install/index.php');}
+
 session_start();
 error_reporting(0);
 
@@ -169,20 +171,22 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 
 
-			// First, let's see if you're a bot that added something to the honeypot
-			if(strlen($_POST['bot_check']) > 0) {
+			// Check the Google Recaptcha API
+				$url =  "https://www.google.com/recaptcha/api/siteverify?secret=" . $recaptchaSecretKey . "&response=" . $_POST['g-recaptcha-response'] . "&remoteip=" . $_SERVER['HTTP_REMOTE_ADDR'];
+				$response = file_get_contents($url);
+				$data = json_decode($response, TRUE);
+				if ($data['success']){		
 
-				$m = '<div class="lib-error">Whoops! That entry looks like something a spam bot would do. Don&#8217;t fill in the last field if you are a real person.</div>';
+					$name = stripslashes($_POST['name']);
+					$email = stripslashes($_POST['email']);
+					$message = stripslashes($_POST['feedback']);
 
-			} else {
-
-				$name = stripslashes($_POST['name']);
-				$email = stripslashes($_POST['email']);
-				$message = stripslashes($_POST['feedback']);
-
-				send_email($name, $email, $message); 
-				$m = '<div class="lib-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>'; 
-			}
+					send_email($name, $email, $message); 
+					$m = '<div class="lib-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>'; 
+				} else {
+					$m = '<div class="lib-error">Sorry, your captcha didn\'t work. Either it\'s our fault, or you\'re a robot. Please try again.</div>'; 
+				}
+			
 
 		}
 
@@ -202,8 +206,6 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
          		if(isset($_GET['thankyou'])) {
 			$m = '<div class="lib-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>';
 		}
-
-
 ?>
 
 <!DOCTYPE html>
@@ -580,12 +582,13 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 	<div class="line break footer">
 		<div class="span1 unit break">
-			<p>Written by <a href="http://jonearley.net/">Jon Earley</a> and <a href="http://matthewreidsma.com" title="Matthew Reidsma Writes about Libraries, Technology, and the Web">Matthew Reidsma</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
+			<p>Written by <a href="http://jonearley.net/">Jon Earley</a>, <a href="http://jon.tw" title="Jon Bloom">Jon Bloom</a>, and <a href="http://matthewreidsma.com" title="Matthew Reidsma Writes about Libraries, Technology, and the Web">Matthew Reidsma</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
 		</div> <!-- end span -->
 	</div> <!-- end line -->
 </div>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src='https://www.google.com/recaptcha/api.js'></script>
 <script>
 $(document).ready(function() {
 
@@ -628,8 +631,47 @@ $(document).ready(function() {
 	} else {
 
 ?>
-
-	$("body").append('<div class="feedback lib-form line"> <form method="post" action=""> <div class="span2 unit left"><label for="name">Your Name:</label> <input type="text" name="name" id="name" placeholder="Optional" /></div><div class="span2 unit left lastUnit"><label for="email">Your Email:</label> <input type="text" name="email" id="email" placeholder="Optional" /></div><label for="feedback">Have an idea? See a problem?</label> <textarea name="feedback"></textarea><input name="bot_check" style="display: none;" /> <div class="right"> <div style="display: inline-block; margin-right: 2em; color: #0065A4; text-decoration: underline; cursor:pointer;" class="issue-trigger">Cancel</div> <input class="lib-button" type="submit" value="Report a Problem" name="problem-report" style="margin-top: 1em;" /> </div> </form> </div>');
+	var problemReportFormHTML = '
+	<div class="feedback lib-form line">
+		<form method="post" action="">
+		<div class="span2 unit left">
+			<label for="name">Your Name:</label>
+			<input type="text" name="name" id="name" placeholder="Optional" />
+		</div>
+		<div class="span2 unit left lastUnit">
+			<label for="email">Your Email:</label>
+			<input type="text" name="email" id="email" placeholder="Optional" />
+		</div>
+		<label for="feedback">Have an idea? See a problem?</label>
+		<textarea name="feedback"></textarea>
+		<div class="g-recaptcha" data-sitekey="<?php echo $recaptchaSiteKey; ?>" style="padding: 10px; display:inline-block"></div>
+		<noscript>
+		  <div style="width: 302px; height: 352px;">
+		    <div style="width: 302px; height: 352px; position: relative;">
+		      <div style="width: 302px; height: 352px; position: absolute;">
+		        <iframe src="https://www.google.com/recaptcha/api/fallback?k=<?php echo $recaptchaSiteKey; ?>"
+		                frameborder="0" scrolling="no"
+		                style="width: 302px; height:352px; border-style: none;">
+		        </iframe>
+		      </div>
+		      <div style="width: 250px; height: 80px; position: absolute; border-style: none;
+		                  bottom: 21px; left: 25px; margin: 0px; padding: 0px; right: 25px;">
+		        <textarea id="g-recaptcha-response" name="g-recaptcha-response"
+		                  class="g-recaptcha-response"
+		                  style="width: 250px; height: 80px; border: 1px solid #c1c1c1;
+		                         margin: 0px; padding: 0px; resize: none;" value="">
+		        </textarea>
+		      </div>
+		    </div>
+		  </div>
+		</noscript>
+		<div class="right">
+			<div style="display: inline-block; margin-right: 2em; color: #0065A4; text-decoration: underline; cursor:pointer;" class="issue-trigger">Cancel</div>
+				<input class="lib-button" type="submit" value="Report a Problem" name="problem-report" style="margin-top: 1em;" />
+			</div>
+		</form>
+	</div>');
+	$('body').append(problemReportFormHTML);
 
 <?php
 

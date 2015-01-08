@@ -1,0 +1,30 @@
+#footer-wrapper{
+	width: 100%;
+	height: 4em;
+	padding-top: .5em;
+	padding-right: 5em;
+	background-color: #333;
+	color: #FFF;
+	position: fixed;
+	bottom: 0;
+}
+#footer-wrapper footer {
+	margin: 0 3em;
+	float: right;
+}
+#wrapper{
+	margin-top: 7em;
+	padding-bottom: 5em;
+}
+#header-wrapper{
+	position: fixed;
+	top: 0;
+}
+#footer-wrapper div {
+	float: left;
+	width: 60%;
+	font-size: 70%;
+	word-wrap: break-word;
+	height: 5em;
+	padding-left: 1em;
+}

@@ -269,6 +269,17 @@ form.lib-simple-form input[type="submit"] {
 
 }
 
+.lib-form abbr {
+	font-size: .8em;
+	margin: .6em 0;
+	display: inline-block;
+	color: #333;
+	font-weight: bold;
+	text-transform: uppercase;
+	padding-top: 30px;
+	padding-left: 10px;
+}
+
 /* Status Message Styles */
 
 .lib-success {display: block;line-height:1.5em;margin: -0.5em 0 1.6em 0;padding: 1em 1.6em;background: #b2ff7f; border: 1px solid #8acc66;text-align: left;color: #444;}

@@ -1,0 +1,30 @@
+<?php
+// Database
+$db_host = '{{db-host}}'; // Database host
+$db_user = '{{db-user}}'; // Database user
+$db_pass = '{{db-pass}}'; // Database password
+$db_database = '{{db-name}}'; // Database name
+
+// Styles
+$library_name = '{{lib-name}}';
+$header_image = '{{lib-image}}';
+$header_url = '{{lib-image-link}}';
+$banner_color = '{{lib-header-hex}}';
+
+// Subscriptions
+$rss_url = '{{rss-url}}';
+$email_subscription_url = '{{email-url}}';
+
+// Set default variables for sending emails
+$to_email = '{{email-to}}';
+$from_email = '{{email-from}}';
+$email_subject = '{{email-subject}}';
+
+//Native login or not
+$use_native_login = {{login-native-login}};
+$non_native_login_url = '{{login-non-native-login-url}}';
+
+//Recaptcha API Keys
+$recaptchaSiteKey = '{{recaptchaSiteKey}}';
+$recaptchaSecretKey = '{{recaptchaSecretKey}}';
+?>
