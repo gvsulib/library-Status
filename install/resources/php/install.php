@@ -34,6 +34,14 @@ function doInstall(){
 		}
 	}
 
+	for ($i = 0; $i < 10; $i++){
+		if (strlen($_SESSION['system-name'][$i]) > 0 && strlen($_SESSION['system-URL'] > 0)){
+			if ($db->query("INSERT INTO `systems` VALUES(NULL, '{$_SESSION['system-name'][$i]}', '{$_SESSION['system-URL'][$i]}'")){
+
+			}
+		}
+	}
+
 	if($db->query("INSERT INTO `user` VALUES (NULL, '{$_SESSION['native-user-username']}', '{$user_pw}', '{$_SESSION['native-user-fname']}','{$_SESSION['native-user-lname']}',	'{$_SESSION['native-user-email']}',0,0,9);"))
 	{
 		header('location: ../../complete.php');
