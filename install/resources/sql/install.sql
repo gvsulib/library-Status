@@ -6,6 +6,7 @@ CREATE TABLE `issue_entries` (
   `status_type_id` int(10) NOT NULL,
   `start_time` int(13) NOT NULL,
   `end_time` int(13) NOT NULL,
+  `created_by` int(10) NOT NULL,
   PRIMARY KEY (`issue_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2;
 INSERT INTO `issue_entries` (`issue_id`, `system_id`, `status_type_id`, `start_time`, `end_time`) VALUES

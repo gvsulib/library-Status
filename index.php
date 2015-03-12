@@ -100,7 +100,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 				// Create new issue
 				$db->query("INSERT INTO issue_entries
-				VALUES ('','$system_id', $status_type_id, '$time', '$end_time')");
+				VALUES ('','$system_id', $status_type_id, '$time', '$end_time', '$user_id')");
 				$issue_id = $db->insert_id;
 
 				// Create a new status entry for issue
