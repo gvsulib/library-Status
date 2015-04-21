@@ -614,7 +614,7 @@ $(document).ready(function() {
 	});
 	$(".status-update").click(function() {
 		console.log('Click');
-		$(this).parent("div.issue-box").find('div.add-comment-form').slideToggle(400);
+		$(this).parent("div.issue-box").find('div.add-comment-form').last().slideToggle(400);
 
 	});
 	$("#status_type_id").change(function(){
