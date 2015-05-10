@@ -28,7 +28,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 		if ($use_native_login == true){
 			header('Location: login.php');
 		} else {
-			header('Location: ' . $not_native_login_url);
+			header('Location: ' . $non_native_login_url);
 		}
 
 	}
