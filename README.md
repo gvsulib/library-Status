@@ -39,7 +39,7 @@ There are two ways to install Library Status: with or without git.
 4. In your browser, navigate to the folder on your server that you uploaded the files. This will begin the installation wizard.
 5. If you see the following in your browser, you're in good shape:
 ![Installation Wizard](resources/img/install.png)
-6. Follow the instructions in the installatino wizard.
+6. Follow the instructions in the installation wizard.
 7. Once complete, you should be at your main Library Status homepage. Feel free to log in and start using your new Library Status Monitor!
 
 #### With Git/Github
