@@ -62,6 +62,7 @@ Library Status also provides an interface for sending along problem reports to a
 2. In feedback.php, edit the form fields to have the attribute `required="required"`, which will tell modern browsers to require the field. (This form is your submission form is JavaScript fails or is not enabled by the user.)
 3. Open up index.php and look for the small bit of jQuery code at the end of the file (line 586). Here you'll also need to add the `required="required"` attribute.
 4. You'll probably want to add some client-side form validation, since form contents are not currently repopulated if they fail server validation. While modern browsers will work well with the `required` attribute, not all browsers support this.
+5. Users will have to complete a reCaptcha. Ideally, since we're using the newest API, this will only be a checkbox for them to click. If not, they'll fill out a standard image based captcha and will be able to submit the form.
 
 We'll be making the failed submission recovery more user-friendly in future releases. Feel free to help our if you can!
 
