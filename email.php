@@ -47,7 +47,7 @@ if (php_sapi_name() == "cli") {
 		if ($lastEmail != $result['email']){
 			if ($i > 0){
 				$message .= "</body></html>";
-				$to = $result['firstName'] . ' ' . $result['lastName'] . ' <' . $lastEmail . '>';
+				$to = $lastFN . ' ' . $lastLN . ' <' . $lastEmail . '>';
 				if(mail($to, $subject, $message, $headers, '-f ' . $from_email)) {
 					echo 'Mail sent to ' . $lastEmail;
 				}
@@ -64,6 +64,8 @@ if (php_sapi_name() == "cli") {
 		$lastEmail = $result['email'];
 		$lastSystem = $result['system_name'];
 		$lastType = $result['type'];
+		$lastFN = $result['firstName'];
+		$lastLN = $result['lastName'];
 		$i++;
 		echo $result['email'] . '\n';
 	}
