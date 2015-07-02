@@ -341,7 +341,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 			<?php
 
-				$result = $db->query("SELECT * FROM systems ORDER BY system_name ASC");
+				$result = $db->query("SELECT * FROM systems WHERE system_category = 0 ORDER BY system_name ASC");
 				$now = time();
 
 				while($row = $result->fetch_assoc())
