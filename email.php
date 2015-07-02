@@ -61,6 +61,8 @@ if (php_sapi_name() == "cli") {
 		$i++;
 	}
 
+	echo $subject;
+
 mail('mreidsma@gmail.com',$subject,$message,$headers);
 
 } else {
