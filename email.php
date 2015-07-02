@@ -68,7 +68,6 @@ if (php_sapi_name() == "cli") {
 		$lastFN = $result['firstName'];
 		$lastLN = $result['lastName'];
 		$i++;
-		echo $result['email'] . '\n';
 	}
 
 
