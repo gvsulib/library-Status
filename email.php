@@ -44,7 +44,9 @@ if (php_sapi_name() == "cli") {
 		if ($lastEmail != $result['email']){
 			if ($i > 0){
 				$message .= "</body></html>";
-				mail($lastEmail, $subject, $message, $headers);
+				if(mail($lastEmail, $subject, $message, $headers)) {
+					echo 'Mail sent to ' . $lastEmail;
+				}
 				$message = "<html><head></head><body>";
 			}
 			$message .= "<h2>Hello " . $result['firstName'] . ",</h2>";
@@ -61,10 +63,6 @@ if (php_sapi_name() == "cli") {
 		$i++;
 		echo $result['email'] . '\n';
 	}
-
-
-
-mail('mreidsma@gmail.com',$subject,$message,$headers);
 
 } else {
 	$url = basename(dirname(__FILE__));
