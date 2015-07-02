@@ -61,7 +61,7 @@ if (php_sapi_name() == "cli") {
 		$i++;
 	}
 
-	echo $subject;
+	echo $lastEmail;
 
 mail('mreidsma@gmail.com',$subject,$message,$headers);
 
