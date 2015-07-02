@@ -22,9 +22,7 @@ if (php_sapi_name() == "cli") {
 	AND i.status_type_id = t.status_type_id
 	AND i.system_id = s.system_id
 	GROUP BY
-	u.user_email,
-	s.system_name,
-	t.status_type_text
+	u.user_email
 	ORDER BY
 	u.user_email,
 	s.system_name";
