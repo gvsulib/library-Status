@@ -59,9 +59,10 @@ if (php_sapi_name() == "cli") {
 		$lastSystem = $result['system_name'];
 		$lastType = $result['type'];
 		$i++;
+		echo $result['email'] . '\n';
 	}
 
-	echo $lastEmail;
+
 
 mail('mreidsma@gmail.com',$subject,$message,$headers);
 
