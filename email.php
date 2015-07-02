@@ -37,9 +37,9 @@ if (php_sapi_name() == "cli") {
 	$headers = 
 	"MIME-Version: 1.0" . "\r\n" .
 	"Content-type:text/html;charset=UTF-8" . "\r\n" . 
-	'From: GVSU Libraries Status <' . $from_email . '>' . "\r\n" .
-	'Reply-To: ' . $from_email . "\r\n" .
-	'Return-Path: ' . $from_email . "\r\n" .
+	'From: GVSU Libraries Status <status@labs.library.gvsu.edu>' . "\r\n" .
+	'Reply-To: status@labs.library.gvsu.edu' . "\r\n" .
+	'Return-Path: status@labs.library.gvsu.edu' . "\r\n" .
 	'X-Mailer: PHP/' . phpversion();
 	$message = "<html><head></head><body>";
 	$i = 0;
