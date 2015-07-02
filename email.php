@@ -36,7 +36,9 @@ if (php_sapi_name() == "cli") {
 	$headers = 
 	"MIME-Version: 1.0" . "\r\n" .
 	"Content-type:text/html;charset=UTF-8" . "\r\n" . 
-	'From: <' . $from_email . '>' . "\r\n";
+	'From: GVSU Libraries Status <' . $from_email . '>' . "\r\n" .
+	'Reply-To: ' . $from_email . "\r\n" .
+	'Return-Path: ' . $from_email . ' . "\r\n" .;
 	$message = "<html><head></head><body>";
 	$i = 0;
 
@@ -44,7 +46,7 @@ if (php_sapi_name() == "cli") {
 		if ($lastEmail != $result['email']){
 			if ($i > 0){
 				$message .= "</body></html>";
-				if(mail($lastEmail, $subject, $message, $headers)) {
+				if(mail($lastEmail, $subject, $message, $headers, '-f ' . $from_email)) {
 					echo 'Mail sent to ' . $lastEmail;
 				}
 				$message = "<html><head></head><body>";
