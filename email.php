@@ -47,7 +47,7 @@ if (php_sapi_name() == "cli") {
 		if ($lastEmail != $result['email']){
 			if ($i > 0){
 				$message .= "</body></html>";
-				$to = $firstName . ' ' . $lastName . ' <' .lastEmail . '>';
+				$to = $result['firstName'] . ' ' . $result['lastName'] . ' <' .lastEmail . '>';
 				if(mail($to, $subject, $message, $headers, '-f ' . $from_email)) {
 					echo 'Mail sent to ' . $lastEmail;
 				}
