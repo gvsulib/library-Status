@@ -47,7 +47,7 @@ if (php_sapi_name() == "cli") {
 		if ($lastEmail != $result['email']){
 			if ($i > 0){
 				$message .= "</body></html>";
-				$to = $result['firstName'] . ' ' . $result['lastName'] . ' <' .lastEmail . '>';
+				$to = $result['firstName'] . ' ' . $result['lastName'] . ' <' . $lastEmail . '>';
 				if(mail($to, $subject, $message, $headers, '-f ' . $from_email)) {
 					echo 'Mail sent to ' . $lastEmail;
 				}
@@ -67,6 +67,8 @@ if (php_sapi_name() == "cli") {
 		$i++;
 		echo $result['email'] . '\n';
 	}
+
+
  
 } else {
 	$url = basename(dirname(__FILE__));
