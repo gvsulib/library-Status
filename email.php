@@ -36,7 +36,7 @@ if (php_sapi_name() == "cli") {
 	$headers = 
 	"MIME-Version: 1.0" . "\r\n" .
 	"Content-type:text/html;charset=UTF-8" . "\r\n" . 
-	'From: <$from_email>' . "\r\n";
+	'From: <' . $from_email . '>' . "\r\n";
 	$message = "<html><head></head><body>";
 	$i = 0;
 
@@ -63,7 +63,7 @@ if (php_sapi_name() == "cli") {
 		$i++;
 		echo $result['email'] . '\n';
 	}
-
+cd 
 } else {
 	$url = basename(dirname(__FILE__));
 	header("Location: /$url");
