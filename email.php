@@ -39,7 +39,8 @@ if (php_sapi_name() == "cli") {
 	"Content-type:text/html;charset=UTF-8" . "\r\n" . 
 	'From: GVSU Libraries Status <' . $from_email . '>' . "\r\n" .
 	'Reply-To: ' . $from_email . "\r\n" .
-	'Return-Path: ' . $from_email . "\r\n";
+	'Return-Path: ' . $from_email . "\r\n" .
+	'X-Mailer: PHP/' . phpversion();
 	$message = "<html><head></head><body>";
 	$i = 0;
 
