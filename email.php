@@ -63,7 +63,7 @@ if (php_sapi_name() == "cli") {
 		$i++;
 		echo $result['email'] . '\n';
 	}
-cd 
+ 
 } else {
 	$url = basename(dirname(__FILE__));
 	header("Location: /$url");
