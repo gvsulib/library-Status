@@ -10,6 +10,7 @@ if (php_sapi_name() == "cli") {
 	t.status_type_text as type,
 	COUNT(t.status_type_text) as amount,
 	u.user_fn as firstName,
+	u.user_ln as lastName,
 	u.user_email as email
 	FROM
 	issue_entries i,
@@ -46,7 +47,8 @@ if (php_sapi_name() == "cli") {
 		if ($lastEmail != $result['email']){
 			if ($i > 0){
 				$message .= "</body></html>";
-				if(mail($lastEmail, $subject, $message, $headers, '-f ' . $from_email)) {
+				$to = $firstName . ' ' . $lastName . ' <' .lastEmail . '>';
+				if(mail($to, $subject, $message, $headers, '-f ' . $from_email)) {
 					echo 'Mail sent to ' . $lastEmail;
 				}
 				$message = "<html><head></head><body>";
