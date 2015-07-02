@@ -383,7 +383,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 						<!-- load system names -->
 						<?php
 
-							$result = $db->query("SELECT * FROM systems ORDER BY system_name ASC");
+							$result = $db->query("SELECT * FROM systems WHERE system_category = 0 ORDER BY system_name ASC");
 							$now = time();
 							$i = 0;
 							$system_count = $result->num_rows;
