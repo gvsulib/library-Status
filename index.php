@@ -1,8 +1,9 @@
 <?php
-if (!file_exists('resources/secret/config.php')){header('location: install/index.php');}
 
 session_start();
 error_reporting(0);
+
+if (!file_exists('resources/secret/config.php')){header('location: install/index.php');}
 
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 
@@ -28,7 +29,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 		if ($use_native_login == true){
 			header('Location: login.php');
 		} else {
-			header('Location: ' . $non_native_login_url);
+			header('Location: ' . $not_native_login_url);
 		}
 
 	}
