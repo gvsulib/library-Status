@@ -1,0 +1,80 @@
+.login p {
+	 text-align: right;
+	 font-size: .9em;
+	 margin-top: 1em;
+}
+
+h2 a { text-decoration: none; color: #333;}
+
+.def-list dt {font-weight:bold;margin-top:.8em;color:#222;}
+.def-list dd {margin-bottom:.7em;border-left:.3em solid #dedede;padding-left:.5em;}
+
+.subscription-list ul li:after a:after {
+	content: ' // ';
+}
+
+.subscription-list ul li:last-child a:after {
+	content: '';
+}
+.lib-horizontal-list ul { list-style: none; padding: 0; margin: 0 !important;}
+.status-bar .lib-horizontal-list ul li {
+	margin-top: .5em;
+	float: left;
+	display: inline-block;
+	margin-right: .5em;
+
+}
+.status-bar { margin-top: 1em;}
+.status-button.active {
+	font-weight: bold;
+}
+label { display: block; font-weight: bold;margin-top:.5em;}
+.login {position: relative; top: 1em; right: 3%; }
+.login a { color: #fff; text-decoration: none;}
+.has-js { display: none; }
+.status-table { margin: 1.5em auto; }
+.status-table .span2 { margin: auto;}
+.status-table .heading { font-weight: bold; }
+.status-heading dl dt { text-align: left !important;}
+.status-table dt,
+.status-table dd { display: inline-block; width:48%; padding: .4em 0;}
+.status-table dl { border-bottom: 1px solid #ddd; width: 95%; }
+.status-table dd { text-align: right;}
+.issue-box { margin-bottom: 1.5em; padding-bottom: 1.5em; padding-top: 0; border-bottom: 2px solid #bbb;}
+.issue-box h4 { margin-bottom: .4em; margin-top: 0; font-weight: bold;}
+.issue-box .tagline { font-size: 90%; color: #575757;margin-top: 1em;clear:both;}
+.comment-list { margin-top: .7em;padding-top: .7em;  border-top: 1px solid #ddd; }
+.timestamp {display: inline-block; float: left; margin-right: .5em;line-height: 1.5em;}
+h2 span { font-size: 12px; display: inline-block; padding: 0 .4em; font-family: Arial, sans-serif;margin-left: .5em;position:relative;bottom:.35em;}
+.tag-unresolved { background: #cb0000; color: white; }
+.tag-resolved { background: green; color: white; }
+.tag-maintenance { background:#0065A4; color: white; }
+.status-update { color: #0065A4; text-decoration: underline; font-size: .9em;margin-top: .5em; cursor: pointer; }
+legend { display: none;}
+form[name="status-form"] { background: #eee; padding: .5em 1%;}
+.lib-online { display: block;
+line-height: 1.5em;
+margin: .5em 0;
+padding: 1em 1.5em;
+background: none repeat scroll 0% 0% #008A00;
+border: 1px solid #8ACC66;
+text-align: left;
+color: #fff;}
+#message-update { position: absolute; top:0; left:0; right: 0; margin-left: auto; margin-right: auto;}
+.row.break.footer { font-size: .8em;}
+.feedback input[type="text"],.feedback textarea { width: 95%; }
+.right { float: right;}
+.feedback {
+	position: fixed;
+	top: 0;
+	max-width: 56em;
+	width: 60%;
+	margin: 0 auto;
+	background-color: #fff;
+	padding: 3%;
+	border: 1px solid #bbb;
+	border-top: none;
+}
+@media screen and (min-width: 768px) {
+	.half { width: 48%; padding: 0 1%; float: left;}
+}

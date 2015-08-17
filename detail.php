@@ -186,7 +186,7 @@
 
 <head>
 	<title>GVSU University Libraries Status</title>
-	<style>
+	<!--style>
 	@font-face {
 	    font-family: 'AlternateGothicFSNo3';
 	    src: url('//gvsuliblabs.com/libs/fonts/AlternateGothicNo3-webfont.eot');
@@ -200,33 +200,79 @@
 	}
 	</style>
 	<link rel="stylesheet" type="text/css" href="resources/css/styles.css"/>
-	<link rel="stylesheet" type="text/css" href="resources/css/layout.css">
+	<link rel="stylesheet" type="text/css" href="resources/css/layout.css"-->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" type="text/css" href="//labs.library.gvsu.edu/libs/fonts/fonts.css" />
+	<link rel="stylesheet" type="text/css" href="//gvsu.edu/cms4/skeleton/0/files/css/cms4.0.min.css" />
+	<link rel="stylesheet" type="text/css" href="//wwwtest.gvsu.edu/library_new/files/css/base.css" />
+	<link rel="stylesheet" type="text/css" href="//gvsu.edu/includes/topbanner/3/header.min.css" />
+	<link rel="stylesheet" type="text/css" href="//labs.library.gvsu.edu/labs/cms4/lib-cms4.css" />
+	<link rel="stylesheet" type="text/css" href="resources/css/styles-new.css"/>
 
 </head>
 
 <body>
-	<div id="header-wrapper" style="<?php echo 'background-color:' . $banner_color . ';'; ?>">
-		<div id="header">
-			<div id="logo">
-				<a href="<?php echo $header_url; ?>">
-					<img src="<?php echo $header_image; ?>" alt="<?php echo $library_name; ?>" border="0">
+		<div id="gvsu-cf_header" class="responsive">
+		<div id="gvsu-cf_header-inner">
+			<div id="gvsu-cf_header-logo">
+				<a href="http://gvsu.edu/">
+					<img src="//gvsu.edu/includes/topbanner/3/gvsu_logo.png" alt="Grand Valley State University">
 				</a>
-			</div>
-		</div>
-	</div>
+			</div><!-- End #gvsu-cf_header-logo -->
+		</div><!-- End #gvsu-cf_header-inner -->
+	</div><!-- End #gvsu-cf_header -->
 
-	<div id="wrapper">
+		<div id="cms-header-wrapper">
+		<div id="cms-header">
+			<div id="cms-header-inner">
+				<a id="cms-navigation-toggle" href="cms-siteindex-index.htm" onclick="return cmsToggleMenu(document.getElementById('cms-navigation'))">
+					<img src=" //gvsu.edu/cms4/skeleton/0/files/img/transparent.png" alt="Menu">
+				</a>
+				<h1>
+					<a href="http://gvsu.edu/library">University Libraries</a>
+				</h1>
+				<div id="library-search">
+					<form action="//gvsu.summon.serialssolutions.com/search">
+						<input type="hidden" name="spellcheck" value="true">
+						<p>
+							<input type="text" name="s.q" placeholder="Find articles, books, &amp; more" size="35">
+							<input type="submit" value="Find It!">
+						</p>
+					</form>
+				</div><!-- End #library-search -->
+					
+			<div class="cms-navigation" id="cms-navigation">
+				<ul>
+					<li><a href="http://gvsu.edu/library/find">Find Materials</a></li>
+					<li><a href="http://gvsu.edu/library/allservices">Services</a></li>
+					<li><a href="http://gvsu.edu/library/about">About Us</a></li>
+					<li><a href="http://help.library.gvsu.edu">Help</a></li>
+				</ul>
+			</div><!-- End #cms-navigation -->
 
-		<div class="line break">
+			<div class="cms-clear"></div>
+		
+			</div> <!-- End #cms-header-inner -->
+		</div><!-- End #cms-header -->
+	</div><!-- End #cms-header-wrapper -->
+
+
+	<div id="cms-body-wrapper">
+		<div id="cms-body">
+			<div id="cms-body-inner">
+				<div id="cms-body-table">
+					<div id="cms-content">
+
+		<div class="row break">
 			<div class="span2 unit left">
-				<h1><a href="index.php"><?php echo $library_name; ?> Status</a></h1>
+				<h2><a href="index.php"><?php echo $library_name; ?> Status</a></h2>
 			</div> <!-- end span -->
 
-			<div class="span2 unit right lib-horizontal-list" style="text-align: right;margin-top:.65em;">
+			<div class="span1 unit right lib-horizontal-list" style="text-align: right;margin-top:.65em;overflow:visible;">
 				<ul>
 
-						<li style="float:right;"><?php echo (($logged_in == 1) ? '<a href="#" class="status-button has-js issue-trigger" style="margin-top:-.5em" id="issue-trigger">Report an Issue</a>' : '<a href="feedback.php" class="lib-button-small issue-trigger" style="margin-top:-.5em" id="feedback-trigger">Report a Problem</a>'); ?></li>
+						<li style="float:right;"><?php echo (($logged_in == 1) ? '<a href="#" class="status-button btn btn-default has-js issue-trigger" style="margin-top:-.5em" id="issue-trigger">Report an Issue</a>' : '<a href="feedback.php" class="btn btn-primary issue-trigger" style="margin-top:-.5em" id="feedback-trigger">Report a Problem</a>'); ?></li>
 							<li style="float:right;margin-right: 8%;"><?php  echo (($logged_in == 1) ? 'Hello, ' . $user_fn . '&nbsp;//&nbsp;<a href="?logout" title="Log out" style="text-decoration: none; font-size: .9em;">Log out</a>' : '<a href="index.php?login" title="Log in" style="text-decoration: none; font-size: .9em;">Log in</a>'); ?></li>
 				</ul>
 			</div>
@@ -236,13 +282,15 @@
 			if(isset($m)) {
 				echo '<div id="message-update">' . $m . '</div>';
 			}
-			?>
 			
-			<div class="line lib-form feedback">
-				<div class = "span1 unit">	
-					<div class = "span1 unit">	
+			
+			if($logged_in == 1) { ?>
+
+			<div class="row lib-form feedback">
+				<div class = "span3 unit">	
+					
 						<h4>Report an Issue</h4>
-					</div>
+		
 
 					<form action="<?php echo $actual_url; ?>" method="POST" name="issue-form">
 						<div style="float: left; padding-right: 1em;">
@@ -298,7 +346,7 @@
 						</div>
 
 
-						<div class = "span1 unit" style="float: left; padding: 1em 0">
+						<div class = "span3 unit" style="float: left; padding: 1em 0">
 							<textarea style="font-size: 1em" name="issue_text" placeholder="Describe issue..."></textarea>
 						</div>
 
@@ -311,30 +359,31 @@
 				</div> <!-- end span -->
 			</div> <!-- end line -->
 
-		<?php	if($detail == 0) { // Show systems template
+		<?php	}
+		if($detail == 0) { // Show systems template
 						
-						echo '<h2>Issues for ' . $system_name . '</h2>';
+						echo '<div class="cms-clear"></div><h3>Issues for ' . $system_name . '</h3>';
 						
 				?>
 				
 				<!-- Add blog-like view of incidents -->
-				<div class="line lib-horizontal-list status-bar" style="clear: both; margin: 2em 0; padding: .75em 1%; background: #eee; border: 1px solid #bbb;">
+				<div class="row status-bar" style="clear: both; margin: 2em 0; padding: .75em 1%; background: #eee; border: 1px solid #bbb;">
 
-					<div class="span3of4 unit left">
+					<div class="span2 lib-horizontal-list unit left">
 						<ul>
-							<li><a href="<?php echo $actual_url; ?>&amp;status=recent" class="status-button <?php echo ($filter == 0 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-recent"><?php echo ($filter == 0 ? 'Showing' : 'Show'); ?> All</a></li>
-							<li><a href="<?php echo $actual_url; ?>&amp;status=unresolved" class="status-button <?php echo ($filter == 1 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-unresolved"><?php echo ($filter == 1 ? 'Showing' : 'Show'); ?> Unresolved</a></li>
-							<li><a href="<?php echo $actual_url; ?>&amp;status=resolved" class="status-button <?php echo ($filter == 2 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($filter == 2 ? 'Showing' : 'Show'); ?> Resolved</a></li>
+							<li><a href="<?php echo $actual_url; ?>&amp;status=recent" class="status-button btn btn-default <?php echo ($filter == 0 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-recent"><?php echo ($filter == 0 ? 'Showing' : 'Show'); ?> All</a></li>
+							<li><a href="<?php echo $actual_url; ?>&amp;status=unresolved" class="status-button btn btn-default <?php echo ($filter == 1 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-unresolved"><?php echo ($filter == 1 ? 'Showing' : 'Show'); ?> Unresolved</a></li>
+							<li><a href="<?php echo $actual_url; ?>&amp;status=resolved" class="status-button btn btn-default <?php echo ($filter == 2 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($filter == 2 ? 'Showing' : 'Show'); ?> Resolved</a></li>
 						</ul>
 					</div>
 
-					<div class="span4 unit right subscription-list" style="text-align:right;">
+					<div class="span1 unit right subscription-list" style="text-align:right;">
 						<p>Subscribe: <a href="http://feeds.feedburner.com/gvsulibstatus" title="Subscribe to the RSS feed">RSS</a>&nbsp;
 							//&nbsp;
 							<a href="http://feedburner.google.com/fb/a/mailverify?uri=gvsulibstatus&amp;loc=en_US" title="Subscribe to updates via Email">Email</a></p>
 					</div>
 
-
+<div class="cms-clear"></div>
 				</div>
 				
 				<?php
@@ -381,7 +430,7 @@
 									
 											echo '
 											<!-- Issue -->
-											<div class="line issue-box span1">
+											<div class="row issue-box span1">
 											' . ($logged_in == 1 && $resolved == 0 ? '<div class="right status-update has-js">Add Update</div>' : '') .'
 														<h2 id="issue_' . $issue_entries['issue_id'] . '"><a href="detail.php?id=' . $issue_entries['issue_id'] . '">' . $status_entries['status_type_text'] . '</a> ' . $current_status .'</h2>
 														<div class="comment-text"><strong class="timestamp">[' . date($time_format, $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>';
@@ -439,7 +488,7 @@
 												<label for="status-' . $issue_entries['issue_id'] . '" style="display:none;">Update Status</label>
 												<textarea style="margin-top: .5em; height: 5em; font-size: 1em" id="status-' . $issue_entries['issue_id'] . '" name="status" placeholder="Update the Status of this Issue"></textarea>
 
-											<div class="line" style="margin-top:.5em;">
+											<div class="row" style="margin-top:.5em;">
 												<div class="span2 right unit" style="text-align:right;">
 
 													<label style="margin-left: 1em;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
@@ -497,7 +546,7 @@
 						
 								echo '
 								<!-- Issue -->
-								<div class="line issue-box span1">
+								<div class="row issue-box span1">
 								' . ($logged_in == 1 && $resolved == 0 ? '<div class="right status-update has-js">Add Update</div>' : '') .'
 											<h2 id="issue_' . $id . '"><a href="detail.php?id=' . $id . '">' . $status_entries['status_type_text'] . '</a> ' . $current_status .'</h2>
 											<div class="comment-text"><strong class="timestamp">[' . date($time_format, $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>';
@@ -544,7 +593,7 @@
 										<label for="status-' . $id . '" style="display:none;">Update Status</label>
 										<textarea style="margin-top: .5em; height: 5em; font-size: 1em" id="status-' . $id . '" name="status" placeholder="Update the Status of this Issue"></textarea>
 
-									<div class="line" style="margin-top:.5em;">
+									<div class="row" style="margin-top:.5em;">
 										<div class="span2 right unit" style="text-align:right;">
 
 											<label style="margin-left: 1em;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
@@ -572,15 +621,79 @@
 				?>
 				
 
-		<div class="line footer">
-			<div class="span1 unit">
+		<div class="row break footer">
+			<div class="span3 unit">
 				
 				<p>Written by <a href="http://jonearley.net/">Jon Earley</a>, <a href="http://jon.tw" title="Jon Bloom">Jon Bloom</a>, and <a href="http://matthewreidsma.com" title="Matthew Reidsma Writes about Libraries, Technology, and the Web">Matthew Reidsma</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
 
 			</div> <!-- end span -->
 		</div> <!-- end line -->
 		
-	</div>
+	</div><!-- End #cms-content -->
+				</div><!-- End #cms-body-table -->
+			</div><!-- End #cms-body-inner -->
+		</div><!-- end #cms-body -->
+	</div><!-- end #cms-body-wrapper -->
+
+	<div id="cms-footer-wrapper">
+		<div id="cms-footer">
+			<div id="cms-footer-inner">
+				<ul>
+					<li><h4>Contact</h4>
+						<p class="vcard">
+							<span class="tel"> 
+								<span class="type">Phone</span>:
+								<span class="value">(616) 331-3500</span>
+							</span>
+							<br />
+							<a href="mailto:library@gvsu.edu" class="email" target="_blank">library@gvsu.edu</a>
+							<br />
+						</p>
+					</li>
+					<li><h4>Social Media</h4>
+						<p>
+							<a href="http://twitter.com/gvsulib" title="http://twitter.com/gvsulib" class="socialmedia-icon socialmedia-icon-twitter">
+								<span class="cms-screen-reader">http://twitter.com/gvsulib</span>
+							</a>
+							<a href="http://youtube.com/user/gvsulib" title="http://youtube.com/user/gvsulib" class="socialmedia-icon socialmedia-icon-youtube">
+								<span class="cms-screen-reader">http://youtube.com/user/gvsulib</span>
+							</a>
+						</p>
+					</li>
+					<li id="library-fdlp">
+								<p>
+									<a href="http://gvsu.edu/library/govdoc" target="_blank">
+										<img src="//wwwtest.gvsu.edu/cms4/asset/0862059E-9024-5893-1B5AAAC2F83BDDD8/fdlp-new.png" alt="Federal Depository Library Program Logo">
+									</a>
+									<br>
+									Federal Depository<br>
+									Library Program
+								</p>
+							</li>
+				</ul>
+			</div><!-- End #cms-footer-inner -->
+		</div><!-- End #cms-footer -->
+	</div><!-- End #cms-footer-wrapper -->
+
+	<div id="cms-copyright-wrapper">
+		<div id="cms-copyright">
+			<div id="cms-copyright-inner">
+				<ul>
+					<li><a href="http://gvsu.edu/affirmativeactionstatement.htm">GVSU is an EO/AA Institutio</a></li>
+					<li><a href="http://gvsu.edu/privacystatement.htm">Privacy Policy</a></li>
+					<li><a href="http://gvsu.edu/disclosures">Disclosures</a></li>
+					<li>Copyright © 1995-2015 GVSU</li>
+				</ul>
+			</div><!-- End #cms-copyright-inner -->
+		</div><!-- End #cms-copyright -->
+	</div><!-- End #cms-copyright-wrapper -->
+
+	<!-- Special div custom to Illiad -->
+	<div id="renewalHack" style="display: none;"></div>
+
+	<script src="//labs.library.gvsu.edu/labs/chatbutton/chatbutton.js"></script>
+	<script src="//gvsu.edu/cms4/skeleton/0/files/js/cms4.0.min.js"></script>
+	<script>cmsInit()</script>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script>
 	$(document).ready(function() {
@@ -624,12 +737,52 @@
 
 	<?php
 
-		} else {
+		} else { 
 
 	?>
 
-		$("body").append('<div class="feedback lib-form line"> <form method="post" action="http://www.gvsu.edu/library/customemail-post.htm?keyId=9D7CB431-E6EB-A2DB-48089384265083C9"> <div class="span2 unit left"><label for="name">Your Name:</label> <input type="text" name="name" id="name" placeholder="Optional" /></div><div class="span2 unit left lastUnit"><label for="email">Your Email:</label> <input type="text" name="email" id="email" placeholder="Optional" /></div><label for="feedback">Have an idea? See a problem?</label> <textarea name="feedback"></textarea> <div class="right"> <div style="display: inline-block; margin-right: 2em; color: #0065A4; text-decoration: underline; cursor:pointer;" class="issue-trigger">Cancel</div> <input class="lib-button" type="submit" value="Report a Problem" style="margin-top: 1em;" /> </div> </form> </div>');
+		var problemReportFormHTML = 
+"	<div class=\"feedback lib-form row\">" +
+"		<form method=\"post\" action=\"\">" +
+"		<div class=\"span2 unit left\">" +
+"			<label for=\"name\">Your Name:</label>" +
+"			<input type=\"text\" name=\"name\" id=\"name\" placeholder=\"Optional\" />" +
+"		</div>" +
+"		<div class=\"span1 unit left lastUnit\">" +
+"			<label for=\"email\">Your Email:</label>" +
+"			<input type=\"text\" name=\"email\" id=\"email\" placeholder=\"Optional\" />" +
+"		</div>" +
+"		<label for=\"feedback\">Have an idea? See a problem?</label>" +
+"		<textarea name=\"feedback\"></textarea>" +
+"		<div class=\"g-recaptcha\" data-sitekey=\"<?php echo $recaptchaSiteKey; ?>\" style=\"padding: 10px; display:inline-block\"></div>" +
+"		<noscript>" +
+"		  <div style=\"width: 302px; height: 352px;\">" +
+"		    <div style=\"width: 302px; height: 352px; position: relative;\">" +
+"		      <div style=\"width: 302px; height: 352px; position: absolute;\">" +
+"		        <iframe src=\"https://www.google.com/recaptcha/api/fallback?k=<?php echo $recaptchaSiteKey; ?>\"" +
+"		                frameborder=\"0\" scrolling=\"no\"" +
+"		                style=\"width: 302px; height:352px; border-style: none;\">" +
+"		        </iframe>" +
+"		      </div>" +
+"		      <div style=\"width: 250px; height: 80px; position: absolute; border-style: none;" +
+"		                  bottom: 21px; left: 25px; margin: 0px; padding: 0px; right: 25px;\">" +
+"		        <textarea id=\"g-recaptcha-response\" name=\"g-recaptcha-response\"" +
+"		                  class=\"g-recaptcha-response\"" +
+"		                  style=\"width: 250px; height: 80px; border: 1px solid #c1c1c1;" +
+"		                         margin: 0px; padding: 0px; resize: none;\" value=\"\">" +
+"		        </textarea>" +
+"		      </div>" +
+"		    </div>" +
+"		  </div>" +
+"		</noscript>" +
+"		<div class=\"right\">" +
+"			<div style=\"display: inline-block; margin-right: 2em; color: #0065A4; text-decoration: underline; cursor:pointer;\" class=\"issue-trigger\">Cancel</div>" +
+"				<input class=\"btn btn-primary\" type=\"submit\" value=\"Report a Problem\" name=\"problem-report\" style=\"margin-top: 1em;\" />" +
+"			</div>" +
+"		</form>" +
+"	</div>";
 
+	$('body').append(problemReportFormHTML);
 		$(".feedback").hide();
 
 		$(".issue-trigger").click(function(e) {
