@@ -14,29 +14,11 @@ require 'resources/php/functions.php';
 <head>
 	<title><?php echo $library_name; ?> Status</title>
 
-	<!--style>
-	@font-face {
-	    font-family: 'AlternateGothicFSNo3';
-	    src: url('//gvsuliblabs.com/libs/fonts/AlternateGothicNo3-webfont.eot');
-	    src: url('//gvsuliblabs.com/libs/fonts/AlternateGothicNo3-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('//gvsuliblabs.com/libs/fonts/AlternateGothicNo3-webfont.woff') format('woff'),
-	         url('//gvsuliblabs.com/libs/fonts/AlternateGothicNo3-webfont.ttf') format('truetype'),
-	         url('//gvsuliblabs.com/libs/fonts/AlternateGothicNo3-webfont.svg#AlternateGothicFSNo3') format('svg');
-	    font-weight: normal;
-	    font-style: normal;
-
-	}
-	</style>
-	<link rel="stylesheet" type="text/css" href="resources/css/styles.css"/>
-	<link rel="stylesheet" type="text/css" href="resources/css/layout.css"-->
+	
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<link rel="stylesheet" type="text/css" href="//labs.library.gvsu.edu/libs/fonts/fonts.css" />
-	<link rel="stylesheet" type="text/css" href="//gvsu.edu/cms4/skeleton/0/files/css/cms4.0.min.css" />
-	<link rel="stylesheet" type="text/css" href="//wwwtest.gvsu.edu/library_new/files/css/base.css" />
-	<link rel="stylesheet" type="text/css" href="//gvsu.edu/includes/topbanner/3/header.min.css" />
-	<link rel="stylesheet" type="text/css" href="//labs.library.gvsu.edu/labs/cms4/lib-cms4.css" />
-	<link rel="stylesheet" type="text/css" href="resources/css/styles-new.css"/>
+	<link rel="stylesheet" type="text/css" href="resources/css/styles.css" />
+
 	<script src='https://www.google.com/recaptcha/api.js'></script>
 </head>
 <body>
@@ -183,7 +165,7 @@ require 'resources/php/functions.php';
 					<li id="library-fdlp">
 								<p>
 									<a href="http://gvsu.edu/library/govdoc" target="_blank">
-										<img src="//wwwtest.gvsu.edu/cms4/asset/0862059E-9024-5893-1B5AAAC2F83BDDD8/fdlp-new.png" alt="Federal Depository Library Program Logo">
+										<img src="//gvsu.edu/cms4/asset/0862059E-9024-5893-1B5AAAC2F83BDDD8/fdlp-new.png" alt="Federal Depository Library Program Logo">
 									</a>
 									<br>
 									Federal Depository<br>
