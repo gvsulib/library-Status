@@ -580,7 +580,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 								<fieldset>
 								<legend>Add a Status Update</legend>
 								<label for="status-' . $issue_entries['issue_id'] . '" style="display:none;">Update Status</label>
-								<textarea style="margin-top: .5em; height: 5em; font-size: 1em width: 100%;" id="status-' . $issue_entries['issue_id'] . '" name="status" placeholder="Update the Status of this Issue"></textarea>
+								<textarea style="margin-top: .5em; height: 5em; font-size: 1em; width: 100%;" id="status-' . $issue_entries['issue_id'] . '" name="status" placeholder="Update the Status of this Issue"></textarea>
 
 							<div class="row" style="margin-top:.5em;">
 								<div class="span2" >
@@ -588,12 +588,14 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 									<label style="margin-left: 1em;display:inline;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
 									<input type="checkbox" name="issue_resolved" id="issue_resolved" value="1">
 
-									<label class="lib-inline" style="display:inline;for="comment-when-' . $issue_entries['issue_id'] . '" >When</label>
+									<label class="lib-inline" style="display:inline;margin-left:1em;" for="comment-when-' . $issue_entries['issue_id'] . '" >When</label>
 									<input type="text" style="width:6em; display:inline-block;" name="when" id="comment-when-' . $issue_entries['issue_id'] . '" value="Now" />
 								</div>
-								<div class="left unit span1 lastUnit">
+								<div class="left unit span1 lastUnit" style="text-align:right;">
 									<input class="status-button" name="submit_status" type="submit" value="Update" />
 								</div>
+																										<div class="cms-clear" style="padding-bottom:.5em;"></div>
+
 							</div>
 
 
@@ -601,6 +603,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 								<input type="hidden" name="status_type_id" value="' . $status_type_id . '" />
 							</fieldset>
 							</form>
+
 						</div>';
 						
 

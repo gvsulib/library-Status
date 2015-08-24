@@ -476,12 +476,14 @@
 													<label style="margin-left: 1em;display:inline;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
 													<input type="checkbox" name="issue_resolved" id="issue_resolved" value="1">
 
-													<label class="lib-inline" style="display:inline;" for="comment-when-' . $issue_entries['issue_id'] . '" >When</label>
+													<label class="lib-inline" style="display:inline;margin-left:1em;" for="comment-when-' . $issue_entries['issue_id'] . '" >When</label>
 													<input type="text" style="width:6em; display:inline-block;" name="when" id="comment-when-' . $issue_entries['issue_id'] . '" value="Now" />
 												</div>
-												<div class="span1">
+												<div class="span1" style="text-align:right;">
 													<input class="status-button" name="submit_status" type="submit" value="Update" />
 												</div>
+																							<div class="cms-clear" style="padding-bottom:.5em;"></div>
+
 											</div>	
 
 
