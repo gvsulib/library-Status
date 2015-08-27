@@ -181,6 +181,10 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 					$name = stripslashes($_POST['name']);
 					$email = stripslashes($_POST['email']);
 					$message = stripslashes($_POST['feedback']);
+					$url = stripslashes($_POST['url']);
+					if(isset($url)) {
+						$message = $message . "\nProblem URL: " . urldecode($url);
+					}
 
 					send_email($name, $email, $message); 
 					$m = '<div class="alert alert-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>'; 
@@ -746,6 +750,7 @@ $(document).ready(function() {
 "		</div>" +
 "		<label for=\"feedback\">Have an idea? See a problem?</label>" +
 "		<textarea name=\"feedback\"></textarea>" +
+"		<input type=\"hidden\" name=\"url\" value=\"<?php echo $_GET['url']; ?>\">" +
 "		<div class=\"g-recaptcha\" data-sitekey=\"<?php echo $recaptchaSiteKey; ?>\" style=\"padding: 10px; display:inline-block\"></div>" +
 "		<noscript>" +
 "		  <div style=\"width: 302px; height: 352px;\">" +
