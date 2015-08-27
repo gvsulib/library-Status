@@ -774,6 +774,13 @@ $(document).ready(function() {
 "		</form>" +
 "	</div>";
 	$('body').append(problemReportFormHTML);
+	$(".issue-trigger").click(function(e) {
+
+		e.preventDefault();
+
+		$(".feedback").slideToggle(400);
+
+	});
 
 <?php
 
@@ -783,13 +790,7 @@ if(isset($_GET['problem'])) { // Force problem form to open
 
 ?>
 	$(".feedback").hide();
-	$(".issue-trigger").click(function(e) {
-
-		e.preventDefault();
-
-		$(".feedback").slideToggle(400);
-
-	});
+	
 	
 <?php
 
