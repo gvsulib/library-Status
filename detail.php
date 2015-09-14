@@ -369,7 +369,7 @@
 				</div>
 				
 				<?php
-						
+						$test = 0;
 						$issue_result = $db->query($issue_query) or die(mysqli_error());
 						
 							while ($issue_entries = $issue_result->fetch_assoc()) {
@@ -398,7 +398,7 @@
 									$num_rows = $result->num_rows;
 
 									$rc = 0;
-
+									$test++;
 									// display issues and check for comments
 									while ($status_entries = $result->fetch_assoc()) {
 
@@ -494,7 +494,7 @@
 										</div>';
 
 									}
-						echo '<!--rc = ' . $rc . '-->';
+						echo '<!--rc = ' . $rc . ' // test = ' . $test . '-->';
 
 					if($attribution != NULL) {
 
