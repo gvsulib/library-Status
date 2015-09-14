@@ -211,6 +211,10 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
          		if(isset($_GET['thankyou'])) {
 			$m = '<div class="alert alert-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>';
 		}
+
+		if(isset($_GET['url'])) {
+			$problem_url = urldecode($_GET['url']);
+		}
 ?>
 
 <!DOCTYPE html>
@@ -576,48 +580,54 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 					// Add the comments entry if logged in and the item is unresolved
 
-					if(($logged_in == 1) && ($resolved == 0)) {
+						if(($logged_in == 1) && ($resolved == 0)) {
 
-						echo '<div class="lib-form add-comment-form" style="margin-top: .5em; padding-top: .5em; border-top: 1px dotted #bbb;">
+							echo '<div class="lib-form add-comment-form" style="margin-top: .5em; padding-top: .5em; border-top: 1px dotted #bbb;">
 
-							<form action="' . $_SERVER['PHP_SELF'] . '" method="POST" name="status-form">
-								<fieldset>
-								<legend>Add a Status Update</legend>
-								<label for="status-' . $issue_entries['issue_id'] . '" style="display:none;">Update Status</label>
-								<textarea style="margin-top: .5em; height: 5em; font-size: 1em; width: 100%;" id="status-' . $issue_entries['issue_id'] . '" name="status" placeholder="Update the Status of this Issue"></textarea>
+								<form action="' . $_SERVER['PHP_SELF'] . '" method="POST" name="status-form">
+									<fieldset>
+									<legend>Add a Status Update</legend>
+									<label for="status-' . $issue_entries['issue_id'] . '" style="display:none;">Update Status</label>
+									<textarea style="margin-top: .5em; height: 5em; font-size: 1em; width: 100%;" id="status-' . $issue_entries['issue_id'] . '" name="status" placeholder="Update the Status of this Issue"></textarea>
 
-							<div class="row" style="margin-top:.5em;">
-								<div class="span2" >
+								<div class="row" style="margin-top:.5em;">
+									<div class="span2" >
 
-									<label style="margin-left: 1em;display:inline;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
-									<input type="checkbox" name="issue_resolved" id="issue_resolved" value="1">
+										<label style="margin-left: 1em;display:inline;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
+										<input type="checkbox" name="issue_resolved" id="issue_resolved" value="1">
 
-									<label class="lib-inline" style="display:inline;margin-left:1em;" for="comment-when-' . $issue_entries['issue_id'] . '" >When</label>
-									<input type="text" style="width:6em; display:inline-block;" name="when" id="comment-when-' . $issue_entries['issue_id'] . '" value="Now" />
+										<label class="lib-inline" style="display:inline;margin-left:1em;" for="comment-when-' . $issue_entries['issue_id'] . '" >When</label>
+										<input type="text" style="width:6em; display:inline-block;" name="when" id="comment-when-' . $issue_entries['issue_id'] . '" value="Now" />
+									</div>
+									<div class="left unit span1 lastUnit" style="text-align:right;">
+										<input class="status-button" name="submit_status" type="submit" value="Update" />
+									</div>
+																											<div class="cms-clear" style="padding-bottom:.5em;"></div>
+
 								</div>
-								<div class="left unit span1 lastUnit" style="text-align:right;">
-									<input class="status-button" name="submit_status" type="submit" value="Update" />
-								</div>
-																										<div class="cms-clear" style="padding-bottom:.5em;"></div>
-
-							</div>
 
 
-								<input type="hidden" name="issue_id" value="' .$issue_entries['issue_id'] . '" />
-								<input type="hidden" name="status_type_id" value="' . $status_type_id . '" />
-							</fieldset>
-							</form>
+									<input type="hidden" name="issue_id" value="' .$issue_entries['issue_id'] . '" />
+									<input type="hidden" name="status_type_id" value="' . $status_type_id . '" />
+								</fieldset>
+								</form>
 
-						</div>';
-						
+							</div>';
+							
 
-					}
-				} 	if($attribution != NULL) {
-						echo $attribution . ' </div><!-- End .line -->';
-					}
+						}
+
+						if($attribution != NULL) {
+
+							echo $attribution . ' </div><!-- End .line -->';
+
+						}
+					} 
+
+					
 					 
-			} // close status loop
-				}
+				} // close status loop
+			}
 
 
 	?>
@@ -747,10 +757,10 @@ $(document).ready(function() {
 "		<div class=\"span1 unit left lastUnit\">" +
 "			<label for=\"email\">Your Email:</label>" +
 "			<input type=\"text\" name=\"email\" id=\"email\" placeholder=\"Optional\" />" +
+"		<input type=\"hidden\" name=\"url\" value=\"<?php echo urldecode($_GET['url']); ?>\">" +
 "		</div>" +
 "		<label for=\"feedback\">Have an idea? See a problem?</label>" +
 "		<textarea name=\"feedback\"></textarea>" +
-"		<input type=\"hidden\" name=\"url\" value=\"<?php echo $_GET['url']; ?>\">" +
 "		<div class=\"g-recaptcha\" data-sitekey=\"<?php echo $recaptchaSiteKey; ?>\" style=\"padding: 10px; display:inline-block\"></div>" +
 "		<noscript>" +
 "		  <div style=\"width: 302px; height: 352px;\">" +
