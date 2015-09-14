@@ -495,13 +495,15 @@
 
 									}
 								}
-						echo '<!--rc = ' . $rc . ' // test = ' . $test . '-->';
+
+						echo '<!--rc = ' . $rc . ' // test = ' . $test . ' and id = ' . $issue_entries['issue_id'] . '-->';
 
 					if($attribution != NULL) {
 
 						echo $attribution . ' </div><!-- End .line -->';
 
-					}								} // close status loop
+					}
+				} // close status loop
 						
 					} else { // Show issue template
 						
