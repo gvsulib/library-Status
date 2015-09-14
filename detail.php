@@ -494,8 +494,13 @@
 										</div>';
 
 									}
-									echo $attribution . '</div>';
-								} // close status loop
+						echo '<!--rc = ' . $rc . '-->';
+
+					if($attribution != NULL) {
+
+						echo $attribution . ' </div><!-- End .line -->';
+
+					}								} // close status loop
 						
 					} else { // Show issue template
 						
