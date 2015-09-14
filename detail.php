@@ -412,7 +412,7 @@
 									
 											echo '
 											<!-- Issue -->
-											<div class="row issue-box span1">
+											<div class="row issue-box span3">
 											' . ($logged_in == 1 && $resolved == 0 ? '<div class="right status-update has-js">Add Update</div>' : '') .'
 														<h2 id="issue_' . $issue_entries['issue_id'] . '"><a href="detail.php?id=' . $issue_entries['issue_id'] . '">' . $status_entries['status_type_text'] . '</a> ' . $current_status .'</h2>
 														<div class="comment-text"><strong class="timestamp">[' . date($time_format, $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>';
