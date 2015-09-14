@@ -618,6 +618,8 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 						}
 					} 
 
+					echo '<!--rc = ' . $rc . '-->';
+
 					if($attribution != NULL) {
 
 						echo $attribution . ' </div><!-- End .line -->';
