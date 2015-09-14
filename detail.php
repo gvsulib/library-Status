@@ -458,7 +458,7 @@
 										}
 											
 										
-									}
+									
 									
 									if(($logged_in == 1) && ($resolved == 0)) {
 
@@ -494,6 +494,7 @@
 										</div>';
 
 									}
+								}
 						echo '<!--rc = ' . $rc . ' // test = ' . $test . '-->';
 
 					if($attribution != NULL) {
