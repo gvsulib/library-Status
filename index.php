@@ -616,15 +616,13 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 							
 
 						}
-
-						if($attribution != NULL) {
-
-							echo $attribution . ' </div><!-- End .line -->';
-
-						}
 					} 
 
-					
+					if($attribution != NULL) {
+
+						echo $attribution . ' </div><!-- End .line -->';
+
+					}
 					 
 				} // close status loop
 			}
