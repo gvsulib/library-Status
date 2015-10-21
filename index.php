@@ -261,7 +261,8 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 					<form action="//gvsu.summon.serialssolutions.com/search">
 						<input type="hidden" name="spellcheck" value="true">
 						<p>
-							<input type="text" name="s.q" placeholder="Find articles, books, &amp; more" size="35">
+							<label for="library-search-box" class="hide-accessible">Search the Library for Books, Articles, Media, and More</label>
+							<input id="library-search-box" type="text" name="s.q" placeholder="Find articles, books, &amp; more" size="35">
 							<input type="submit" value="Find It!">
 						</p>
 					</form>
