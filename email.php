@@ -1,3 +1,4 @@
+
 <?php
 error_reporting(E_ALL);
 if (php_sapi_name() == "cli") {
@@ -37,9 +38,9 @@ if (php_sapi_name() == "cli") {
 	$headers = 
 	"MIME-Version: 1.0" . "\r\n" .
 	"Content-type:text/html;charset=UTF-8" . "\r\n" . 
-	'From: GVSU Libraries Status <status@labs.library.gvsu.edu>' . "\r\n" .
-	'Reply-To: status@labs.library.gvsu.edu' . "\r\n" .
-	'Return-Path: status@labs.library.gvsu.edu' . "\r\n" .
+	'From: GVSU Libraries Status <library@gvsu.edu>' . "\r\n" .
+	'Reply-To: library@gvsu.edu' . "\r\n" .
+	'Return-Path: library@gvsu.edu' . "\r\n" .
 	'X-Mailer: PHP/' . phpversion();
 	$message = "<html><head></head><body>";
 	$i = 0;
@@ -48,7 +49,7 @@ if (php_sapi_name() == "cli") {
 		if ($lastEmail != $result['email']){
 			if ($i > 0){
 				$message .= "</body></html>";
-				$to = $lastFirstName . ' ' . $lastLastName . ' <' . $lastEmail . '>';
+				$to = $lastFirstName . ' ' . $lastLastName . ' <' . $lastEmail . '>, x@mail.asana.com';
 				if(mail($to, $subject, $message, $headers, '-f ' . $from_email)) {
 					echo 'Mail sent to ' . $lastEmail;
 				}
