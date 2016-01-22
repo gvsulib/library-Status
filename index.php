@@ -579,47 +579,9 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 									<div class ="comment-text"><strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
 								</div> <!-- end comment-list --> ';
 
-							if($rc == $num_rows) {
-
-// Add the comments entry if logged in and the item is unresolved
-
-						if(($logged_in == 1) && ($resolved == 0)) {
-
-							echo '<div class="lib-form add-comment-form" style="margin-top: .5em; padding-top: .5em; border-top: 1px dotted #bbb;">
-
-								<form action="' . $_SERVER['PHP_SELF'] . '" method="POST" name="status-form">
-									<fieldset>
-									<legend>Add a Status Update</legend>
-									<label for="status-' . $issue_entries['issue_id'] . '" style="display:none;">Update Status</label>
-									<textarea style="margin-top: .5em; height: 5em; font-size: 1em; width: 100%;" id="status-' . $issue_entries['issue_id'] . '" name="status" placeholder="Update the Status of this Issue"></textarea>
-
-								<div class="row" style="margin-top:.5em;">
-									<div class="span2" >
-
-										<label style="margin-left: 1em;display:inline;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
-										<input type="checkbox" name="issue_resolved" id="issue_resolved" value="1">
-
-										<label class="lib-inline" style="display:inline;margin-left:1em;" for="comment-when-' . $issue_entries['issue_id'] . '" >When</label>
-										<input type="text" style="width:6em; display:inline-block;" name="when" id="comment-when-' . $issue_entries['issue_id'] . '" value="Now" />
-									</div>
-									<div class="left unit span1 lastUnit" style="text-align:right;">
-										<input class="status-button" name="submit_status" type="submit" value="Update" />
-									</div>
-																											<div class="cms-clear" style="padding-bottom:.5em;"></div>
-
-								</div>
-
-
-									<input type="hidden" name="issue_id" value="' .$issue_entries['issue_id'] . '" />
-									<input type="hidden" name="status_type_id" value="' . $status_type_id . '" />
-								</fieldset>
-								</form>
-
-							</div>';
-
+							if($rc == $num_rows) { // Last comment, add the comment form
+								add_comment_field($issue_entries['issue_id'], $status_type_id);
 							}
-
-						}
 
 					
 							
