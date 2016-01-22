@@ -3,8 +3,6 @@
 session_start();
 error_reporting(0);
 
-if (!file_exists('resources/secret/config.php')){header('location: install/index.php');}
-
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 
 	$_SESSION['location'] = $actual_url;
@@ -458,7 +456,12 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 								// Display Day
 								while ($rw = $system_result->fetch_assoc()) {
 
+									echo 
+
 									// Check if there is no resolution or a scheduled resolution is still in the future
+
+									// Priority should be: 2 first, 1 second, 6 third.
+
 									if (($rw['end_time'] == 0) || ($rw['end_time'] > $now) || ($rw['start_time'] > $now)) {
                                                                                 $day = date('Ymd',$now);
 
