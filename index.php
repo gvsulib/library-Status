@@ -581,9 +581,9 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 									<div class ="comment-text"><strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
 								</div> <!-- end comment-list --> ';
 
-						}
+								if($rc == $num_rows) {
 
-					// Add the comments entry if logged in and the item is unresolved
+// Add the comments entry if logged in and the item is unresolved
 
 						if(($logged_in == 1) && ($resolved == 0)) {
 
@@ -618,7 +618,14 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 								</form>
 
 							</div>';
-							
+
+							}
+
+						}
+
+						}
+
+					
 
 						}
 					} 
