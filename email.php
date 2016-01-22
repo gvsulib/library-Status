@@ -1,7 +1,6 @@
-
+#!/usr/bin/env php
 <?php
 error_reporting(E_ALL);
-if (php_sapi_name() == "cli") {
 	require 'resources/secret/config.php';
 	$con = new mysqli($db_host,$db_user,$db_pass,$db_database);
 	$query = 
@@ -73,8 +72,5 @@ if (php_sapi_name() == "cli") {
 
 
  
-} else {
-	$url = basename(dirname(__FILE__));
-	header("Location: /$url");
-}
+
 ?>
