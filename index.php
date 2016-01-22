@@ -455,10 +455,6 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 								// Display Day
 								while ($rw = $system_result->fetch_assoc()) {
-
-								
-									var_dump($rw);
-									echo '<br />';
 							
 
 									// Check if there is no resolution or a scheduled resolution is still in the future
