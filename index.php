@@ -449,14 +449,17 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text, i.issue_id
 								FROM issue_entries i, status_type s
-								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id AND i.start_time < '$now' ORDER BY i.status_type_id DESC");
+								WHERE i.system_id = {$row['system_id']} AND i.status_type_id = s.status_type_id AND i.start_time < '$now' AND (i.end_time = 0 OR i.end_time > '$now') ORDER BY s.status_type_text ASC");
 
 								$currently = 'color: #147D11">Online'; // currently displayed. Color difference is WCAG2 AA compliant
 
 								// Display Day
 								while ($rw = $system_result->fetch_assoc()) {
 
-									echo 
+								
+									var_dump($rw);
+									echo '<br />';
+							
 
 									// Check if there is no resolution or a scheduled resolution is still in the future
 
@@ -466,6 +469,8 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
                                                                                 $day = date('Ymd',$now);
 
 										//echo '<p>color</p>';
+
+
 
 										$currently = 'color: #cb0000;">'.$rw['status_type_text'];
 
