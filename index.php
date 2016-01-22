@@ -3,8 +3,6 @@
 session_start();
 error_reporting(0);
 
-if (!file_exists('resources/secret/config.php')){header('location: install/index.php');}
-
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 
 	$_SESSION['location'] = $actual_url;
@@ -16,7 +14,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 	// Are you logged in?
 
 	// Debug the user login by a force login
-	$_SESSION['username'] = 'reidsmam';
+	//$_SESSION['username'] = 'reidsmam';
 
 	// Include additional libraries that make this work
 	require 'resources/secret/config.php';
