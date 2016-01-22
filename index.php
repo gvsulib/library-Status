@@ -16,7 +16,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 	// Are you logged in?
 
 	// Debug the user login by a force login
-	//$_SESSION['username'] = 'reidsmam';
+	$_SESSION['username'] = 'reidsmam';
 
 	// Include additional libraries that make this work
 	require 'resources/secret/config.php';
@@ -581,9 +581,9 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 									<div class ="comment-text"><strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
 								</div> <!-- end comment-list --> ';
 
-						}
+							if($rc == $num_rows) {
 
-					// Add the comments entry if logged in and the item is unresolved
+// Add the comments entry if logged in and the item is unresolved
 
 						if(($logged_in == 1) && ($resolved == 0)) {
 
@@ -618,9 +618,16 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 								</form>
 
 							</div>';
+
+							}
+
+						}
+
+					
 							
 
 						}
+						
 					} 
 
 					echo '<!--rc = ' . $rc . '-->';
@@ -630,6 +637,9 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 						echo $attribution . ' </div><!-- End .line -->';
 
 					}
+
+					
+
 					 
 				} // close status loop
 			}
