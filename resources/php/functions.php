@@ -174,3 +174,10 @@ function add_comment_field($issue_id, $status_type_id) {
 
 	}
 }
+
+
+
+function edit_comment_field($issue_id, $status_entry_id) {
+
+
+}

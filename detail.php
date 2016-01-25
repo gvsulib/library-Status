@@ -125,6 +125,67 @@
 				$m = '<div class="lib-success">Your status update has been added.</div>';
 			}
 
+			// new status post$loggedin
+			if (isset($_POST['update_status_id'])) {
+
+				$issue_id = $_POST['issue_id'];
+				$status_type_id = $_POST['update_status_type_id'];
+				$status_text = $db->real_escape_string($_POST['update_status_text']);
+				$status_id = $_POST['update_status_id'];
+				$status_delete = $_POST['status_delete'];
+
+				$updated_issue_resolved = $_POST['updated_issue_resolved'];
+				$issue_resolved = $_POST['old_issue_resolved'];
+
+				// Create a time one year back to see use to check if posting time is in range.
+				$time_check = time();
+				$time_check = strtotime('-1 month');
+
+				// If time is something special or ready or for now and is within the last year.
+				if (($_POST['update-when'] != 'Now') && (strtotime($_POST['update-when']) > $time_check)) {
+					$time = strtotime($_POST['update-when']);
+				} else {
+					$time = time();
+				}
+
+				// Check to see if the issue resolution is the same as it was before
+				if($updated_issue_resolved != $issue_resolved) {
+
+					// if entry is now resolved, update the issue record to reflect that
+					if ($updated_issue_resolved == 1) {
+						$status_type_id = 3;
+
+						//update issue end_time and close issue
+						$db->query("UPDATE issue_entries
+									SET issue_entries.end_time = '$time'
+									WHERE $issue_id = issue_entries.issue_id");
+					} else {
+						// remove the saved resolution
+						$db->query("UPDATE issue_entries
+									SET issue_entries.end_time = '0'
+									WHERE $issue_id = issue_entries.issue_id");
+					}
+
+
+				}
+				$status_value = $status_type_id;
+				
+
+				// Update status entry
+				if($db->query("UPDATE status_entries
+								SET status_timestamp = '$time',
+								status_type_id = '$status_type_id',
+								status_delete = '$status_delete',
+								status_text = '$status_text'
+								WHERE status_id = '$status_id'")) {
+						$m = '<div class="alert alert-success">Your status has been updated.</div>';
+				} else {
+						$m = '<div class="alert alert-danger">There was a problem saving your update. ' . $db->error . '</div>';
+				}
+
+
+			}
+
 		} // End loop for logged in user
 	}
 	
@@ -191,6 +252,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<link rel="stylesheet" type="text/css" href="resources/css/styles.css" />
+
 
 
 </head>
@@ -394,7 +456,10 @@
 
 									$result = $db->query("SELECT s.status_id, s.issue_id, s.status_timestamp, s.status_public, s.status_user_id, s.status_text, s.status_delete, u.user_id, u.user_fn, u.user_ln, st.status_type_id, st.status_type_text
 										FROM status_entries s, user u, status_type st
-										WHERE s.issue_id = '{$issue_entries['issue_id']}' AND s.status_user_id = u.user_id AND s.status_type_id = st.status_type_id
+										WHERE s.issue_id = '{$issue_entries['issue_id']}' 
+										AND s.status_user_id = u.user_id 
+										AND s.status_type_id = st.status_type_id
+										AND s.status_delete != 1
 										ORDER BY s.status_timestamp ASC") or die(mysqli_error());
 
 									$num_rows = $result->num_rows;
@@ -417,7 +482,7 @@
 											<div class="row issue-box span3">
 											' . ($logged_in == 1 && $resolved == 0 ? '<div class="right status-update has-js">Add Update</div>' : '') .'
 														<h2 id="issue_' . $issue_entries['issue_id'] . '"><a href="detail.php?id=' . $issue_entries['issue_id'] . '">' . $status_entries['status_type_text'] . '</a> ' . $current_status .'</h2>
-														<div class="comment-text"><strong class="timestamp">[' . date($time_format, $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>';
+														<div class="comment-text" id="' . $status_entries['status_id'] . '">' . (($logged_in == 1) && ($status_entries['status_user_id'] == $user_id) ? '<span class="edit-link" id="entry-' . $status_entries['status_id'] . '"  data-timestamp="' . $status_entries['status_timestamp'] . '" data-issue="' . $issue_entries['issue_id'] . '" data-type="' . $status_type_id . '">Edit</span>' : '') . '<strong class="timestamp">[' . date($time_format, $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '										<div style="display: none;" id="raw-' . $status_entries['status_id'] . '">' . $status_entries['status_text'] . '</div>';
 
 														// Note the use of the date
 														// Note the use of the date
@@ -451,7 +516,7 @@
 											}
 
 											echo '<div class="comment-list">
-													<div class ="comment-text"><strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
+													<div class ="comment-text" id="' . $status_entries['status_id'] . '">' . (($logged_in == 1) && ($status_entries['status_user_id'] == $user_id) ? '<span class="edit-link" id="entry-' . $status_entries['status_id'] . '"  data-timestamp="' . $status_entries['status_timestamp'] . '" data-issue="' . $issue_entries['issue_id'] . '" data-type="' . $status_type_id . '">Edit</span>' : '') . '<strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '<div style="display: none;" id="raw-' . $status_entries['status_id'] . '">' . $status_entries['status_text'] . '</div></div>
 												</div> <!-- end comment-list --> ';	
 											
 											if($rc == $num_rows) { // Last comment, add the comment field
@@ -460,7 +525,7 @@
 										}
 								}
 
-						echo '<!--rc = ' . $rc . ' // test = ' . $test . ' and id = ' . $issue_entries['issue_id'] . '-->';
+						echo '</div><!--rc = ' . $rc . ' // test = ' . $test . ' and id = ' . $issue_entries['issue_id'] . '-->';
 
 					if($attribution != NULL) {
 
@@ -481,7 +546,10 @@
 
 						$result = $db->query("SELECT s.status_id, s.issue_id, s.status_timestamp, s.status_public, s.status_user_id, s.status_text, s.status_delete, u.user_id, u.user_fn, u.user_ln, s.status_type_id, st.status_type_text
 							FROM status_entries s, user u, status_type st
-							WHERE s.issue_id = '$id' AND s.status_user_id = u.user_id AND s.status_type_id = st.status_type_id
+							WHERE s.issue_id = '$id' 
+							AND s.status_user_id = u.user_id 
+							AND s.status_type_id = st.status_type_id
+							AND s.status_delete != 1
 							ORDER BY s.status_timestamp ASC") or die(mysqli_error());
 
 						$num_rows = $result->num_rows;
@@ -505,7 +573,7 @@
 								<div class="row issue-box span1">
 								' . ($logged_in == 1 && $resolved == 0 ? '<div class="right status-update has-js">Add Update</div>' : '') .'
 											<h2 id="issue_' . $id . '"><a href="detail.php?id=' . $id . '">' . $status_entries['status_type_text'] . '</a> ' . $current_status .'</h2>
-											<div class="comment-text"><strong class="timestamp">[' . date($time_format, $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>';
+											<div class="comment-text" id="' . $status_entries['status_id'] . '"><strong class="timestamp">[' . date($time_format, $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '<div style="display: none;" id="raw-' . $status_entries['status_id'] . '">' . $status_entries['status_text'] . '</div>';
 
 											// Note the use of the date
 											$displayed_date = date("y-n-j", $status_entries['status_timestamp']);
@@ -532,7 +600,7 @@
 								}
 
 								echo '<div class="comment-list">
-										<div class ="comment-text"><strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
+										<div class ="comment-text" id="' . $status_entries['status_id'] . '"><strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
 									</div> <!-- end comment-list --> ';	
 
 								if($rc == $num_rows) { // Last comment, add the comment field
@@ -621,7 +689,7 @@
 	<!-- Special div custom to Illiad -->
 	<div id="renewalHack" style="display: none;"></div>
 
-	<script src="//labs.library.gvsu.edu/labs/chatbutton/chatbutton.js"></script>
+	<script src="//gvsuliblabs.com/labs/chatbutton/chatbutton.js"></script>
 	<script src="//gvsu.edu/cms4/skeleton/0/files/js/cms4.0.min.js"></script>
 	<script>cmsInit()</script>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -629,6 +697,19 @@
 	$(document).ready(function() {
 
 		$('#message-update').css('position','fixed');
+
+		function timeConverter(UNIX_timestamp){
+		  var a = new Date(UNIX_timestamp * 1000);
+		  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+		  var year = a.getFullYear();
+		  var month = months[a.getMonth()];
+		  var date = a.getDate();
+		  var hour = a.getHours();
+		  var min = a.getMinutes();
+		  var sec = a.getSeconds();
+		  var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+		  return time;
+		}
 
 		setTimeout(function() {
 		    $('#message-update').fadeOut('slow');
@@ -663,6 +744,43 @@
 		       $('.end-time-box').hide();
 		    }
 		});
+
+		$('.edit-link').css('font-size','.9em').css('cursor','pointer').css('color','#0065A4');
+
+	$('.edit-link').click(function(e){
+		e.preventDefault();
+
+		var issueId = $(this).attr('data-issue');
+		console.log('Issue: ' + issueId);
+
+		var statusId = $(this).parent('.comment-text').attr('id');
+		console.log(statusId);
+
+		var statusText = $('#raw-' + statusId).text();
+		console.log(statusText);
+
+		// Build the select menu
+
+		var selectMenu = '<select name="update_status_type_id" id="update_status_type_id">' + $('select#status_type_id').html() + '</select>';
+
+		var oldTime = timeConverter($(this).attr('data-timestamp'));
+		console.log(oldTime);
+
+		var statusType = $(this).attr('data-type');
+
+		$(this).parent('.comment-text').html('<form method="post" name="update_comment_form" style="margin-top: .5em; font-size: 1em; width: 100%;"><input type="hidden" name="update_status_id" value="' + statusId + '"/><input type="hidden" name="issue_id" value="' + issueId + '" /><div style="float:left;"><label class="lib-inline" for="id="update-when">Time:</label>&nbsp;<input type="text" id="update-when" name="update-when" class="lib-inline" value="' + oldTime + '" /></div><div style="margin-left:2em;float:left"><label for="update_status_type_id">Issue Type:</label>' + selectMenu + '</div><br /><textarea name="update_status_text" style="height:5em;width:94%;margin: 1em 0;">' + statusText + '</textarea><br /><button class="btn btn-default" style="color: red !important;" id="status_delete" name="status_delete" type="submit" value="1">Delete Entry</button> <input type="submit" value="Update" class="btn btn-primary" style="display:inline-block; float: right;margin-right:4%;" /></form>');
+
+		$('select#update_status_type_id').find('option').each(function() {
+			if($(this).val() == statusType) {
+				$(this).attr('selected',true);
+			}
+		});
+
+		$('#status_delete').click(function() {
+			confirm('Are you sure you want to delete this entry?');
+			return true;
+		});
+	});
 	});
 
 	<?php
