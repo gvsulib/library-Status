@@ -624,6 +624,10 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 								if($issue_entries['status_type_id'] == 5) { // Update
 										$attribution_verb = ' happened on ' . date("n/j/y", $status_entries['status_timestamp']);
 								}
+
+								if($rc == $num_rows) { // Last comment, add the comment field
+												add_comment_field($issue_entries['issue_id'], $status_type_id);
+											}
 								
 								$attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
 								

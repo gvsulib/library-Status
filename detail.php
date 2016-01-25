@@ -497,6 +497,10 @@
 																$attribution_verb = ' happened on ' . date("n/j/y", $status_entries['status_timestamp']);
 														}
 
+														if($rc == $num_rows) { // Last comment, add the comment field
+															add_comment_field($issue_entries['issue_id'], $status_type_id);
+														}
+
 														$attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
 
 
@@ -525,7 +529,7 @@
 										}
 								}
 
-						echo '</div><!--rc = ' . $rc . ' // test = ' . $test . ' and id = ' . $issue_entries['issue_id'] . '-->';
+						echo '</div><!--rc = ' . $rc . ' // test = ' . $num_rows . ' and id = ' . $issue_entries['issue_id'] . '-->';
 
 					if($attribution != NULL) {
 
@@ -580,6 +584,9 @@
 
 											$attribution = '<p class="tagline">This issue was reported on ' . date("n/j/y", $status_entries['status_timestamp']) . ($resolved == 1 ? ' and resolved on ' . date('n/j/y', $end_time) : '') .'.</p>';
 
+											if($rc == $num_rows) { // Last comment, add the comment field
+												add_comment_field($issue_entries['issue_id'], $status_type_id);
+											}
 
 							// list last comment
 							} else {
