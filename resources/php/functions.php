@@ -142,7 +142,7 @@ function add_comment_field($issue_id, $status_type_id) {
 
 		echo '<div class="lib-form add-comment-form" style="margin-top: .5em; padding-top: .5em; border-top: 1px dotted #bbb;">
 
-			<form action="' . $_SERVER['PHP_SELF'] . '" method="POST" name="status-form">
+			<form action="" method="POST" name="status-form">
 				<fieldset>
 				<legend>Add a Status Update</legend>
 				<label for="status-' . $issue_id . '" style="display:none;">Update Status</label>
