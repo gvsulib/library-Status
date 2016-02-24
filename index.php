@@ -659,7 +659,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 							if($rc == $num_rows) { // Last comment, add the comment form
 								add_comment_field($issue_entries['issue_id'], $status_type_id);
-								echo '</div>';
+								//echo '</div>';
 							}
 
 					
