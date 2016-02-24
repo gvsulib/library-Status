@@ -653,8 +653,8 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 										
 										'<strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> 
 										' . Markdown($status_entries['status_text']) . '
-										<div style="display: none;" id="raw-' . $status_entries['status_id'] . '">' . $status_entries['status_text'] . '
-									</div>
+										<div style="display: none;" id="raw-' . $status_entries['status_id'] . '">' . $status_entries['status_text'] . '</div>
+									</div><!-- end comment-text -->
 								</div> <!-- end comment-list --> ';
 
 							if($rc == $num_rows) { // Last comment, add the comment form
