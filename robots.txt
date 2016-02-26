@@ -1,0 +1,7 @@
+# go away Baidu Spider
+User-agent: Baiduspider
+Disallow: /
+
+# go away sputnik
+User-agent: sputnik
+Disallow: /
