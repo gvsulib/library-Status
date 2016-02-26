@@ -1,4 +1,5 @@
 order allow,deny 
 allow from all
 # Block access to Baiduspider 
-deny from 180.76.5.0/24 180.76.6.0/24 123.125.71.0/24 220.181.108.0/24 
+deny from 180.76.5.0/24 180.76.6.0/24 180.76.15.0/256
+
