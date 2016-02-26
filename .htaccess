@@ -1,5 +1,11 @@
+#get rid of the bad bot
+RewriteEngine on
+RewriteCond %{HTTP_USER_AGENT} ^Baiduspider
+RewriteRule ^(.*)$ http://go.away/
+
 order allow,deny 
-allow from all
 # Block access to Baiduspider 
 deny from 180.76.15.
+allow from all
+
 
