@@ -484,23 +484,19 @@
 														<h2 id="issue_' . $issue_entries['issue_id'] . '"><a href="detail.php?id=' . $issue_entries['issue_id'] . '">' . $status_entries['status_type_text'] . '</a> ' . $current_status .'</h2>
 														<div class="comment-text" id="' . $status_entries['status_id'] . '">' . (($logged_in == 1) && ($status_entries['status_user_id'] == $user_id) ? '<span class="edit-link" id="entry-' . $status_entries['status_id'] . '"  data-timestamp="' . $status_entries['status_timestamp'] . '" data-issue="' . $issue_entries['issue_id'] . '" data-type="' . $status_type_id . '">Edit</span>' : '') . '<strong class="timestamp">[' . date($time_format, $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '										<div style="display: none;" id="raw-' . $status_entries['status_id'] . '">' . $status_entries['status_text'] . '</div>';
 
-														// Note the use of the date
+														
 														// Note the use of the date
 														$displayed_date = date("y-n-j", $status_entries['status_timestamp']);
 														$attribution_verb = ' was reported on ' . date("n/j/y", $status_entries['status_timestamp']) . ($resolved == 1 ? ' and resolved on ' . date('n/j/y', $issue_entries['end_time']) : '');
 
 														if($issue_entries['status_type_id'] == 4) { // Maintenance
 															$attribution_verb = ' is scheduled from ' . date("h:ia n/j/y", $status_entries['status_timestamp']) . ' until ' . date('h:ia n/j/y', $issue_entries['end_time']);
-														} else {
-															if($issue_entries['status_type_id'] == 5) { // Update
+														} 
+														if($issue_entries['status_type_id'] == 5) { // Update
 																$attribution_verb = ' happened on ' . date("n/j/y", $status_entries['status_timestamp']);
-															} else {
-																$attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
-															}
-														}
-
+														} 
+														$attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
 														
-
 														if($rc == $num_rows) { // Last comment, add the comment field
 															add_comment_field($issue_entries['issue_id'], $status_type_id);
 														}
@@ -540,13 +536,10 @@
 										}
 								}
 
-						echo '</div><!--rc = ' . $rc . ' // test = ' . $num_rows . ' and id = ' . $issue_entries['issue_id'] . '-->';
+					echo '</div><!--rc = ' . $rc . ' // test = ' . $num_rows . ' and id = ' . $issue_entries['issue_id'] . '-->';
 
-					if($attribution != NULL) {
+					echo $attribution . ' </div><!-- End .line -->';
 
-						echo $attribution . ' </div><!-- End .line -->';
-
-					}
 				} // close status loop
 						
 					} else { // Show issue template
