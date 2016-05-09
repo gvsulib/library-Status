@@ -228,7 +228,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 		bits and then send the email.
 	*/
 
-		if(isset($_POST['problem-report'])) {
+		if(isset($_REQUEST['problem-report'])) {
 
 
 
@@ -238,10 +238,10 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 				$data = json_decode($response, TRUE);
 				if ($data['success']){		
 
-					$name = stripslashes($_POST['name']);
-					$email = stripslashes($_POST['email']);
-					$message = stripslashes($_POST['feedback']);
-					$url = stripslashes($_POST['url']);
+					$name = stripslashes($_REQUEST['name']);
+					$email = stripslashes($_REQUEST['email']);
+					$message = stripslashes($_REQUEST['feedback']);
+					$url = stripslashes($_REQUEST['url']);
 					if(isset($url)) {
 						$message = $message . "\nProblem URL: " . urldecode($url);
 					}

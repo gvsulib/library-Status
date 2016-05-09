@@ -1,3 +1,4 @@
+
 #get rid of the bad bot
 RewriteEngine on
 RewriteCond %{HTTP_USER_AGENT} ^Baiduspider

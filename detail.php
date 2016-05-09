@@ -520,12 +520,19 @@
 											}
 
 											echo '<div class="comment-list">
-													<div class ="comment-text" id="' . $status_entries['status_id'] . '">' . (($logged_in == 1) && ($status_entries['status_user_id'] == $user_id) ? '<span class="edit-link" id="entry-' . $status_entries['status_id'] . '"  data-timestamp="' . $status_entries['status_timestamp'] . '" data-issue="' . $issue_entries['issue_id'] . '" data-type="' . $status_type_id . '">Edit</span>' : '') . '<strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '<div style="display: none;" id="raw-' . $status_entries['status_id'] . '">' . $status_entries['status_text'] . '</div></div>
-												</div> <!-- end comment-list --> ';	
-											
-											if($rc == $num_rows) { // Last comment, add the comment field
-												add_comment_field($issue_entries['issue_id'], $status_type_id);
-											}
+									<div class ="comment-text" id="' . $status_entries['status_id'] . '">'
+										. (($logged_in == 1) && ($status_entries['status_user_id'] == $user_id) ? '<span class="edit-link" id="entry-' . $status_entries['status_id'] . '"  data-timestamp="' . $status_entries['status_timestamp'] . '" data-issue="' . $issue_entries['issue_id'] . '" data-type="' . $status_type_id . '">Edit</span>' : '') .
+										
+										'<strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> 
+										' . Markdown($status_entries['status_text']) . '
+										<div style="display: none;" id="raw-' . $status_entries['status_id'] . '">' . $status_entries['status_text'] . '</div>
+									</div><!-- end comment-text -->
+								</div> <!-- end comment-list --> ';
+
+							if($rc == $num_rows) { // Last comment, add the comment form
+								add_comment_field($issue_entries['issue_id'], $status_type_id);
+								//echo '</div>';
+							}
 										}
 								}
 
