@@ -495,7 +495,7 @@
 															if($issue_entries['status_type_id'] == 5) { // Update
 																$attribution_verb = ' happened on ' . date("n/j/y", $status_entries['status_timestamp']);
 															} else {
-																if($attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
+																$attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
 															}
 														}
 
