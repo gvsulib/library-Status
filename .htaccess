@@ -1,13 +1,10 @@
-
 #get rid of the bad bot
 RewriteEngine on
 RewriteCond %{HTTP_USER_AGENT} ^Baiduspider
 RewriteRule ^(.*)$ http://go.away/
 
-order allow,deny 
-# Block access to Baiduspider 
+order allow,deny
+# Block access to Baiduspider and Sputnik
 deny from 180.76.15.
 deny from 5.143.231.
 allow from all
-
-
