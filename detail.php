@@ -491,17 +491,21 @@
 
 														if($issue_entries['status_type_id'] == 4) { // Maintenance
 															$attribution_verb = ' is scheduled from ' . date("h:ia n/j/y", $status_entries['status_timestamp']) . ' until ' . date('h:ia n/j/y', $issue_entries['end_time']);
+														} else {
+															if($issue_entries['status_type_id'] == 5) { // Update
+																$attribution_verb = ' happened on ' . date("n/j/y", $status_entries['status_timestamp']);
+															} else {
+																if($attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
+															}
 														}
 
-														if($issue_entries['status_type_id'] == 5) { // Update
-																$attribution_verb = ' happened on ' . date("n/j/y", $status_entries['status_timestamp']);
-														}
+														
 
 														if($rc == $num_rows) { // Last comment, add the comment field
 															add_comment_field($issue_entries['issue_id'], $status_type_id);
 														}
 
-														$attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
+														
 
 
 										// list last comment
