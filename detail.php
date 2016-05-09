@@ -620,10 +620,10 @@
 								
 							}
 							
-							
+							echo $attribution . '</div>';
 						}
 							
-						echo $attribution . '</div>';
+						
 						
 					}
 				?>
