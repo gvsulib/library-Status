@@ -756,10 +756,10 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 	<!-- Special div custom to Illiad -->
 	<div id="renewalHack" style="display: none;"></div>
 
-	<script src="//gvsuliblabs.com/labs/chatbutton/chatbutton.js"></script>
-	<script src="//gvsu.edu/cms4/skeleton/0/files/js/cms4.0.min.js"></script>
+	<script src="https://prod.library.gvsu.edu/labs/chatbutton/chatbutton.js"></script>
+	<script src="https://www.gvsu.edu/cms4/skeleton/0/files/js/cms4.0.min.js"></script>
 	<script>cmsInit()</script>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src='https://www.google.com/recaptcha/api.js'></script>
 <script>
 $(document).ready(function() {
