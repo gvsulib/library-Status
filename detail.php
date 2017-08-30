@@ -261,8 +261,8 @@
 		<div id="gvsu-cf_header" class="responsive">
 		<div id="gvsu-cf_header-inner">
 			<div id="gvsu-cf_header-logo">
-				<a href="http://gvsu.edu/">
-					<img src="//gvsu.edu/includes/topbanner/3/gvsu_logo.png" alt="Grand Valley State University">
+				<a href="https://gvsu.edu/">
+					<img src="https://gvsu.edu/includes/topbanner/3/gvsu_logo.png" alt="Grand Valley State University">
 				</a>
 			</div><!-- End #gvsu-cf_header-logo -->
 		</div><!-- End #gvsu-cf_header-inner -->
@@ -272,13 +272,13 @@
 		<div id="cms-header">
 			<div id="cms-header-inner">
 				<a id="cms-navigation-toggle" href="cms-siteindex-index.htm" onclick="return cmsToggleMenu(document.getElementById('cms-navigation'))">
-					<img src=" //gvsu.edu/cms4/skeleton/0/files/img/transparent.png" alt="Menu">
+					<img src="https://gvsu.edu/cms4/skeleton/0/files/img/transparent.png" alt="Menu">
 				</a>
 				<h1>
-					<a href="http://gvsu.edu/library">University Libraries</a>
+					<a href="https://gvsu.edu/library">University Libraries</a>
 				</h1>
 				<div id="library-search">
-					<form action="//gvsu.summon.serialssolutions.com/search">
+					<form action="https://gvsu.summon.serialssolutions.com/search">
 						<input type="hidden" name="spellcheck" value="true">
 						<p>
 							<label for="library-search-box" class="hide-accessible">Search the Library for Books, Articles, Media, and More</label>
@@ -290,9 +290,9 @@
 					
 			<div class="cms-navigation" id="cms-navigation">
 				<ul>
-					<li><a href="http://gvsu.edu/library/find">Find Materials</a></li>
-					<li><a href="http://gvsu.edu/library/allservices">Services</a></li>
-					<li><a href="http://gvsu.edu/library/about">About Us</a></li>
+					<li><a href="https://gvsu.edu/library/find">Find Materials</a></li>
+					<li><a href="https://gvsu.edu/library/allservices">Services</a></li>
+					<li><a href="https://gvsu.edu/library/about">About Us</a></li>
 					<li><a href="http://help.library.gvsu.edu">Help</a></li>
 				</ul>
 			</div><!-- End #cms-navigation -->
@@ -632,7 +632,7 @@
 		<div class="row break footer">
 			<div class="span3 unit">
 				
-				<p>Written by <a href="http://jonearley.net/">Jon Earley</a>, <a href="http://jon.tw" title="Jon Bloom">Jon Bloom</a>, and <a href="http://matthewreidsma.com" title="Matthew Reidsma Writes about Libraries, Technology, and the Web">Matthew Reidsma</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
+				<p>Written by <a href="http://jonearley.net/">Jon Earley</a>, <a href="http://jon.tw" title="Jon Bloom">Jon Bloom</a>, and <a href="https://matthew.reidsrow.com" title="Matthew Reidsma Writes about Libraries, Technology, and the Web">Matthew Reidsma</a> for <a href="https://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
 
 			</div> <!-- end span -->
 		</div> <!-- end line -->
@@ -660,19 +660,19 @@
 					</li>
 					<li><h4>Social Media</h4>
 						<p>
-							<a href="http://twitter.com/gvsulib" title="http://twitter.com/gvsulib" class="socialmedia-icon socialmedia-icon-twitter">
-								<span class="cms-screen-reader">http://twitter.com/gvsulib</span>
+							<a href="https://twitter.com/gvsulib" title="https://twitter.com/gvsulib" class="socialmedia-icon socialmedia-icon-twitter">
+								<span class="cms-screen-reader">https://twitter.com/gvsulib</span>
 							</a>
-							<a href="http://youtube.com/user/gvsulib" title="http://youtube.com/user/gvsulib" class="socialmedia-icon socialmedia-icon-youtube">
-								<span class="cms-screen-reader">http://youtube.com/user/gvsulib</span>
+							<a href="https://youtube.com/user/gvsulib" title="https://youtube.com/user/gvsulib" class="socialmedia-icon socialmedia-icon-youtube">
+								<span class="cms-screen-reader">https://youtube.com/user/gvsulib</span>
 							</a>
-							<a href="http://instagram.com/gvsulib" title="http://instagram.com/gvsulib" class="socialmedia-icon socialmedia-icon-instagram"><span class="cms-screen-reader">http://instagram.com/gvsulib</span></a>
+							<a href="https://instagram.com/gvsulib" title="https://instagram.com/gvsulib" class="socialmedia-icon socialmedia-icon-instagram"><span class="cms-screen-reader">https://instagram.com/gvsulib</span></a>
 						</p>
 					</li>
 					<li id="library-fdlp">
 								<p>
-									<a href="http://gvsu.edu/library/govdoc" target="_blank">
-										<img src="//gvsu.edu/cms4/asset/0862059E-9024-5893-1B5AAAC2F83BDDD8/fdlp-new.png" alt="Federal Depository Library Program Logo">
+									<a href="https://gvsu.edu/library/govdoc" target="_blank">
+										<img src="https://gvsu.edu/cms4/asset/0862059E-9024-5893-1B5AAAC2F83BDDD8/fdlp-new.png" alt="Federal Depository Library Program Logo">
 									</a>
 									<br>
 									Federal Depository<br>
@@ -688,9 +688,9 @@
 		<div id="cms-copyright">
 			<div id="cms-copyright-inner">
 				<ul>
-					<li><a href="http://gvsu.edu/affirmativeactionstatement.htm">GVSU is an EO/AA Institutio</a></li>
-					<li><a href="http://gvsu.edu/privacystatement.htm">Privacy Policy</a></li>
-					<li><a href="http://gvsu.edu/disclosures">Disclosures</a></li>
+					<li><a href="https://gvsu.edu/affirmativeactionstatement.htm">GVSU is an EO/AA Institutio</a></li>
+					<li><a href="https://gvsu.edu/privacystatement.htm">Privacy Policy</a></li>
+					<li><a href="https://gvsu.edu/disclosures">Disclosures</a></li>
 					<li>Copyright © 1995-2015 GVSU</li>
 				</ul>
 			</div><!-- End #cms-copyright-inner -->
@@ -700,10 +700,10 @@
 	<!-- Special div custom to Illiad -->
 	<div id="renewalHack" style="display: none;"></div>
 
-	<script src="//gvsuliblabs.com/labs/chatbutton/chatbutton.js"></script>
-	<script src="//gvsu.edu/cms4/skeleton/0/files/js/cms4.0.min.js"></script>
+	<script src="https://prod.library.gvsu.edu/labs/chatbutton/chatbutton.js"></script>
+	<script src="https://www.gvsu.edu/cms4/skeleton/0/files/js/cms4.0.min.js"></script>
 	<script>cmsInit()</script>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script>
 	$(document).ready(function() {
 
