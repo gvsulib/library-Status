@@ -175,9 +175,184 @@ function add_comment_field($issue_id, $status_type_id) {
 	}
 }
 
+//function to wrap error messages in HTML if we need to display them without loading the page
+///this is most often done because we can't connect to the database
+function HTML_error_message($errormsg) {
+	echo <<<EOD
+	<!DOCTYPE html>
+	<html lang="en">
+	
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Status Error</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	</head>
+	<body>
+	Error:  Status app cannot load.  System error message noted below
+	<P>$errormsg</P>
+</body>
+</html>
+EOD;
+}
+
+//gets user information about a logged-in user and returns it as a PHP array for easy reference
+function MakeUserArray ($userName, $databaseConnection) {
+
+	$user_result=$databaseConnection->query("SELECT * FROM user WHERE user_username = '$userName' LIMIT 1");
+	
+	if(($user_result) && ($user_result->num_rows > 0)) { // Query was successful, a user was found
+	
+		$user = array("username" => $userName);
+		while($row = $user_result->fetch_assoc()) {
+			$user["access"] = $row["user_access"];
+			$user["id"] = $row["user_id"];
+			$user["fn"] = $row["user_fn"];
+		}
+	
+		
+		return $user;
+	} else {
+		return "User could not be found in table";
+	}
+}
+//verifies and formats user-supplied time values
+function verifyFormatTime($time) {
+	// Create a time one year back to see use to check if posting time is in range.
+	$time_check = time();
+	$time_check = strtotime('-1 month');
+
+	// If time is something special or ready or for now and is within the last year.
+	if (($time != 'Now') && ($time > $time_check)) {
+		$time = strtotime($time);
+	} else {
+		$time = time();
+	}
+	return $time;
+
+}
+
+//function to construct queries for issue data to the database based on the designated filter
+function constructQuery($filter) {
+	$query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time, issue_entries.status_type_id FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id";
+
+	switch ($filter) {
+		case 0:
+			$query = $query . " ORDER BY issue_entries.issue_id DESC LIMIT 10";
+			break;
+		case 2:
+			$query = $query . " AND issue_entries.end_time > 0 ORDER BY issue_entries.issue_id DESC";
+			break;
+		case 1:
+			$query = $query . " AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
+
+	}
+	return $query;
+
+}
+//inserts new issues into the database.  All issues MUST HAVE at least one status.
+function createNewIssue($system_id,$status_type_id, $time, $end_time, $userid, $issue_text, $dataBaseConnection) {
+	$query = "INSERT INTO issue_entries VALUES ('','$system_id', $status_type_id, '$time', '$end_time', '$userid')";
+	//we need to do multiple updates simultaneously, and submit them all at once, so we need to turn autocommit off.  
+	//this ensures the entire commit succeeds or fails.  We don't want issues without status updates or vice versa!
+	$dataBaseConnection->autocommit(FALSE);
+	$dataBaseConnection->query($query);
+	$issue_id = $dataBaseConnection->insert_id;
+	$query = "INSERT INTO status_entries VALUES ('','$issue_id','$time','1','$userid','$issue_text','0')";
+	$dataBaseConnection->query($query);
+	
+	//does the commit work?
+	if ($dataBaseConnection->commit()) {
+		$returnValue = 1;
+	} else {
+		$returnValue = $dataBaseConnection->error;
+	}
+	//things in the function shouldn't modify the main DB object, but just in case, make sure to turn autocommit back on.
+	$dataBaseConnection->autocommit(TRUE);
+	return $returnValue;
+	
+}
+
+//note this only creates a new status message-to update the main issue, use closeIssue or changeIssueStatus
+function createNewStatus( $issue_id, $time, $public, $userID, $status_text, $closing, $databaseConnection) {
+	//is this status closing the issue?  If so, change it in the issue table
+	if ($closing) {
+		$statusChanged = changeIssueStatus($issue_id, 3, $databaseConnection);
+		if (!$statusChanged == 1) {
+			return "Unable to Change issue Status: " . $statusChanged;
+		} 
+	} 
+
+	// Create the new status entry
+	$query = "INSERT INTO status_entries VALUES ('','$issue_id','$time','$public','$userID','$status_text','0')";
+	if ($databaseConnection->query($query)) {
+		return 1;
+	} else {
+		return $databaseConnection->error;
+	}
+		
+
+}
 
 
-function edit_comment_field($issue_id, $status_entry_id) {
+function changeIssueStatus($issueID, $statusID, $databaseConnection) {
+	
+	//are we closing the issue?  If so, insert a time closed.
+	if ($statusID == 3) {
+		
+		$time = time();
+		$query = "UPDATE issue_entries SET issue_entries.end_time = '$time', issue_entries.status_type_id = '$statusID' WHERE $issue_id = issue_entries.issue_id";
+		
+		if ($databaseConnection->query($query)) {
+			
+			return 1;
+		} else {
+			
+			return $databaseConnection->error;
+		}
+  	} else {
+		//otherwise, just update the status of the issue
+		$query = "UPDATE issue_entries SET status_type_id = '$statusID' WHERE issue_id = '$issueID'";
+		if ($databaseConnection->query($query)) {
+		
+			return 1;
+		} else {
+		
+			return $databaseConnection->error;
+		}
+  	}
+}
+//function to delete a status update.  Note that this does not work if there's only one status update left.
+//in that case, use $deleteIssue to get rid of both the issue and all associated status updates
+function deleteStatus($statusID, $databaseConnection) {
+	//first figure out if this is the last remaining status for this issue.  If it is, we can't delete.
+	$query = "SELECT issue_id from status_entries WHERE issue_id = (SELECT issue_id from status_entries WHERE status_id = $statusID)";
+	$result = $databaseConnection->query($query);
+	if ($result) {
+		if ($result->num_rows <= 1) {
+			//this is the only status for this issue.  Tell user to delete the issue instead.
+			return "Only remaining status for this issue.  Delete the issue instead.";
 
+		} else {
+			$query = "DELETE from status_entries WHERE status_id = $statusID";
+			if ($databaseConnection->query($query)) {
+				return 1;
+			} else {
+				return "Could not Delete Issue: " . $databaseConnection->error;
+			}
+		}
+	} else {
+		return "Could not contact database: " . $databaseConnection->error;
+	}
 
+}
+//the only things you are allowed to edit on status messages is wether they are public and the text of the status
+function editStatus($status_id, $public, $status_text, $time, $databaseConnection) {
+	$status_text = $databaseConnection->real_escape_string($status_text);
+	$query = "UPDATE status_entries SET status_timestamp = '$time', status_public = '$public', status_text = '$status_text' WHERE status_id = $status_id";
+	if (!$databaseConnection->query($query)) {
+		return $databaseConnection->error;
+	} else {
+		return 1;
+	}
+	
 }

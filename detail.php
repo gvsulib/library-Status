@@ -1,21 +1,13 @@
 <?php
-	session_start();
-	$actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
-	$_SESSION['location'] = $actual_url;
 	
-	date_default_timezone_set('America/Detroit');
-	$logged_in = 0;
 	
-	// Are you logged in?
-	
-	// Debug the user login by a force login
-	//$_SESSION['username'] = 'reidsmam';
+// Debug the user login by a force login
+//$_SESSION['username'] = 'reidsmam';
 
-	
-	include 'resources/secret/config.php';
-	include 'resources/php/functions.php';
-	include ('resources/php/markdown.php');
-	
+//startup depends on variables set in the config file, so it has to be 
+//loaded last
+require 'startup.php';
+
 	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
 	if ($db->connect_errno) {
     	printf("Connect failed: %s\n", $db->connect_error);

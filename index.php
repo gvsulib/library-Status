@@ -1,377 +1,217 @@
 <?php
 
-session_start();
-error_reporting(0);
+ //as well as loads required library files
+include 'resources/secret/config.php';
+include 'resources/php/functions.php';
+include ('resources/php/markdown.php');
 
-$actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+//load all starting session and other variables and required libraries
+require 'resources/php/startup.php';
 
-	$_SESSION['location'] = $actual_url;
-	
-	date_default_timezone_set('America/Detroit');
-	$logged_in = 0; // By default, user is logged out
-	$m = NULL; // By default, there are no messages
+//holds system messages we want to show to the user.  By default, there are none
+$userMessage = NULL;
 
-	// Are you logged in?
-
-	// Debug the user login by a force login
-	//$_SESSION['username'] = 'reidsmam';
-
-	// Include additional libraries that make this work
-	require 'resources/secret/config.php';
-	require 'resources/php/functions.php';
-	require 'resources/php/markdown.php';
-
-	if(isset($_GET['login']) && !(isset($_SESSION['username']))) { // No $_SESSION['username'] variable, send to login script
-
-		// User has not logged in
-		if ($use_native_login == true){
-			header('Location: login.php');
-		} else {
-			header('Location: ' . $not_native_login_url);
-		}
-
-	}
-
-	
-
-	$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
-	if ($db->connect_errno) {
-    	printf("Connect failed: %s\n", $db->connect_error);
-    	exit();
-	}
-
-	if(isset($_SESSION['username'])) { // User has logged in
-
-		if (isset($_REQUEST['logout'])) {
-			$_SESSION = array();
-			session_destroy();
-			header('Location: index.php');
-		}
-
-		$username = $_SESSION['username'];
-		// User names are unique, so only need a single row
-		// Get all the bits from the user name so you don't have to ask again
-		$user_result=$db->query("SELECT * FROM user WHERE user_username = '$username' LIMIT 1");
-
-		if(($user_result) && ($user_result->num_rows > 0)) { // Query was successful, a user was found
+// uncomment to force a login
+//$_SESSION['username'] = 'felkerk';
 
 
-			while($row = $user_result->fetch_assoc()) {
-				$user_access = $row["user_access"];
-				$user_id = $row["user_id"];
-				$user_fn = $row["user_fn"];
-			}
-
+if (isset($_SESSION['username'])) { // User has logged in
+	//if the user is logging out, don't bother to check anything, destroy the session
+	//and reload the page
+	if (isset($_REQUEST['logout'])) {
+		$_SESSION = array();
+		session_destroy();
+		
+	} else {
+		//otherwise, attempt to make a user object
+		
+		$user = MakeUserArray($_SESSION['username'], $db);
+		if (is_array($user)) {
 			$logged_in = 1;
-
-			// Create the user object as $user.
-			// User id is then $loggedin_user->user_id
-			$loggedin_user = $user_result->fetch_object();
-
-			// new issue post
-			if (isset($_POST['submit_issue'])) {
-
-				$issue_text = $db->real_escape_string($_POST['issue_text']);
-				$system_id = $_POST['system_id'];
-				$status_type_id = $_POST['status_type_id'];
-					
-
-				// Create a time one year back to see use to check if posting time is in range.
-				$time_check = time();
-				$time_check = strtotime('-1 month');
-
-				// If time is something special or ready or for now and is within the last year.
-				if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
-					$time = strtotime($_POST['when']);
-				} else {
-					$time = time();
-				}
-				
-				$end_time = 0;
-				
-				if($status_type_id == 4) { // Scheduled Maintenance
-					$end_time = strtotime($_POST['end_time']);
-				} 
-				
-				if($status_type_id == 5) { // Update
-					$end_time = $time;
-				}
-
-				// Create new issue
-				$db->query("INSERT INTO issue_entries
-				VALUES ('','$system_id', $status_type_id, '$time', '$end_time', '$user_id')");
-				$issue_id = $db->insert_id;
-
-				// Create a new status entry for issue
-				if($db->query("INSERT INTO status_entries
-				VALUES ('','$issue_id','$time','1','$status_type_id','$user_id','$issue_text','0')")) {
-					$m = '<div class="alert alert-success">Your issue has been added.</div>';
-				} else {
-					$m = '<div class="alert alert-danger">There was a problem adding your issue. ' . $db->error . '</div>';
-				}
-
-
-
-			}
-
-			// new status post$loggedin
-			if (isset($_POST['submit_status'])) {
-
-				$issue_id = $_POST['issue_id'];
-				$status_type_id = $_POST['status_type_id'];
-				$status_text = $db->real_escape_string($_POST['status']);
-
-				$issue_resolved = $_POST['issue_resolved'];
-
-				// Create a time one year back to see use to check if posting time is in range.
-				$time_check = time();
-				$time_check = strtotime('-1 month');
-
-				// If time is something special or ready or for now and is within the last year.
-				if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
-					$time = strtotime($_POST['when']);
-				} else {
-					$time = time();
-				}
-
-				$status_value = $status_type_id;
-				if ($issue_resolved == 1) {
-					$status_value = 3;
-
-					//update issue end_time and close issue
-					$db->query("UPDATE issue_entries
-								SET issue_entries.end_time = '$time'
-								WHERE $issue_id = issue_entries.issue_id");
-				}
-
-				// Create a new status entry
-				if($db->query("INSERT INTO status_entries
-				VALUES ('','$issue_id','$time','1','$status_value','$user_id','$status_text','0')")) {
-						$m = '<div class="alert alert-success">Your status update has been added.</div>';
-				} else {
-						$m = '<div class="alert alert-danger">There was a problem saving your update. ' . $db->error . '</div>';
-				}
-
-
-			}
-
-
-			// new status post$loggedin
-			if (isset($_POST['update_status_id'])) {
-
-				$issue_id = $_POST['issue_id'];
-				$status_type_id = $_POST['update_status_type_id'];
-				$status_text = $db->real_escape_string($_POST['update_status_text']);
-				$status_id = $_POST['update_status_id'];
-				$status_delete = $_POST['status_delete'];
-
-				$updated_issue_resolved = $_POST['updated_issue_resolved'];
-				$issue_resolved = $_POST['old_issue_resolved'];
-
-				// Create a time one year back to see use to check if posting time is in range.
-				$time_check = time();
-				$time_check = strtotime('-1 month');
-
-				// If time is something special or ready or for now and is within the last year.
-				if (($_POST['update-when'] != 'Now') && (strtotime($_POST['update-when']) > $time_check)) {
-					$time = strtotime($_POST['update-when']);
-				} else {
-					$time = time();
-				}
-
-				// Check to see if the issue resolution is the same as it was before
-				if($updated_issue_resolved != $issue_resolved) {
-
-					// if entry is now resolved, update the issue record to reflect that
-					if ($updated_issue_resolved == 1) {
-						$status_type_id = 3;
-
-						//update issue end_time and close issue
-						$db->query("UPDATE issue_entries
-									SET issue_entries.end_time = '$time'
-									WHERE $issue_id = issue_entries.issue_id");
-					} else {
-						// remove the saved resolution
-						$db->query("UPDATE issue_entries
-									SET issue_entries.end_time = '0'
-									WHERE $issue_id = issue_entries.issue_id");
-					}
-
-
-				}
-				$status_value = $status_type_id;
-				
-
-				// Update status entry
-				if($db->query("UPDATE status_entries
-								SET status_timestamp = '$time',
-								status_type_id = '$status_type_id',
-								status_delete = '$status_delete',
-								status_text = '$status_text'
-								WHERE status_id = '$status_id'")) {
-						$m = '<div class="alert alert-success">Your status update has been updated.</div>';
-				} else {
-						$m = '<div class="alert alert-danger">There was a problem saving your update. ' . $db->error . '</div>';
-				}
-
-
-			}
-
-		} // End loop for logged in user
-
+		} else {
+			//set a message for the user if they couldn't be found
+			$userMessage = "<div class=\"alert alert-danger\">" . $user . "</div>";
+		}
+	}
+}
+if (isset($_POST['status_delete']) && $logged_in = 1) {
+	$statusID = $_POST['update_status_id'];
+	$deleteStatus = deleteStatus($statusID, $db);
+	if ($deleteStatus == 1) {
+		$userMessage = '<div class="alert alert-success">Status Deleted.</div>';
+	} else {
+		$userMessage = '<div class="alert alert-danger">There was a problem deleting your status. ' . $deleteStatus . '</div>';
+	}
 }
 
+
+// post a new issue
+if (isset($_POST['submit_issue']) && $logged_in = 1) {
+
+	$issue_text = $db->real_escape_string($_POST['issue_text']);
+	$system_id = $_POST['system_id'];
+	$status_type_id = $_POST['status_type_id'];
+					
+
+	// Create a time one year back to see use to check if posting time is in range.
+	$time_check = time();
+	$time_check = strtotime('-1 month');
+
+	// If time is an acceptable value, attach the value, otherwise use the current time
+	if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
+		$time = strtotime($_POST['when']);
+	} else {
+		$time = time();
+	}
+				
+	$end_time = 0;
+				
+	if($status_type_id == 4) { // Scheduled Maintenance
+		$end_time = strtotime($_POST['end_time']);
+	} 
+				
+	if($status_type_id == 5) { // Update
+		$end_time = $time;
+	}
+
+	// Create new issue
+	$issueCreated = createNewIssue($system_id,$status_type_id,$time,$end_time,$user["id"],$issue_text,$db);
+	if ($issueCreated == 1) {
+		$userMessage = '<div class="alert alert-success">Your issue has been added.</div>';
 		
+	} else {
+		$userMessage = '<div class="alert alert-danger">There was a problem adding your issue. ' . $issueCreated . '</div>';
+	}
+	
+}
 
-	/*
-		A non-logged-in user has submitted a problem report. Check for basic bad
-		bits and then send the email.
-	*/
+// new status post
+if (isset($_POST['submit_status']) && $logged_in = 1) {
 
-		if(isset($_REQUEST['problem-report'])) {
+	$issue_id = $_POST['issue_id'];
+	$status_type_id = $_POST['status_type_id'];
+	$status_text = $db->real_escape_string($_POST['status']);
+	$issue_resolved = false;
+	if (isset($_POST['issue_resolved'])) {
+		$issue_resolved = true;
+	}
 
+	//verify and format time 
+	$time = verifyFormatTime($_POST['when']);
 
+	//currently all issues are public be default, that may change in future
+	$public = 1;
 
-			// Check the Google Recaptcha API
-				$url =  "https://www.google.com/recaptcha/api/siteverify?secret=" . $recaptchaSecretKey . "&response=" . $_POST['g-recaptcha-response'] . "&remoteip=" . $_SERVER['HTTP_REMOTE_ADDR'];
-				$response = file_get_contents($url);
-				$data = json_decode($response, TRUE);
-				if ($data['success']){		
+	//create the status.  Note that if the status code is "closed,"  the function automagaically closes the entire issue
+	$statusCreated = createNewStatus( $issue_id, $time, $public, $user['id'], $status_text, $issue_resolved, $db);
+	
+	if ($statusCreated == 1) {
+		$userMessage = '<div class="alert alert-success">Your status has been added.</div>';	
+	} else {
+		$userMessage = '<div class="alert alert-danger">There was a problem adding your status. ' . $statusCreated  . '</div>';
+	}
+	
+}
 
-					$name = stripslashes($_REQUEST['name']);
-					$email = stripslashes($_REQUEST['email']);
-					$message = stripslashes($_REQUEST['feedback']);
-					$url = stripslashes($_REQUEST['url']);
-					if(isset($url)) {
-						$message = $message . "\nProblem URL: " . urldecode($url);
-					}
+//edit an existing status
+if (isset($_POST['update_status']) && $logged_in = 1) {
 
-					send_email($name, $email, $message); 
-					$m = '<div class="alert alert-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>'; 
-				} else {
-					$m = '<div class="alert alert-danger">Sorry, your captcha didn\'t work. Either it\'s our fault, or you\'re a robot. Please try again.</div>'; 
-				}
-			
+	$issue_id = $_POST['issue_id'];
+	$status_id = $_POST['update_status_id'];
+	$status_type_id = $_POST['update_status_type_id'];
+	$status_text = $_POST['update_status_text'];
 
+	//verify and format time 
+	if (isset($_POST['update-when'])) {
+		$time = verifyFormatTime($_POST['update-when']);
+	} else {
+		$time = time();
+	}
+	//currently all issues are public by default, that may change in future
+	$public = 1;
+	
+	$statusEdited = editStatus($status_id, $public, $status_text, $time, $db);
+	if ($statusEdited ==1) {
+		
+		$issueChanged = changeIssueStatus($issue_id, $status_type_id, $db);	
+		if ($issueChanged == 1) {
+			$userMessage = '<div class="alert alert-success">Your status has been updated.</div>';
+		} else {
+			$userMessage = '<div class="alert alert-danger">There was a problem adding your status. ' . $issueChanged  . '</div>';
 		}
+	} else {
+		$userMessage = '<div class="alert alert-danger">There was a problem adding your status. ' . $statusEdited  . '</div>';
+	}
+	
+}
 
-		$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time, issue_entries.status_type_id FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id ORDER BY issue_entries.issue_id DESC LIMIT 10";
-		$filter = 0; // Most Recent Filter is active
 
-		if(isset($_GET['status']) && ($_GET['status'] == 'resolved')) {
-			$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time, issue_entries.status_type_id FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id  AND issue_entries.end_time > 0 ORDER BY issue_entries.issue_id DESC";
+
+//has the user chosen to filter the issues?
+// 0 = all issues, 1 = unresolved, 2= resolved
+$filter = 0; // all issues by default
+
+if (isset($_GET['status'])) {
+
+	switch ($_GET['status']) {
+		case "resolved":
 			$filter = 2; // Show Resolved
-		}
+			break;
+		case "unresolved":
+			$filter = 1; // Show Unresolved
+			break;
+	
+	}
+}
 
-		if(isset($_GET['status']) && ($_GET['status'] == 'unresolved')) {
-				$issue_query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time, issue_entries.status_type_id FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
-				$filter = 1; // Show Unresolved
-		}
+//get the correct query for the specified filter
+$issue_query = constructQuery($filter);
 
-         		if(isset($_GET['thankyou'])) {
-			$m = '<div class="alert alert-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>';
-		}
+if(isset($_GET['thankyou'])) {
+	$userMessage = '<div class="alert alert-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>';
+}
 
-		if(isset($_GET['url'])) {
-			$problem_url = urldecode($_GET['url']);
-		}
+if(isset($_GET['url'])) {
+	$problem_url = urldecode($_GET['url']);
+	
+}
+//load the header HTML
+include 'resources/HTML/header.php';	
+
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title><?php echo $library_name; ?> Status</title>
-
-	<title>Library Status - University Libraries - Grand Valley State University</title>
-	
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<meta name="description" content="The current status of all library systems.">
-	<meta name="keywords" content="course reserve,course reserves,reserves,gvsu,grand valley,library, libraries,research tools">
-
-	<!-- Custom CSS -->
-
-	<link rel="stylesheet" type="text/css" href="resources/css/styles.css" />
-
-</head>
-
-<body>
-
-	<div id="gvsu-cf_header" class="responsive">
-		<div id="gvsu-cf_header-inner">
-			<div id="gvsu-cf_header-logo">
-				<a href="http://gvsu.edu/">
-					<img src="//gvsu.edu/includes/topbanner/3/gvsu_logo.png" alt="Grand Valley State University">
-				</a>
-			</div><!-- End #gvsu-cf_header-logo -->
-		</div><!-- End #gvsu-cf_header-inner -->
-	</div><!-- End #gvsu-cf_header -->
-
-		<div id="cms-header-wrapper">
-		<div id="cms-header">
-			<div id="cms-header-inner">
-				<a id="cms-navigation-toggle" href="cms-siteindex-index.htm" onclick="return cmsToggleMenu(document.getElementById('cms-navigation'))">
-					<img src=" //gvsu.edu/cms4/skeleton/0/files/img/transparent.png" alt="Menu">
-				</a>
-				<h1>
-					<a href="http://gvsu.edu/library">University Libraries</a>
-				</h1>
-				<div id="library-search">
-					<form action="//gvsu.summon.serialssolutions.com/search">
-						<input type="hidden" name="spellcheck" value="true">
-						<p>
-							<label for="library-search-box" class="hide-accessible">Search the Library for Books, Articles, Media, and More</label>
-							<input id="library-search-box" type="text" name="s.q" placeholder="Find articles, books, &amp; more" size="35">
-							<input type="submit" value="Find It!">
-						</p>
-					</form>
-				</div><!-- End #library-search -->
-					
-			<div class="cms-navigation" id="cms-navigation">
-				<ul>
-					<li><a href="http://gvsu.edu/library/find">Find Materials</a></li>
-					<li><a href="http://gvsu.edu/library/allservices">Services</a></li>
-					<li><a href="http://gvsu.edu/library/about">About Us</a></li>
-					<li><a href="http://help.library.gvsu.edu">Help</a></li>
-				</ul>
-			</div><!-- End #cms-navigation -->
-
-			<div class="cms-clear"></div>
-		
-			</div> <!-- End #cms-header-inner -->
-		</div><!-- End #cms-header -->
-	</div><!-- End #cms-header-wrapper -->
 
 
-	<div id="cms-body-wrapper">
-		<div id="cms-body">
-			<div id="cms-body-inner">
-				<div id="cms-body-table">
-					<div id="cms-content">
 
-	<div class="row break">
-		<div class="span3 unit left">
-			<h2><a href="index.php"><?php echo $library_name; ?> Status</a></h2>
-		</div> <!-- end span -->
+<div id="cms-body-wrapper">
+	<div id="cms-body">
+		<div id="cms-body-inner">
+			<div id="cms-body-table">
+				<div id="cms-content">
+
+<div class="row break">
+	<div class="span3 unit left">
+		<h2><a href="index.php"><?php echo $library_name; ?> Status</a></h2>
+	</div> <!-- end span -->
+</div>
+<div class="row">
+<div class="span1">&nbsp;</div>
+	<div class="span2 unit right lib-horizontal-list" style="text-align: right;margin-top:.65em; overflow:visible;">
+		<ul>
+
+				<li style="float:right;"><?php echo (($logged_in == 1) ? '<a href="#" class="status-button btn btn-default has-js issue-trigger" style="margin-top:-.5em;" id="issue-trigger">Report an Issue</a>' : '<a href="feedback.php" class="btn btn-primary issue-trigger" style="margin-top:-.5em;overflow:visible;" id="feedback-trigger">Report a Problem</a>'); ?></li>
+
+				<li style="float:right;margin-right: 8%;"><?php  echo (($logged_in == 1) ? 'Hello, ' . $user["fn"] . '&nbsp;//&nbsp;<a href="?logout" title="Log out" style="text-decoration: none; font-size: .9em;">Log out</a>' : "<a href=\"$loginUrl\" title=\"Log in\" style=\"text-decoration: none; font-size: .9em;\">Log in</a>"); ?></li>
+		</ul>
 	</div>
-	<div class="row">
-	<div class="span1">&nbsp;</div>
-		<div class="span2 unit right lib-horizontal-list" style="text-align: right;margin-top:.65em; overflow:visible;">
-			<ul>
+</div> <!-- end line -->
+<?php
 
-					<li style="float:right;"><?php echo (($logged_in == 1) ? '<a href="#" class="status-button btn btn-default has-js issue-trigger" style="margin-top:-.5em;" id="issue-trigger">Report an Issue</a>' : '<a href="feedback.php" class="btn btn-primary issue-trigger" style="margin-top:-.5em;overflow:visible;" id="feedback-trigger">Report a Problem</a>'); ?></li>
-						<li style="float:right;margin-right: 8%;"><?php  echo (($logged_in == 1) ? 'Hello, ' . $user_fn . '&nbsp;//&nbsp;<a href="?logout" title="Log out" style="text-decoration: none; font-size: .9em;">Log out</a>' : '<a href="?login" title="Log in" style="text-decoration: none; font-size: .9em;">Log in</a>'); ?></li>
-			</ul>
-		</div>
-	</div> <!-- end line -->
-	<?php
+if(isset($userMessage)) {
+	echo '<div id="message-update">' . $userMessage . '</div>';
+}
 
-		if(isset($m)) {
-			echo '<div id="message-update">' . $m . '</div>';
-		}
-
-		if($logged_in == 1) {
+if($logged_in == 1) {
 
 	?>
 	<div class="row lib-form feedback">
@@ -571,11 +411,12 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 				while ($issue_entries = $issue_result->fetch_assoc()) {
 
-					$result = $db->query("SELECT s.status_id, s.issue_id, s.status_timestamp, s.status_public, s.status_user_id, s.status_text, s.status_delete, u.user_id, u.user_fn, u.user_ln, st.status_type_id, st.status_type_text
-						FROM status_entries s, user u, status_type st
+					$result = $db->query("SELECT s.status_id, s.issue_id, s.status_timestamp, s.status_public, s.status_user_id, s.status_text, s.status_delete, u.user_id, u.user_fn, u.user_ln, i.status_type_id, st.status_type_text
+						FROM status_entries s, user u, status_type st, issue_entries i
 						WHERE s.issue_id = '{$issue_entries['issue_id']}' 
+						AND i.issue_id = s.issue_id
 						AND s.status_user_id = u.user_id 
-						AND s.status_type_id = st.status_type_id
+						AND i.status_type_id = st.status_type_id
 						AND s.status_delete != 1
 						ORDER BY s.status_timestamp ASC");
 
@@ -609,7 +450,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 								' . ($logged_in == 1 && $resolved == 0 ? '<div class="right status-update has-js">Add Update</div>' : '') .'
 								<h2 id="issue_' . $issue_entries['issue_id'] . '"><a href="detail.php?id=' . $issue_entries['issue_id'] . '">' . $status_entries['status_type_text'] . ' for ' . $issue_entries['system_name'] . ' ' . $current_status .'</a></h2>
 								<div class="comment-text" id="' . $status_entries['status_id'] . '">' 
-								. (($logged_in == 1) && ($status_entries['status_user_id'] == $user_id) ? '<span class="edit-link" id="entry-' . $status_entries['status_id'] . '"  data-timestamp="' . $status_entries['status_timestamp'] . '" data-issue="' . $issue_entries['issue_id'] . '" data-type="' . $status_type_id . '">Edit</span>' : '') . 
+								. (($logged_in == 1) && ($status_entries['status_user_id'] == $user["id"]) ? '<span class="edit-link" id="entry-' . $status_entries['status_id'] . '"  data-timestamp="' . $status_entries['status_timestamp'] . '" data-issue="' . $issue_entries['issue_id'] . '" data-type="' . $status_type_id . '">Edit</span>' : '') . 
 								'<strong class="timestamp">[' . date("n/j @ g:i a", $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
 								<div style="display: none;" id="raw-' . $status_entries['status_id'] . '">' . $status_entries['status_text'] . '</div>';
 
@@ -649,7 +490,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 							echo '<div class="comment-list">
 									<div class ="comment-text" id="' . $status_entries['status_id'] . '">'
-										. (($logged_in == 1) && ($status_entries['status_user_id'] == $user_id) ? '<span class="edit-link" id="entry-' . $status_entries['status_id'] . '"  data-timestamp="' . $status_entries['status_timestamp'] . '" data-issue="' . $issue_entries['issue_id'] . '" data-type="' . $status_type_id . '">Edit</span>' : '') .
+										. (($logged_in == 1) && ($status_entries['status_user_id'] == $user["id"]) ? '<span class="edit-link" id="entry-' . $status_entries['status_id'] . '"  data-timestamp="' . $status_entries['status_timestamp'] . '" data-issue="' . $issue_entries['issue_id'] . '" data-type="' . $status_type_id . '">Edit</span>' : '') .
 										
 										'<strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> 
 										' . Markdown($status_entries['status_text']) . '
@@ -689,9 +530,9 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 
 
 	<div class="row break footer">
-		<div class="span3 unit break">
-			<p>Written by <a href="http://jonearley.net/">Jon Earley</a>, <a href="http://jon.tw" title="Jon Bloom">Jon Bloom</a>, and <a href="http://matthewreidsma.com" title="Matthew Reidsma Writes about Libraries, Technology, and the Web">Matthew Reidsma</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
-		</div> <!-- end span -->
+	<div class="span3 unit break">
+		<p>Written by <a href="http://jonearley.net/">Jon Earley</a>, <a href="http://jon.tw" title="Jon Bloom">Jon Bloom</a>, and <a href="http://matthewreidsma.com" title="Matthew Reidsma Writes about Libraries, Technology, and the Web">Matthew Reidsma</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
+	</div> <!-- end span -->
 	</div> <!-- end line -->
 </div><!-- End #cms-content -->
 				</div><!-- End #cms-body-table -->
@@ -833,7 +674,7 @@ $(document).ready(function() {
 
 		var statusType = $(this).attr('data-type');
 
-		$(this).parent('.comment-text').html('<form method="post" name="update_comment_form" style="margin-top: .5em; font-size: 1em; width: 100%;"><input type="hidden" name="update_status_id" value="' + statusId + '"/><input type="hidden" name="issue_id" value="' + issueId + '" /><div style="float:left;"><label class="lib-inline" for="id="update-when">Time:</label>&nbsp;<input type="text" id="update-when" name="update-when" class="lib-inline" value="' + oldTime + '" /></div><div style="margin-left:2em;float:left"><label for="update_status_type_id">Issue Type:</label>' + selectMenu + '</div><br /><textarea name="update_status_text" style="height:5em;width:94%;margin: 1em 0;">' + statusText + '</textarea><br /><button class="btn btn-default" style="color: red !important;" id="status_delete" name="status_delete" type="submit" value="1">Delete Entry</button> <input type="submit" value="Update" class="btn btn-primary" style="display:inline-block; float: right;margin-right:4%;" /></form>');
+		$(this).parent('.comment-text').html('<form method="post" name="update_comment_form" style="margin-top: .5em; font-size: 1em; width: 100%;"><input type="hidden" name="update_status_id" value="' + statusId + '"/><input type="hidden" name="issue_id" value="' + issueId + '" /><div style="float:left;"><label class="lib-inline" for="id="update-when">Time:</label>&nbsp;<input type="text" id="update-when" name="update-when" class="lib-inline" value="' + oldTime + '" /></div><div style="margin-left:2em;float:left"><label for="update_status_type_id">Issue Type:</label>' + selectMenu + '</div><br /><textarea name="update_status_text" style="height:5em;width:94%;margin: 1em 0;">' + statusText + '</textarea><br /><button class="btn btn-default" style="color: red !important;" id="status_delete" name="status_delete" type="submit" value="1">Delete Entry</button> <input type="submit" name="update_status" class="btn btn-primary" style="display:inline-block; float: right;margin-right:4%;" /></form>');
 
 		$('select#update_status_type_id').find('option').each(function() {
 			if($(this).val() == statusType) {
