@@ -1,5 +1,10 @@
 <?php
+if(!session_status() === PHP_SESSION_ACTIVE) {
+	session_start();
+	$actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 
+	$_SESSION['location'] = $actual_url;
+}
  //as well as loads required library files
 include 'resources/secret/config.php';
 include 'resources/php/functions.php';
@@ -12,7 +17,7 @@ require 'resources/php/startup.php';
 $userMessage = NULL;
 
 // uncomment to force a login
-//$_SESSION['username'] = 'felkerk';
+$_SESSION['username'] = 'felkerk';
 
 
 if (isset($_SESSION['username'])) { // User has logged in
@@ -99,10 +104,15 @@ if (isset($_POST['submit_status']) && $logged_in = 1) {
 	//verify and format time 
 	$time = verifyFormatTime($_POST['when']);
 
-	//currently all issues are public be default, that may change in future
-	$public = 1;
+	//if it's related to a safety issue, hide it
+	if ($status_type_id == 7) {
+		$public = 0;
 
-	//create the status.  Note that if the status code is "closed,"  the function automagaically closes the entire issue
+	} else {
+		$public = 1;
+	}
+
+	//create the status.  Note that if the resolved flag is set to true,  the function automagaically closes the entire issue
 	$statusCreated = createNewStatus( $issue_id, $time, $public, $user['id'], $status_text, $issue_resolved, $db);
 	
 	if ($statusCreated == 1) {
@@ -145,10 +155,17 @@ if (isset($_POST['update_status']) && $logged_in = 1) {
 	
 }
 
+//has the user chosen to look at building issues?
 
+$building = "IS NULL"; // show system issues by defualt
+
+if (isset($_GET['building'])) {
+
+	$building = "= '$_GET['building']'";
+}
 
 //has the user chosen to filter the issues?
-// 0 = all issues, 1 = unresolved, 2= resolved
+// 0 = all issues, 1 = unresolved, 2= resolved 3 = updates
 $filter = 0; // all issues by default
 
 if (isset($_GET['status'])) {
@@ -160,7 +177,9 @@ if (isset($_GET['status'])) {
 		case "unresolved":
 			$filter = 1; // Show Unresolved
 			break;
-	
+		case "updates":
+			$filter = 3; // Show updates
+			break;
 	}
 }
 
@@ -177,6 +196,12 @@ if(isset($_GET['url'])) {
 }
 //load the header HTML
 include 'resources/HTML/header.php';	
+
+if ($userMessage != "") {
+
+	include 'resources/HTML/user_alert_message.php';
+
+}
 
 ?>
 
@@ -196,6 +221,8 @@ include 'resources/HTML/header.php';
 </div>
 <div class="row">
 <div class="span1">&nbsp;</div>
+
+	<!--login link and submit issue buttons-->
 	<div class="span2 unit right lib-horizontal-list" style="text-align: right;margin-top:.65em; overflow:visible;">
 		<ul>
 
@@ -205,120 +232,25 @@ include 'resources/HTML/header.php';
 		</ul>
 	</div>
 </div> <!-- end line -->
-<?php
 
-if(isset($userMessage)) {
-	echo '<div id="message-update">' . $userMessage . '</div>';
-}
 
-if($logged_in == 1) {
 
-	?>
-	<div class="row lib-form feedback">
-			<div>
-				<h3>Report an Issue</h3>
-			</div>
 
-			<form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" name="issue-form" onsubmit="return validateForm()">
-				<div class="row">
-				<div class="span1">
-					<label class="lib-inline">System:</label>
-					<select name="system_id">
-
-						<!-- load system names -->
-						<?php
-						$result = $db->query("SELECT * FROM systems");
-
-						while($row = $result->fetch_assoc())
-						{
-							echo '<option value="' . $row["system_id"] . '">' . $row["system_name"] . '</option>';
-						}
-						?>
-
-					</select>
-				</div>
-
-				<div class="span1">
-					<label class="lib-inline">Status:</label>
-					<select name="status_type_id" id="status_type_id">
-
-						<!-- Load status types -->
-						<?php
-						$result = $db->query("SELECT * FROM status_type");
-						while($row = $result->fetch_assoc())
-						{
-							if ($row["status_type_id"] != 3)
-							echo '<option value="' . $row["status_type_id"] . '">' . $row["status_type_text"] . '</option>';
-						}
-						?>
-
-					</select>
-				</div>
-
-				<div class="when_box span1">
-
-					<label style="padding-top: .2em; " for="when">When:</label>
-					<input type="text" name="when" value = "Now" style="width: 40%; font-size: .8em; font; color: #575757; display: inline">
-					<div class="end-time-box">
-						<label style="padding-top: .2em;" for="end_time">Ends:</label>
-						<input type="text" name="end_time"  style="width: 40%; font-size: .8em; font; color: #575757; display: inline">
-					</div>
-				</div>
-				</div>
-
-				<div class = "span3 unit" style="float: left; padding: 1em 0">
-					<textarea style="font-size: 1em;width:96%" name="issue_text" placeholder="Describe issue..."></textarea>
-				</div>
-
-				<input class="status-button" style="float: left;" name="submit_issue" type="submit" value="Submit Issue" />
-
-				<div style="float: left; margin-left: 3%; color: #0065A4; text-decoration: underline; cursor:pointer;" class="has-js issue-trigger" id="cancel-issue">Cancel</div>
-
-			</form>
-
-		</div> <!-- end span -->
-
-	<?php
-}
-	?>
 <div class="cms-clear"></div>
 	<div class="row break" style="margin-top: 1em;">
 
-			<?php
+		<?php
 
-				$result = $db->query("SELECT * FROM systems WHERE system_category = 0 ORDER BY system_name ASC");
-				$now = time();
-
-				while($row = $result->fetch_assoc())
-				{
-
-					$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id
-													FROM issue_entries i
-													WHERE i.system_id = {$row['system_id']}
-													AND i.start_time < '$now'");
-
-					$status = '<div class="alert alert-success" style="margin: 0;">
-						<p>All systems are online.</p>
-						</div>';
-
-					while ($rw = $system_result->fetch_assoc()) {
-
-						// Check if there is a resolution or if a scheduled resolution has not happened yet
-						if (($rw['end_time'] == 0) || ($rw['end_time'] > $now)) {
-							if ($rw['status_type_id'] == 2) {
-								$status = '<div class="alert alert-danger" style="margin: 0;">
+			if (areUnresolvedSystemIssues($db) == true) {
+				$status = '<div class="alert alert-success" style="margin: 0;"> <p>All systems are online.</p></div>';
+			} else {
+				$status = '<div class="alert alert-danger" style="margin: 0;">
 									<p>Uh-oh, we have a system down. You can bet that we&#8217;re working on it!</p>
 									</div>';
-								break 2;
-							}
-						}
-					} // end while
+			}
+			echo $status;
 
-				} // end system while
-
-				echo $status;
-
-			?>
+		?>
 
 	</div> <!-- end line -->
 
@@ -329,7 +261,7 @@ if($logged_in == 1) {
 						<!-- load system names -->
 						<?php
 
-							$result = $db->query("SELECT * FROM systems WHERE system_category = 0 ORDER BY system_name ASC");
+							$result = $db->query("SELECT * FROM systems WHERE building $building ORDER BY system_name ASC");
 							$now = time();
 							$i = 0;
 							$system_count = $result->num_rows;
@@ -353,8 +285,8 @@ if($logged_in == 1) {
 																FROM issue_entries i, status_type s
 																WHERE i.system_id = {$row['system_id']} 
 																AND i.status_type_id = s.status_type_id 
-																AND i.start_time < '$now' 
-																AND (i.end_time = 0 OR i.end_time > '$now') 
+																AND i.start_time < NOW() 
+																AND (i.end_time IS NULL OR i.end_time > NOW()) 
 																ORDER BY s.status_type_text ASC");
 
 								$currently = 'color: #147D11">Online'; // currently displayed. Color difference is WCAG2 AA compliant
@@ -363,7 +295,7 @@ if($logged_in == 1) {
 								while ($rw = $system_result->fetch_assoc()) {
 
 									// Check if there is no resolution or a scheduled resolution is still in the future
-									if (($rw['end_time'] == 0) || ($rw['end_time'] > $now) || ($rw['start_time'] > $now)) {
+									if (is_null(($rw['end_time'])) || ($rw['end_time'] > $now) || ($rw['start_time'] > $now)) {
                                                                                 $day = date('Ymd',$now);
 
 										//echo '<p>color</p>';

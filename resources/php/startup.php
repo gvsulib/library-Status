@@ -1,13 +1,6 @@
 <?
 //sets session and other variables that have to be initialized when any page of the status app is loaded
 
-
-session_start();
-//error_reporting(0);
-
-$actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
-
-$_SESSION['location'] = $actual_url;
 	
 date_default_timezone_set('America/Detroit');
 
