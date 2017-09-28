@@ -156,21 +156,29 @@ if (isset($_POST['update_status']) && $logged_in = 1) {
 }
 
 //has the user chosen to look at building issues?
+//if so set the $system variable so we can build the correct status table later
 
-$building = "IS NULL"; // show system issues by defualt
+$system = 0;
 
-if (isset($_GET['building'])) {
+if (isset($_GET['system'])) {
+	if ($_GET['system'] != 0) {
+		$system = $_GET['system'];
+		
 
-	$building = "= '$_GET['building']'";
+	}
+	
 }
+//set part of query string for the status display, and the blog display
+
+
 
 //has the user chosen to filter the issues?
 // 0 = all issues, 1 = unresolved, 2= resolved 3 = updates
 $filter = 0; // all issues by default
 
-if (isset($_GET['status'])) {
+if (isset($_GET['filter'])) {
 
-	switch ($_GET['status']) {
+	switch ($_GET['filter']) {
 		case "resolved":
 			$filter = 2; // Show Resolved
 			break;
@@ -183,8 +191,7 @@ if (isset($_GET['status'])) {
 	}
 }
 
-//get the correct query for the specified filter
-$issue_query = constructQuery($filter);
+
 
 if(isset($_GET['thankyou'])) {
 	$userMessage = '<div class="alert alert-success">Thanks! We&#8217;ll get right on that. If you shared your email, we&#8217;ll follow up with you soon.</div>';
@@ -234,14 +241,14 @@ if ($userMessage != "") {
 </div> <!-- end line -->
 
 
-
+<?php echo getSystemStatus(14, $db) ?>
 
 <div class="cms-clear"></div>
 	<div class="row break" style="margin-top: 1em;">
 
 		<?php
 
-			if (areUnresolvedSystemIssues($db) == true) {
+			if (!areUnresolvedSystemIssues($db)) {
 				$status = '<div class="alert alert-success" style="margin: 0;"> <p>All systems are online.</p></div>';
 			} else {
 				$status = '<div class="alert alert-danger" style="margin: 0;">
@@ -254,15 +261,52 @@ if ($userMessage != "") {
 
 	</div> <!-- end line -->
 
+	<div class="row status-bar" style="clear: both; margin: 2em 0; padding: .75em 1%; background: #eee; border: 1px solid #bbb;">
+			
+
+			<!--select wether you want to look at systems or buildings.  
+			0=systems, 1=building issues, 3 = both-->
+
+		<div class="span2 unit left lib-horizontal-list">
+			<ul>
+				<li><a href="index.php" class="status-button btn btn-default <?php echo ($system == 0 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-recent"><?php echo ($system == 0 ? 'Showing' : 'Show'); ?> Systems</a></li>
+				<li><a href="?system=1" class="status-button btn btn-default <?php echo ($system == 1 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-unresolved"><?php echo ($system == 1 ? 'Showing' : 'Show'); ?> Buildings</a></li>
+				<li><a href="?system=2" class="status-button btn btn-default <?php echo ($system == 2 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($system == 2 ? 'Showing' : 'Show'); ?> All</a></li>
+				
+			</ul>
+		</div>
+
+		<div class="cms-clear"></div>
+	</div>
+
 	<div class="row break status-table">
 
 		<div class="half">
 
-						<!-- load system names -->
+						<!-- build the status table for systems -->
 						<?php
+							//get all the systems from the database for the tab the user has chosen
 
-							$result = $db->query("SELECT * FROM systems WHERE building $building ORDER BY system_name ASC");
-							$now = time();
+						if ($system == 2) {
+							$building = '';
+						} elseif ($system == 0) {
+							$building = ' WHERE building IS NULL';
+							
+						} else {
+							$building = ' WHERE building IS NOT NULL';
+						}
+
+						$query = "SELECT * FROM systems $building ORDER BY system_name ASC";
+
+						$result = $db->query($query);
+						if (!$result) {
+							echo "There was an error accessing the database: " . $db->error;
+
+						} elseif ($result->num_rows < 1) {
+
+							echo "No systems found.";
+							
+						} else {
 							$i = 0;
 							$system_count = $result->num_rows;
 
@@ -270,8 +314,7 @@ if ($userMessage != "") {
 							$half = round($system_count/2);
 
 							// loop through each system
-							while($row = $result->fetch_assoc())
-							{
+							while($row = $result->fetch_assoc()) {
 								if($i == $half) {
 									echo '</div><div class="half">';
 								}
@@ -281,35 +324,19 @@ if ($userMessage != "") {
 								echo '<dt><a href="detail.php?system='. $row['system_id'] . '" style="text-decoration: none;">' . $row["system_name"] . '</a></dt> ';
 								echo '<dd class = "col2 name"><a href="detail.php?system='. $row['system_id'] .'" style = "text-decoration: none;';
 
-								$system_result = $db->query ("SELECT i.start_time, i.end_time, i.status_type_id, s.status_type_text, i.issue_id
-																FROM issue_entries i, status_type s
-																WHERE i.system_id = {$row['system_id']} 
-																AND i.status_type_id = s.status_type_id 
-																AND i.start_time < NOW() 
-																AND (i.end_time IS NULL OR i.end_time > NOW()) 
-																ORDER BY s.status_type_text ASC");
-
-								$currently = 'color: #147D11">Online'; // currently displayed. Color difference is WCAG2 AA compliant
-
-								// Display Day
-								while ($rw = $system_result->fetch_assoc()) {
-
-									// Check if there is no resolution or a scheduled resolution is still in the future
-									if (is_null(($rw['end_time'])) || ($rw['end_time'] > $now) || ($rw['start_time'] > $now)) {
-                                                                                $day = date('Ymd',$now);
-
-										//echo '<p>color</p>';
-
-										$currently = 'color: #cb0000;">'.$rw['status_type_text'];
-
-									}
+								$status = getSystemStatus($row['system_id'], $db);
+								
+								if ($status == "Online") {
+									echo 'color: #147D11;">Online';
+								} else {
+									echo 'color: #cb0000;">' . $status;
 								}
 
-								echo $currently . '</a></dd>'; // close currently displayed
+								echo '</a></dd>'; // close currently displayed
 								$i++;
 								echo '</dl>'; // close row
 							}
-
+						}
 						?>
 
 			</div>
@@ -321,8 +348,10 @@ if ($userMessage != "") {
 		<div class="span2 unit left lib-horizontal-list">
 			<ul>
 				<li><a href="index.php" class="status-button btn btn-default <?php echo ($filter == 0 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-recent"><?php echo ($filter == 0 ? 'Showing' : 'Show'); ?> Recent</a></li>
-				<li><a href="?status=unresolved" class="status-button btn btn-default <?php echo ($filter == 1 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-unresolved"><?php echo ($filter == 1 ? 'Showing' : 'Show'); ?> Unresolved</a></li>
-				<li><a href="?status=resolved" class="status-button btn btn-default <?php echo ($filter == 2 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($filter == 2 ? 'Showing' : 'Show'); ?> Resolved</a></li>
+				<li><a href="?filter=unresolved" class="status-button btn btn-default <?php echo ($filter == 1 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-unresolved"><?php echo ($filter == 1 ? 'Showing' : 'Show'); ?> Unresolved</a></li>
+				<li><a href="?filter=resolved" class="status-button btn btn-default <?php echo ($filter == 2 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($filter == 2 ? 'Showing' : 'Show'); ?> Resolved</a></li>
+				<li><a href="?filter=updates" class="status-button btn btn-default <?php echo ($filter == 3 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($filter == 3 ? 'Showing' : 'Show'); ?> Updates</a></li>
+			
 			</ul>
 		</div>
 
@@ -336,46 +365,109 @@ if ($userMessage != "") {
 	</div>
 	<?php
 
-			$issue_result = $db->query($issue_query);
-			$n_rows = $issue_result->num_rows;
-			
-			if ($n_rows > 0) {
+	//Get ready to retrieve systems based on the system and filter criteria the user has chosen for the blog display
+	
+	//for the blog display, we only want the ten most current issues
+	$limit = 10;
 
-				while ($issue_entries = $issue_result->fetch_assoc()) {
+	if ($system == 0) {
+		$building = "NONE";
+	} else if ($system == 1) {
+		$building = "ALL";
+	} else {
+		$building = "EVERYTHING";
+	}
 
-					$result = $db->query("SELECT s.status_id, s.issue_id, s.status_timestamp, s.status_public, s.status_user_id, s.status_text, s.status_delete, u.user_id, u.user_fn, u.user_ln, i.status_type_id, st.status_type_text
-						FROM status_entries s, user u, status_type st, issue_entries i
-						WHERE s.issue_id = '{$issue_entries['issue_id']}' 
-						AND i.issue_id = s.issue_id
-						AND s.status_user_id = u.user_id 
-						AND i.status_type_id = st.status_type_id
-						AND s.status_delete != 1
-						ORDER BY s.status_timestamp ASC");
+	//don't show non-public issues if you aren't logged in
+	if ($logged_in) {
+		$public = false;
+	} else {
+		$public = true;
+	}
 
-					$num_rows = $result->num_rows;
-					$issue_id = $issue_entries['issue_id'];
+	//get issues and updates.  Depending on the filter, we may want issues, updates, or both.
+	if ($filter == 0 ) {
+		$limit = 5;
+		$open = "ALL";
+		$issues = getIssues($building, '', '', $open, $public, "", $limit, $db);
+		$updates = getUpdates($building, '', $public, '', $limit, $db);
 
-					$rc = 0;
-					$attribution = NULL;
-					// display issues and check for comments
-					while ($status_entries = $result->fetch_assoc()) {
-						$rc++;
-						if ($rc == 1) {
+	} else if ($filter == 1) {
+		$open = "OPEN";
+		$issues = getIssues($building, '', '', $open, $public, "", $limit, $db);
+	} else if ($filter == 2) {
+		$open = "CLOSED";
+		$issues = getIssues($building, '', '', $open, $public, "", $limit, $db);
+	} else if ($filter == 3) {
+		$updates = getUpdates($building, '', $public, '', $limit, $db);
+	}
+	//debugging code
+	/*
+	if (isset($issues)) {
+		if (is_string($issues)) {
+			echo $issues;
+		} else {
+			echo var_dump($issues);
+		}
+	}
 
-							$status_type_id = $status_entries['status_type_id'];
 
-							if($issue_entries['end_time'] > 0) {
-								$resolved = 1;
-								if($issue_entries['status_type_id'] != 4) {
-									$current_status = '<span class="tag-resolved">Resolved</span>';
-								} else {
-									$current_status = '<span class="tag-maintenance">Maintenance</span>';
-								}
-							} else {
-								$current_status = '<span class="tag-unresolved">Unresolved</span>';
-								$resolved = 0;
-							}
+	if (isset($updates)) {
+		if (is_string($updates)) {
+			echo $updates;
+		} else {
+			echo var_dump($updates);
+		}
+	}
+	*/
+	//do we have issues to display?  
+	$displayIssues = false;
 
+	if (isset($issues)) {
+		if (!is_string($issues)) {
+			$displayIssues = true;
+		} else {
+			echo "<P>" . $issues . "<P>";
+		}
+	}
+	//do we have updates to display?		
+	$displayUpdates = false;
+	
+	if (isset($issues)) {
+		if (!is_string($issues)) {
+			$displayUpdates= true;
+		} else {
+				echo "<P>" . $updates . "<P>";
+		}
+	}	
+	
+	if ($displayIssues) {
+			foreach ($issues as $id => $issue) {
+				//what's the status of the issue?  Display the correct flag
+				if (strtotime($issue["end_time"]) > time() || is_null($issue["end_time"])) {
+					$current_status = '<span class="tag-unresolved">Unresolved</span>';
+					$resolved = 0;
+				} else {
+					$current_status = '<span class="tag-resolved">Resolved</span>';
+					$resolved = 1;
+				}
+				if (!is_null($issue["building"])) {
+					$building = "at " . $issue["building"];
+				} else {
+					$building = '';
+				}
+
+				echo '<!-- Issue --> <div class = "row issue-box span3">';
+				if ($logged_in == 1 && $resolved == 0) {echo '<div class="right status-update has-js">Add Update</div>';}
+				echo '<h2 id="issue_' . $id . '"><a href="detail.php?id=' . $id . '">' . $issue['status_name'] . ' for ' . $issue['system_name'] . $building . $current_status .'</a></h2>';
+				echo '<div class="comment-text" id="' . $issue['status'] . '">'; 
+				echo '</div>';
+			}
+	}
+		
+		
+	/*
+	
 							echo '
 							<!-- Issue -->
 							<div class = "row issue-box span3">
@@ -457,7 +549,7 @@ if ($userMessage != "") {
 				} // close status loop
 			}
 
-
+			*/
 	?>
 
 

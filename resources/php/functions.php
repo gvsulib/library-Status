@@ -65,8 +65,6 @@ function send_email($name,$email,$message) {
 
 function is_valid_email($email) {
 
-	global $m;
-
   return preg_match('#^[a-z0-9.!\#$%&\'*+-/=?^_`{|}~]+@([0-9.]+|([^\s]+\.+[a-z]{2,6}))$#si', $email);
 }
 
@@ -197,11 +195,184 @@ EOD;
 
 //FUNCTIONS TO GET DATA FROM DATABASE
 
+
+//get the status of a specific system
+function getSystemStatus($systemID, $dataBaseConnection) {
+	$query = "SELECT status_type_id FROM issue_entries WHERE system_id = $systemID AND (end_time > NOW() OR end_time IS NULL)";
+	$ids = $dataBaseConnection->query($query);
+	if (!$ids) {
+		return $dataBaseConnection->error;
+	}
+	if ($ids->num_rows <= 0) {
+		return "Online";
+
+	}
+
+	while ($row = $ids->fetch_assoc()) {
+		if ($row["status_type_id"] == 2 || $row["status_type_id"] == 4 || $row["status_type_id"] == 7) {
+			return "Offline";
+		
+		}
+	}
+
+	return "Minor Issue";
+
+	
+
+}
+
+
+
+//get updates from the updates table based on different criteria.  Return the update data as a multidimensional array,
+//or an error message if none are found
+function getUpdates($building, $system, $public, $user, $limit, $dataBaseConnection) {
+	
+	$query = "SELECT u.*, s.system_name, s.building FROM updates u, systems s WHERE u.system_id = s.system_id ";
+	
+	
+	//if public is set to true, bring only public display items, otherwise, get all of them.
+	
+	if ($public) {
+		
+		$query = $query . "AND u.public = 1 ";
+			
+	}
+		
+	
+	//the acceptable values are the name of the building, "EVERYTHING" (all issues)
+	//"ALL"  (all non-system issues) and "NONE" (all non-building issues)
+	
+	if ($building == "EVERYTHING") {
+		$query = $query;
+
+	} elseif ($building == "ALL") {
+		$query = $query . "AND s.building IS NOT NULL ";
+
+	} elseif ($building == "NONE") {
+		$query = $query . "AND s.building IS NULL ";
+	} else {
+		$query = $query . "AND s.building = \"$building\" ";
+	}
+	if ($system) {
+		$query = $query . "AND s.system_id = $system ";
+
+	}
+	if ($user) {
+		
+		$query = $query . "AND u.created_by = $user ";
+	}
+	
+	$query = $query . "ORDER BY u.timestamp ";
+	
+	if ($limit) {
+		
+		$query = $query . "LIMIT $limit";
+	}
+	
+	$updates = $dataBaseConnection->query($query);
+	
+	if (!$updates) {
+		return $dataBaseConnection->error;
+	} elseif ($updates->num_rows <= 0) {
+		return "No updates found.";
+	} else {
+		$return_array = array();
+		while ($row = $updates->fetch_assoc()) {
+			$return_array[$row["update_id"]] = array("timestamp" => $row["timestamp"], 
+			"text" => $row["text"],
+			"system_name" => $row["system_name"],
+			"system_id" => $row["system_id"],
+			"user" => $row["created_by"],
+			"building" => $row["building"]
+			);
+			
+			
+		}
+	}
+	return $return_array;
+}
+
+
+//gets issue data by various criteria.  Will either return an array of all issue IDs matching criteria, a database
+//error, or a message indicating no data could be found for those criteria.
+function getIssues($building, $status, $system, $open, $public, $user, $limit, $dataBaseConnection) {
+
+	//start building the query
+	$query = "SELECT i.*, s.system_name, s.building, r.status_type_text FROM  issue_entries i, systems s, status_type r, status_entries e 
+	WHERE s.system_id = i.system_id AND i.status_type_id = r.status_type_id AND e.issue_id = i.issue_id ";
+	//start checking the various parameters.  
+	
+	//if public is set to true, bring only public display items, otherwise, get all of them.
+	if ($public) {
+		$query = $query . "AND i.public = 1 ";
+	}
+	
+	//the acceptable values are to leave it blank (all issues)
+	//"ALL"  (all non-system issues) and "NONE" (all non-building issues)
+	
+	if ($building == "ALL") {
+		$query = $query . "AND s.building IS NOT NULL ";
+
+	} elseif ($building == "NONE") {
+		$query = $query . "AND s.building IS NULL ";
+	} 
+	//if you set these to be anything other than false, use the numbers provided
+	if ($status) {
+		$query = $query . "AND i.status_type_id = $status ";
+
+	}
+	if ($system) {
+		$query = $query . "AND s.system_id = $system ";
+
+	}
+	//$open can be set to "OPEN" (all open issues)  "CLOSED" (all closed issues) or "ALL" for all open or closed issues
+	if ($open == "OPEN") {
+		$query = $query . "AND (i.end_time IS NULL OR (i.start_time > NOW() AND i.end_time < NOW())) ";
+
+	} elseif ($open == "ALL") {
+		$query = $query;
+	} else {
+		$query = $query . "AND (i.end_time IS NOT NULL AND i.end_time < NOW()) ";
+	}
+	if ($user) {
+		$query = $query . "AND i.created_by = $user ";
+	}
+
+	//order issues by the ones with the most recent status updates.  This makes peeling off recent ones for the front display easy
+	$query = $query . "ORDER BY e.status_timestamp ASC ";
+
+	if ($limit) {
+
+		$query = $query . "LIMIT $limit";
+	}
+
+	$ids = $dataBaseConnection->query($query);
+
+	if (!$ids) {
+		return $dataBaseConnection->error;
+	} elseif ($ids->num_rows <= 0) {
+		return "No issues found.";
+	} else {
+		$return_array = array();
+		while ($row = $ids->fetch_assoc()) {
+			$return_array[$row["issue_id"]] = array("start_time" => $row["start_time"], 
+			"end_time" => $row["end_time"], 
+			"system_name" => $row["system_name"],
+			"status" => $row["status_type_id"],
+			"user" => $row["created_by"],
+			"building" => $row["building"],
+			"status_name" => $row["status_type_text"]
+		);
+		}
+		return $return_array;
+	}
+}
+
 //used to check and see if any systems currently have an outstanding major issue
 function areUnresolvedSystemIssues($dataBaseConnection) {
 	$time = time();
 	//first check to see if there are any major issues with no end time set
-	$query = "SELECT i.end_time FROM issue_entries i, systems s WHERE s.system_id = i.system_id AND s.building IS NULL AND i.status_type_id=2 AND i.end_time IS NULL";
+	$query = "SELECT i.issue_id FROM issue_entries i, systems s WHERE s.system_id = i.system_id AND s.building IS NULL AND i.status_type_id in (2,4) AND (i.end_time IS NULL OR i.end_time > NOW)) ";
 	$unresolvedIssues = $dataBaseConnection->query($query);
 	if (!$unresolvedIssues) {
 		return $dataBaseConnection->error;
@@ -209,40 +380,14 @@ function areUnresolvedSystemIssues($dataBaseConnection) {
 
 	if ($unresolvedIssues->num_rows > 0) {
 		return true;
+	} else {
+		return false;
 	}
-	//now check for any scheduled maintenance
-	$query = "SELECT i.end_time FROM issue_entries i, systems s WHERE s.system_id = i.system_id AND s.building IS NULL AND i.status_type_id = 4 AND i.end_time IS NOT NULL AND NOW() < i.end_time ";
-	$unresolvedIssues = $dataBaseConnection->query($query);
-	if (!$unresolvedIssues) {
-		return $dataBaseConnection->error;
-	}
-
-	if ($unresolvedIssues->num_rows > 0) {
-		return true;
-	} 
-
-	return false;
+	
 
 }
 
-//function to construct queries for issue data to the database based on the designated filter
-function constructQuery($filter) {
-	$query = "SELECT issue_entries.issue_id, systems.system_name, issue_entries.end_time, issue_entries.status_type_id FROM issue_entries, systems WHERE issue_entries.system_id = systems.system_id";
 
-	switch ($filter) {
-		case 0:
-			$query = $query . " ORDER BY issue_entries.issue_id DESC LIMIT 10";
-			break;
-		case 2:
-			$query = $query . " AND issue_entries.end_time > 0 ORDER BY issue_entries.issue_id DESC";
-			break;
-		case 1:
-			$query = $query . " AND (issue_entries.end_time BETWEEN 0 AND 0) ORDER BY issue_entries.issue_id DESC";
-
-	}
-	return $query;
-
-}
 //get all status IDs for a given issue and return them as an array
 function getStatusIDs($issueID, $dataBaseConnection) {
 	$query = "SELECT status_id FROM status_entries WHERE issue_id = '$issueID'";
@@ -354,7 +499,7 @@ function createNewIssue($system_id,$status_type_id, $time, $end_time, $userid, $
 	$dataBaseConnection->autocommit(FALSE);
 	$dataBaseConnection->query($query);
 	$issue_id = $dataBaseConnection->insert_id;
-	$query = "INSERT INTO status_entries VALUES ('','$issue_id',FROM_UNIXTIME($time),'$public','$userid','$issue_text',)";
+	$query = "INSERT INTO status_entries VALUES ('','$issue_id',FROM_UNIXTIME($time),'$public','$userid','$issue_text')";
 	$dataBaseConnection->query($query);
 	
 	//does the commit work?
