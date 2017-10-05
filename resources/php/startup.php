@@ -11,6 +11,8 @@ $logged_in = 0;
 if ($use_native_login == true){
     $loginUrl = "login.php";
 
+} else {
+    $loginUrl = $non_native_login_url;
 }
 //can we connect to the database?  If not, display an error and cease loading the app
 $db = new mysqli($db_host, $db_user, $db_pass, $db_database);

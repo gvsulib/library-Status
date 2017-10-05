@@ -234,8 +234,7 @@ div.hover {
 
 
 .feedback {
-	position: fixed;
-	top: 0;
+	
 	max-width: 56em;
 	width: 60%;
 	margin: 0 auto;

@@ -8,6 +8,9 @@ if(!session_status() === PHP_SESSION_ACTIVE) {
  //as well as loads required library files
 include 'resources/secret/config.php';
 include 'resources/php/functions.php';
+
+
+//markdown is used to display the status entries for issues and the text of updates
 include ('resources/php/markdown.php');
 
 //load all starting session and other variables and required libraries
@@ -30,7 +33,7 @@ if (isset($_SESSION['username'])) { // User has logged in
 	} else {
 		//otherwise, attempt to make a user object
 		
-		$user = MakeUserArray($_SESSION['username'], $db);
+		$user = MakeUserArray($_SESSION['username'],'', $db);
 		if (is_array($user)) {
 			$logged_in = 1;
 		} else {
@@ -53,72 +56,65 @@ if (isset($_POST['status_delete']) && $logged_in = 1) {
 // post a new issue
 if (isset($_POST['submit_issue']) && $logged_in = 1) {
 
-	$issue_text = $db->real_escape_string($_POST['issue_text']);
-	$system_id = $_POST['system_id'];
-	$status_type_id = $_POST['status_type_id'];
+	$text = $db->real_escape_string($_POST['issue_text']);
+	$systemid = $_POST['system_id'];
+	$statusid = $_POST['status_type_id'];
+	$userid = $_POST['userid'];
 					
-
-	// Create a time one year back to see use to check if posting time is in range.
-	$time_check = time();
-	$time_check = strtotime('-1 month');
-
-	// If time is an acceptable value, attach the value, otherwise use the current time
-	if (($_POST['when'] != 'Now') && (strtotime($_POST['when']) > $time_check)) {
-		$time = strtotime($_POST['when']);
-	} else {
-		$time = time();
-	}
+	$time = verifyFormatTime($_POST["when"]);
 				
-	$end_time = 0;
-				
-	if($status_type_id == 4) { // Scheduled Maintenance
+	if($statusid == 4) { // Scheduled Maintenance
 		$end_time = strtotime($_POST['end_time']);
 	} 
 				
-	if($status_type_id == 5) { // Update
-		$end_time = $time;
+	if($statusid == 0) { // Update
+		$created = createNewUpdate($userid, $text, $time, $systemid, $public, $dataBaseConnection);
+	} else {//otherwise issue
+		$created = createNewIssue($systemid,$statusid,$time,$end_time,$userid,$text,$db);
 	}
-
-	// Create new issue
-	$issueCreated = createNewIssue($system_id,$status_type_id,$time,$end_time,$user["id"],$issue_text,$db);
-	if ($issueCreated == 1) {
-		$userMessage = '<div class="alert alert-success">Your issue has been added.</div>';
-		
+	//did we successfully create the issue/update?
+	if (is_string($created)) {
+		$userMessage = '<div class="alert alert-danger">' . $created . '</div>';
 	} else {
-		$userMessage = '<div class="alert alert-danger">There was a problem adding your issue. ' . $issueCreated . '</div>';
+		'<div class="alert alert-success">update or issue created.</div>';
 	}
 	
 }
 
 // new status post
 if (isset($_POST['submit_status']) && $logged_in = 1) {
-
+	$userid = $_POST['user_id'];
 	$issue_id = $_POST['issue_id'];
-	$status_type_id = $_POST['status_type_id'];
 	$status_text = $db->real_escape_string($_POST['status']);
-	$issue_resolved = false;
-	if (isset($_POST['issue_resolved'])) {
-		$issue_resolved = true;
-	}
-
 	//verify and format time 
 	$time = verifyFormatTime($_POST['when']);
-
-	//if it's related to a safety issue, hide it
-	if ($status_type_id == 7) {
-		$public = 0;
-
-	} else {
-		$public = 1;
-	}
-
-	//create the status.  Note that if the resolved flag is set to true,  the function automagaically closes the entire issue
-	$statusCreated = createNewStatus( $issue_id, $time, $public, $user['id'], $status_text, $issue_resolved, $db);
 	
-	if ($statusCreated == 1) {
-		$userMessage = '<div class="alert alert-success">Your status has been added.</div>';	
+	//is the user closing the issue?  If so, try to close it, and if that doesn't work, STOP
+	//if it does work, or the user is not closing the issue, make the new status update
+	if (isset($_POST['issue_resolved'])) {
+		$time = verifyFormatTime($_POST["when"]);
+
+
+		$closed = closeIssue($issue_id, $time, $db);
+		if (is_string($closed)) {
+			$userMessage = "<div class=\"alert alert-danger\">Problem Closing this issue: " . $closed . "</div>";
+		} else {
+			$statusCreated = createNewStatus( $issue_id, $time, $userid, $status_text, $db);
+			
+			if ($statusCreated == 1) {
+				$userMessage = '<div class="alert alert-success">Your status has been added.</div>';	
+			} else {
+				$userMessage = '<div class="alert alert-danger">There was a problem adding your status. ' . $statusCreated  . '</div>';
+			}
+		}
 	} else {
-		$userMessage = '<div class="alert alert-danger">There was a problem adding your status. ' . $statusCreated  . '</div>';
+		$statusCreated = createNewStatus( $issue_id, $time, $userid, $status_text, $db);
+		
+		if ($statusCreated == 1) {
+			$userMessage = '<div class="alert alert-success">Your status has been added.</div>';	
+		} else {
+			$userMessage = '<div class="alert alert-danger">There was a problem adding your status. ' . $statusCreated  . '</div>';
+		}
 	}
 	
 }
@@ -167,6 +163,12 @@ if (isset($_GET['system'])) {
 
 	}
 	
+} else if (isset($_POST['system'])) {
+	if ($_POST['system'] != 0) {
+		$filter = $_POST['system'];
+		
+
+	}	
 }
 //set part of query string for the status display, and the blog display
 
@@ -177,17 +179,16 @@ if (isset($_GET['system'])) {
 $filter = 0; // all issues by default
 
 if (isset($_GET['filter'])) {
+	if ($_GET['filter'] != 0) {
+			$filter = $_GET['filter'];
+			
+	
+	}
+} else if (isset($_POST['filter'])) {
+	if ($_POST['filter'] != 0) {
+		$filter = $_POST['filter'];
+		
 
-	switch ($_GET['filter']) {
-		case "resolved":
-			$filter = 2; // Show Resolved
-			break;
-		case "unresolved":
-			$filter = 1; // Show Unresolved
-			break;
-		case "updates":
-			$filter = 3; // Show updates
-			break;
 	}
 }
 
@@ -204,9 +205,15 @@ if(isset($_GET['url'])) {
 //load the header HTML
 include 'resources/HTML/header.php';	
 
+
+//display any messages associated with any updates the user performed
 if ($userMessage != "") {
 
-	include 'resources/HTML/user_alert_message.php';
+	echo '<div ID="message-update">';
+	
+	echo $userMessage;
+	
+	echo '</div>';
 
 }
 
@@ -240,9 +247,6 @@ if ($userMessage != "") {
 	</div>
 </div> <!-- end line -->
 
-
-<?php echo getSystemStatus(14, $db) ?>
-
 <div class="cms-clear"></div>
 	<div class="row break" style="margin-top: 1em;">
 
@@ -269,9 +273,9 @@ if ($userMessage != "") {
 
 		<div class="span2 unit left lib-horizontal-list">
 			<ul>
-				<li><a href="index.php" class="status-button btn btn-default <?php echo ($system == 0 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-recent"><?php echo ($system == 0 ? 'Showing' : 'Show'); ?> Systems</a></li>
-				<li><a href="?system=1" class="status-button btn btn-default <?php echo ($system == 1 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-unresolved"><?php echo ($system == 1 ? 'Showing' : 'Show'); ?> Buildings</a></li>
-				<li><a href="?system=2" class="status-button btn btn-default <?php echo ($system == 2 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($system == 2 ? 'Showing' : 'Show'); ?> All</a></li>
+				<li><a href="index.php?system=0&filter=<?php echo $filter; ?>" class="status-button btn btn-default <?php echo ($system == 0 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-recent"><?php echo ($system == 0 ? 'Showing' : 'Show'); ?> Systems</a></li>
+				<li><a href="index.php?system=1&filter=<?php echo $filter; ?>" class="status-button btn btn-default <?php echo ($system == 1 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-unresolved"><?php echo ($system == 1 ? 'Showing' : 'Show'); ?> Buildings</a></li>
+				<li><a href="index.php?system=2&filter=<?php echo $filter; ?>" class="status-button btn btn-default <?php echo ($system == 2 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($system == 2 ? 'Showing' : 'Show'); ?> All</a></li>
 				
 			</ul>
 		</div>
@@ -342,15 +346,32 @@ if ($userMessage != "") {
 			</div>
 	</div> <!-- end line -->
 	<div class="cms-clear"></div>
+	
+
+	<!--
+		if the user is logged in, show the report form for logged in users.$_COOKIE
+		Otherwise, show the form for non-logged in users
+	
+	-->
+	<?php 
+	
+	if ($logged_in = 1) {
+		include "resources/HTML/Report_problem_logged_in.php";
+	
+	}  else {
+		include "resources/HTML/Report_problem_logged_in.php";
+		}
+	?>
+
 	<!-- Add blog-like view of incidents -->
 	<div class="row status-bar" style="clear: both; margin: 2em 0; padding: .75em 1%; background: #eee; border: 1px solid #bbb;">
 
 		<div class="span2 unit left lib-horizontal-list">
 			<ul>
-				<li><a href="index.php" class="status-button btn btn-default <?php echo ($filter == 0 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-recent"><?php echo ($filter == 0 ? 'Showing' : 'Show'); ?> Recent</a></li>
-				<li><a href="?filter=unresolved" class="status-button btn btn-default <?php echo ($filter == 1 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-unresolved"><?php echo ($filter == 1 ? 'Showing' : 'Show'); ?> Unresolved</a></li>
-				<li><a href="?filter=resolved" class="status-button btn btn-default <?php echo ($filter == 2 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($filter == 2 ? 'Showing' : 'Show'); ?> Resolved</a></li>
-				<li><a href="?filter=updates" class="status-button btn btn-default <?php echo ($filter == 3 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($filter == 3 ? 'Showing' : 'Show'); ?> Updates</a></li>
+				<li><a href="index.php?filter=0&system=<?php echo $system; ?>" class="status-button btn btn-default <?php echo ($filter == 0 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-recent"><?php echo ($filter == 0 ? 'Showing' : 'Show'); ?> Recent</a></li>
+				<li><a href="index.php?filter=1&system=<?php echo $system; ?>" class="status-button btn btn-default <?php echo ($filter == 1 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-unresolved"><?php echo ($filter == 1 ? 'Showing' : 'Show'); ?> Unresolved</a></li>
+				<li><a href="index.php?filter=2&system=<?php echo $system; ?>" class="status-button btn btn-default <?php echo ($filter == 2 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($filter == 2 ? 'Showing' : 'Show'); ?> Resolved</a></li>
+				<li><a href="index.php?filter=3&system=<?php echo $system; ?>" class="status-button btn btn-default <?php echo ($filter == 3 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-resolved"><?php echo ($filter == 3 ? 'Showing' : 'Show'); ?> Updates</a></li>
 			
 			</ul>
 		</div>
@@ -365,11 +386,13 @@ if ($userMessage != "") {
 	</div>
 	<?php
 
-	//Get ready to retrieve systems based on the system and filter criteria the user has chosen for the blog display
+	//Get ready to retrieve issues and updates based on the system and filter criteria the user has chosen for the blog display
 	
-	//for the blog display, we only want the ten most current issues
-	$limit = 10;
+	//for the blog display, we don't want a limit, but we are setting recent to be true, which will only bring us
+	//issues and updates created in the past year.
+	$limit = false;
 
+	//are they asking to see building or nonbuilding data?
 	if ($system == 0) {
 		$building = "NONE";
 	} else if ($system == 1) {
@@ -385,171 +408,145 @@ if ($userMessage != "") {
 		$public = true;
 	}
 
-	//get issues and updates.  Depending on the filter, we may want issues, updates, or both.
+	//get issues and updates.  Depending on the filter, we may want issues, updates, or both.  This will return them as 
+	//multidimesional arrays, sorted 
+	//by the most recently updated (see the functions to see how this works).  If both are requested, we need to do some work to 
+	//merge and sort the resulting arrays by most recent update
 	if ($filter == 0 ) {
-		$limit = 5;
 		$open = "ALL";
-		$issues = getIssues($building, '', '', $open, $public, "", $limit, $db);
-		$updates = getUpdates($building, '', $public, '', $limit, $db);
+		$issues = getIssues($building, '', '', $open, $public, "", $limit, true, $db);
+		$updates = getUpdates($building, '', $public, '', $limit, true, $db);
+
+		//now compare the last updated date of each issue to the timestamp of each update, pulling the more recenet one off the end of the array and putting it 
+		//into our new array, producing a mixed array or issues and updates, soreted by date
+		$results = array();
+
+		//if there's an error, echo it and set the variable to be an empty array
+		if (is_string($issues)) {
+			echo "problem getting issues: " . $issues;
+			$issues = array();
+		} 
+
+		if (is_string($updates) ) {
+			echo "Problem getting updates: " . $updates;
+			$updates = array();
+		}
+
+		while (count($issues) != 0 || count($updates != 0)) {
+			//if we've run out of updates, append all the remaining issues to the array in order
+			if (count($updates) == 0) {
+				foreach ($issues as $issue){
+					$results[] = $issue;
+				}
+				break;
+			}
+			//ditto for issues
+			if (count($issues) == 0) {
+				foreach ($updates as $update){
+					$results[] = $update;
+				}
+				break;
+			}
+			//still got both?  compare times, pull the more recent one and append to array
+			if (strtotime($issues[0]["last_updated"]) >= strtotime($updates[0]["timestamp"])) {
+				$results[] = array_shift($issues);
+			} else {
+				$results[] = array_shift($updates);
+			}
+
+
+		}
 
 	} else if ($filter == 1) {
 		$open = "OPEN";
-		$issues = getIssues($building, '', '', $open, $public, "", $limit, $db);
+		$results = getIssues($building, '', '', $open, $public, "", $limit, true, $db);
+		if (is_string($results)) {
+			echo "problem getting issues: " . $results;
+			$results = array();
+		} 
+
 	} else if ($filter == 2) {
 		$open = "CLOSED";
-		$issues = getIssues($building, '', '', $open, $public, "", $limit, $db);
+		$results = getIssues($building, '', '', $open, $public, "", $limit, true, $db);
+		if (is_string($results)) {
+			echo "problem getting issues: " . $results;
+			$results = array();
+		}
 	} else if ($filter == 3) {
-		$updates = getUpdates($building, '', $public, '', $limit, $db);
-	}
-	//debugging code
-	/*
-	if (isset($issues)) {
-		if (is_string($issues)) {
-			echo $issues;
-		} else {
-			echo var_dump($issues);
+		$results = getUpdates($building, '', $public, '', $limit, true, $db);
+		if (is_string($results)) {
+			echo "problem getting updates: " . $results;
+			$results = array();
 		}
 	}
-
-
-	if (isset($updates)) {
-		if (is_string($updates)) {
-			echo $updates;
-		} else {
-			echo var_dump($updates);
-		}
-	}
-	*/
-	//do we have issues to display?  
-	$displayIssues = false;
-
-	if (isset($issues)) {
-		if (!is_string($issues)) {
-			$displayIssues = true;
-		} else {
-			echo "<P>" . $issues . "<P>";
-		}
-	}
-	//do we have updates to display?		
-	$displayUpdates = false;
 	
-	if (isset($issues)) {
-		if (!is_string($issues)) {
-			$displayUpdates= true;
-		} else {
-				echo "<P>" . $updates . "<P>";
-		}
-	}	
-	
-	if ($displayIssues) {
-			foreach ($issues as $id => $issue) {
-				//what's the status of the issue?  Display the correct flag
-				if (strtotime($issue["end_time"]) > time() || is_null($issue["end_time"])) {
-					$current_status = '<span class="tag-unresolved">Unresolved</span>';
-					$resolved = 0;
-				} else {
-					$current_status = '<span class="tag-resolved">Resolved</span>';
-					$resolved = 1;
-				}
-				if (!is_null($issue["building"])) {
-					$building = "at " . $issue["building"];
-				} else {
-					$building = '';
-				}
+	//do we have issues to display?  Were there errors in getting the issues or updates?
+	//if so, display the errors, and set flags so that we don't try to display empty arrays
 
-				echo '<!-- Issue --> <div class = "row issue-box span3">';
-				if ($logged_in == 1 && $resolved == 0) {echo '<div class="right status-update has-js">Add Update</div>';}
-				echo '<h2 id="issue_' . $id . '"><a href="detail.php?id=' . $id . '">' . $issue['status_name'] . ' for ' . $issue['system_name'] . $building . $current_status .'</a></h2>';
-				echo '<div class="comment-text" id="' . $issue['status'] . '">'; 
+	
+	//display results if we have 'em
+
+	foreach ($results as $result) {
+		if ($result["type"] == "issue") {
+			echo '<!-- Issue --> <div class = "row issue-box span3" id="'. $result["id"] . '">';
+			displayIssue($result, $logged_in);
+			//now start getting the status updates for this issue.  The function should sort them by date, we just have to display them
+			$status_ids = getStatusIDs($result["id"], $db); //this should always return something, all issues have at least one status
+			
+			foreach ($status_ids as $statusid) {
+				
+				$status = getStatusData($statusid, $db);
+
+				$status_user = MakeUserArray('', $status["userID"], $db);//likewise, this should return something.
+				echo '<div class"comment-text" id="status_id"' . $statusid . '">';
+				echo '<strong class="timestamp">[' . formatDateTime($status["timestamp"]) . ']-' . $status_user["fn"] . " " . $status_user["ln"] . "</strong>";
+				echo Markdown($status["text"]);
 				echo '</div>';
+
 			}
+			//if the user is logged in and the issue is open, display a status update form
+			
+			if (strtotime($result["end_time"]) > time() || is_null($result["end_time"])) {
+				$resolved = false;
+			} else {
+				$resolved = true;
+			}
+
+			if ($logged_in == 1  && $resolved == 0) {
+				$issueid = $result["id"];
+
+				//has the user already tried to submit this form?  If so, retain the data.
+				if (isset($_POST["status_form"])  && $_POST['issue_id'] == $result['id']){
+					
+					$text = $_POST["text"];
+					$when = $_POST["when"];
+					if (isset($_POST["resolved"])) {$resolved = true;} else {$resolved = false;}
+					
+					$userid = $_POST["user_id"];
+
+					
+				} else {
+					$text = '';
+					$when = "Now";
+					$resolved = false;
+					
+					$userid = $user["id"];
+				}
+
+				echo displayNewStatusForm($issueid, $userid, $text, $resolved, $when, $system, $filter);
+			}
+			echo '</div>';
+		
+		} else if ($result["type"] == "update") {
+			
+			echo '<!-- Issue --> <div class = "row issue-box span3" id="'. $result["id"] . '">';
+			displayUpdate($result, $db);
+			echo '</div>';
+			
+		}	
 	}
 		
 		
-	/*
-	
-							echo '
-							<!-- Issue -->
-							<div class = "row issue-box span3">
-								' . ($logged_in == 1 && $resolved == 0 ? '<div class="right status-update has-js">Add Update</div>' : '') .'
-								<h2 id="issue_' . $issue_entries['issue_id'] . '"><a href="detail.php?id=' . $issue_entries['issue_id'] . '">' . $status_entries['status_type_text'] . ' for ' . $issue_entries['system_name'] . ' ' . $current_status .'</a></h2>
-								<div class="comment-text" id="' . $status_entries['status_id'] . '">' 
-								. (($logged_in == 1) && ($status_entries['status_user_id'] == $user["id"]) ? '<span class="edit-link" id="entry-' . $status_entries['status_id'] . '"  data-timestamp="' . $status_entries['status_timestamp'] . '" data-issue="' . $issue_entries['issue_id'] . '" data-type="' . $status_type_id . '">Edit</span>' : '') . 
-								'<strong class="timestamp">[' . date("n/j @ g:i a", $status_entries['status_timestamp']) . ' - ' .$status_entries['user_fn'] . ']</strong> ' . Markdown($status_entries['status_text']) . '</div>
-								<div style="display: none;" id="raw-' . $status_entries['status_id'] . '">' . $status_entries['status_text'] . '</div>';
-
-								// Note the use of the date
-								$displayed_date = date("y-n-j", $status_entries['status_timestamp']);
-								$attribution_verb = ' was reported on ' . date("n/j/y", $status_entries['status_timestamp']) . ($resolved == 1 ? ' and resolved on ' . date('n/j/y', $issue_entries['end_time']) : '');
-								
-								if($issue_entries['status_type_id'] == 4) { // Maintenance
-									$attribution_verb = ' is scheduled from ' . date("h:ia n/j/y", $status_entries['status_timestamp']) . ' until ' . date('h:ia n/j/y', $issue_entries['end_time']);
-								}
-
-								if($issue_entries['status_type_id'] == 5) { // Update
-										$attribution_verb = ' happened on ' . date("n/j/y", $status_entries['status_timestamp']);
-								}
-
-								if($rc == $num_rows) { // Last comment, add the comment field
-												add_comment_field($issue_entries['issue_id'], $status_type_id);
-											}
-								
-								$attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
-								
-								
-
-						} else {
-
-							// Comment wrapper
-
-							// Do we need to show the date again?
-							$comment_date = date('y-n-j', $status_entries['status_timestamp']);
-
-							if($displayed_date != $comment_date) {
-								$displayed_date = $comment_date;
-								$comment_time = date('n/j @ g:i a', $status_entries['status_timestamp']);
-							} else {
-								$comment_time = date('g:i a', $status_entries['status_timestamp']);
-							}
-
-							echo '<div class="comment-list">
-									<div class ="comment-text" id="' . $status_entries['status_id'] . '">'
-										. (($logged_in == 1) && ($status_entries['status_user_id'] == $user["id"]) ? '<span class="edit-link" id="entry-' . $status_entries['status_id'] . '"  data-timestamp="' . $status_entries['status_timestamp'] . '" data-issue="' . $issue_entries['issue_id'] . '" data-type="' . $status_type_id . '">Edit</span>' : '') .
-										
-										'<strong class="timestamp">[' . $comment_time . ' - ' .$status_entries['user_fn'] . ']</strong> 
-										' . Markdown($status_entries['status_text']) . '
-										<div style="display: none;" id="raw-' . $status_entries['status_id'] . '">' . $status_entries['status_text'] . '</div>
-									</div><!-- end comment-text -->
-								</div> <!-- end comment-list --> ';
-
-							if($rc == $num_rows) { // Last comment, add the comment form
-								add_comment_field($issue_entries['issue_id'], $status_type_id);
-								//echo '</div>';
-							}
-
-					
-							
-
-						}
-						
-					} 
-
-					echo '<!--rc = ' . $rc . '-->';
-
-					if($attribution != NULL) {
-
-						echo $attribution . ' </div><!-- End .line -->';
-
-
-					}
-
-					
-
-					 
-				} // close status loop
-			}
-
-			*/
 	?>
 
 
@@ -564,234 +561,8 @@ if ($userMessage != "") {
 		</div><!-- end #cms-body -->
 	</div><!-- end #cms-body-wrapper -->
 
-	<div id="cms-footer-wrapper">
-		<div id="cms-footer">
-			<div id="cms-footer-inner">
-				<ul>
-					<li><h4>Contact</h4>
-						<p class="vcard">
-							<span class="tel"> 
-								<span class="type">Phone</span>:
-								<span class="value">(616) 331-3500</span>
-							</span>
-							<br />
-							<a href="mailto:library@gvsu.edu" class="email" target="_blank">library@gvsu.edu</a>
-							<br />
-						</p>
-					</li>
-					<li><h4>Social Media</h4>
-						<p>
-							<a href="http://twitter.com/gvsulib" title="http://twitter.com/gvsulib" class="socialmedia-icon socialmedia-icon-twitter">
-								<span class="cms-screen-reader">http://twitter.com/gvsulib</span>
-							</a>
-							<a href="http://youtube.com/user/gvsulib" title="http://youtube.com/user/gvsulib" class="socialmedia-icon socialmedia-icon-youtube">
-								<span class="cms-screen-reader">http://youtube.com/user/gvsulib</span>
-							</a>
-							<a href="http://instagram.com/gvsulib" title="http://instagram.com/gvsulib" class="socialmedia-icon socialmedia-icon-instagram"><span class="cms-screen-reader">http://instagram.com/gvsulib</span></a>
-						</p>
-					</li>
-					<li id="library-fdlp">
-								<p>
-									<a href="http://gvsu.edu/library/govdoc" target="_blank">
-										<img src="//gvsu.edu/cms4/asset/0862059E-9024-5893-1B5AAAC2F83BDDD8/fdlp-new.png" alt="Federal Depository Library Program Logo">
-									</a>
-									<br>
-									Federal Depository<br>
-									Library Program
-								</p>
-							</li>
-				</ul>
-			</div><!-- End #cms-footer-inner -->
-		</div><!-- End #cms-footer -->
-	</div><!-- End #cms-footer-wrapper -->
+<?php include "resources/HTML/footer.php"; ?>
 
-	<div id="cms-copyright-wrapper">
-		<div id="cms-copyright">
-			<div id="cms-copyright-inner">
-				<ul>
-					<li><a href="http://gvsu.edu/affirmativeactionstatement.htm">GVSU is an EO/AA Institutio</a></li>
-					<li><a href="http://gvsu.edu/privacystatement.htm">Privacy Policy</a></li>
-					<li><a href="http://gvsu.edu/disclosures">Disclosures</a></li>
-					<li>Copyright © 1995-2015 GVSU</li>
-				</ul>
-			</div><!-- End #cms-copyright-inner -->
-		</div><!-- End #cms-copyright -->
-	</div><!-- End #cms-copyright-wrapper -->
-
-	<!-- Special div custom to Illiad -->
-	<div id="renewalHack" style="display: none;"></div>
-
-	<script src="https://prod.library.gvsu.edu/labs/chatbutton/chatbutton.js"></script>
-	<script src="https://www.gvsu.edu/cms4/skeleton/0/files/js/cms4.0.min.js"></script>
-	<script>cmsInit()</script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	<script src='https://www.google.com/recaptcha/api.js'></script>
-<script>
-$(document).ready(function() {
-
-	$('#message-update').css('position','fixed');
-
-	function timeConverter(UNIX_timestamp){
-		  var a = new Date(UNIX_timestamp * 1000);
-		  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-		  var year = a.getFullYear();
-		  var month = months[a.getMonth()];
-		  var date = a.getDate();
-		  var hour = a.getHours();
-		  var min = a.getMinutes();
-		  var sec = a.getSeconds();
-		  var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
-		  return time;
-		}
-
-	setTimeout(function() {
-	    $('#message-update').fadeOut('slow');
-	}, 5000);
-
-<?php
-
-	if($logged_in == 1) {
-
-?>
-	$(".end-time-box").hide();
-	$(".feedback").hide();
-	$(".add-comment-form").hide();
-	$(".has-js").css("display","inline-block");
-	$(".issue-trigger").click(function(e) {
-
-		$(".feedback").slideToggle(400);
-
-	});
-	$(".status-update").click(function() {
-		console.log('Click');
-		$(this).parent("div.issue-box").find('div.add-comment-form').last().slideToggle(400);
-
-	});
-	$("#status_type_id").change(function(){
-	    if ($("#status_type_id").val() == "4") {
-	       $('.end-time-box').show();
-	    } else {
-	       $('.end-time-box').hide();
-	    }
-	});
-
-	$('.edit-link').css('font-size','.9em').css('cursor','pointer').css('color','#0065A4');
-
-	$('.edit-link').click(function(e){
-		e.preventDefault();
-
-		var issueId = $(this).attr('data-issue');
-		console.log('Issue: ' + issueId);
-
-		var statusId = $(this).parent('.comment-text').attr('id');
-		console.log(statusId);
-
-		var statusText = $('#raw-' + statusId).text();
-		console.log(statusText);
-
-		// Build the select menu
-
-		var selectMenu = '<select name="update_status_type_id" id="update_status_type_id">' + $('select#status_type_id').html() + '</select>';
-
-		var oldTime = timeConverter($(this).attr('data-timestamp'));
-		console.log(oldTime);
-
-		var statusType = $(this).attr('data-type');
-
-		$(this).parent('.comment-text').html('<form method="post" name="update_comment_form" style="margin-top: .5em; font-size: 1em; width: 100%;"><input type="hidden" name="update_status_id" value="' + statusId + '"/><input type="hidden" name="issue_id" value="' + issueId + '" /><div style="float:left;"><label class="lib-inline" for="id="update-when">Time:</label>&nbsp;<input type="text" id="update-when" name="update-when" class="lib-inline" value="' + oldTime + '" /></div><div style="margin-left:2em;float:left"><label for="update_status_type_id">Issue Type:</label>' + selectMenu + '</div><br /><textarea name="update_status_text" style="height:5em;width:94%;margin: 1em 0;">' + statusText + '</textarea><br /><button class="btn btn-default" style="color: red !important;" id="status_delete" name="status_delete" type="submit" value="1">Delete Entry</button> <input type="submit" name="update_status" class="btn btn-primary" style="display:inline-block; float: right;margin-right:4%;" /></form>');
-
-		$('select#update_status_type_id').find('option').each(function() {
-			if($(this).val() == statusType) {
-				$(this).attr('selected',true);
-			}
-		});
-
-		$('#status_delete').click(function() {
-			confirm('Are you sure you want to delete this entry?');
-			return true;
-		});
-	});
-
-});
-
-<?php
-
-	} else {
-
-?>
-	var problemReportFormHTML = 
-"	<div class=\"feedback lib-form row\">" +
-"		<form method=\"post\" action=\"\">" +
-"		<div class=\"span2 unit left\">" +
-"			<label for=\"name\">Your Name:</label>" +
-"			<input type=\"text\" name=\"name\" id=\"name\" placeholder=\"Optional\" />" +
-"		</div>" +
-"		<div class=\"span1 unit left lastUnit\">" +
-"			<label for=\"email\">Your Email:</label>" +
-"			<input type=\"text\" name=\"email\" id=\"email\" placeholder=\"Optional\" />" +
-"		<input type=\"hidden\" name=\"url\" value=\"<?php echo urldecode($_GET['url']); ?>\">" +
-"		</div>" +
-"		<label for=\"feedback\">Have an idea? See a problem?</label>" +
-"		<textarea name=\"feedback\"></textarea>" +
-"		<div class=\"g-recaptcha\" data-sitekey=\"<?php echo $recaptchaSiteKey; ?>\" style=\"padding: 10px; display:inline-block\"></div>" +
-"		<noscript>" +
-"		  <div style=\"width: 302px; height: 352px;\">" +
-"		    <div style=\"width: 302px; height: 352px; position: relative;\">" +
-"		      <div style=\"width: 302px; height: 352px; position: absolute;\">" +
-"		        <iframe src=\"https://www.google.com/recaptcha/api/fallback?k=<?php echo $recaptchaSiteKey; ?>\"" +
-"		                frameborder=\"0\" scrolling=\"no\"" +
-"		                style=\"width: 302px; height:352px; border-style: none;\">" +
-"		        </iframe>" +
-"		      </div>" +
-"		      <div style=\"width: 250px; height: 80px; position: absolute; border-style: none;" +
-"		                  bottom: 21px; left: 25px; margin: 0px; padding: 0px; right: 25px;\">" +
-"		        <textarea id=\"g-recaptcha-response\" name=\"g-recaptcha-response\"" +
-"		                  class=\"g-recaptcha-response\"" +
-"		                  style=\"width: 250px; height: 80px; border: 1px solid #c1c1c1;" +
-"		                         margin: 0px; padding: 0px; resize: none;\" value=\"\">" +
-"		        </textarea>" +
-"		      </div>" +
-"		    </div>" +
-"		  </div>" +
-"		</noscript>" +
-"		<div class=\"right\">" +
-"			<div style=\"display: inline-block; margin-right: 2em; color: #0065A4; text-decoration: underline; cursor:pointer;\" class=\"issue-trigger\">Cancel</div>" +
-"				<input class=\"btn btn-primary\" type=\"submit\" value=\"Report a Problem\" name=\"problem-report\" style=\"margin-top: 1em;\" />" +
-"			</div>" +
-"		</form>" +
-"	</div>";
-	$('body').append(problemReportFormHTML);
-	$(".issue-trigger").click(function(e) {
-
-		e.preventDefault();
-
-		$(".feedback").slideToggle(400);
-
-	});
-
-<?php
-
-if(isset($_GET['problem'])) { // Force problem form to open
-	
-} else {
-
-?>
-	$(".feedback").hide();
-	
-	
-<?php
-
-}
-
-?>
-	
-});
-
-<?php
-	}
-?>
-
-</script>
 </body>
 
 </html>

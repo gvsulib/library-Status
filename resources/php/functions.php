@@ -192,6 +192,30 @@ function HTML_error_message($errormsg) {
 </html>
 EOD;
 }
+//FORMATTING AND VERIFICATION FUNCTIONS
+
+//formats the DATETIME values returned form the database into more readable format for display
+function formatDateTime ($string) {
+	$date = new DateTime($string);
+	return $date-> format('Y-m-d @ g:i A');
+}
+
+
+//used to verify and format the time returned from user-filled forms into a unix timestamp
+function verifyFormatTime($time) {
+	// Create a time one year back to see use to check if posting time is in range.
+	$time_check = time();
+	$time_check = strtotime('-1 month');
+
+	// If time is something special or ready or for now and is within the last year.
+	if (($time != 'Now') && ($time > $time_check)) {
+		$time = strtotime($time);
+	} else {
+		$time = time();
+	}
+	return $time;
+
+}
 
 //FUNCTIONS TO GET DATA FROM DATABASE
 
@@ -221,14 +245,19 @@ function getSystemStatus($systemID, $dataBaseConnection) {
 
 }
 
-
-
-//get updates from the updates table based on different criteria.  Return the update data as a multidimensional array,
+//get updates from the updates table based on different criteria.  Return the update data as an array,
 //or an error message if none are found
-function getUpdates($building, $system, $public, $user, $limit, $dataBaseConnection) {
+function getUpdates($building, $system, $public, $user, $limit, $recent, $dataBaseConnection) {
+	
 	
 	$query = "SELECT u.*, s.system_name, s.building FROM updates u, systems s WHERE u.system_id = s.system_id ";
 	
+	if ($recent == true) {
+		$current_date = new DateTime();
+		$year_ago = $current_date->modify("-1 year");
+		$yearAgo = $current_date->getTimestamp();
+		$query = $query . "AND u.timestamp > FROM_UNIXTIME($yearAgo) ";
+	}
 	
 	//if public is set to true, bring only public display items, otherwise, get all of them.
 	
@@ -262,7 +291,7 @@ function getUpdates($building, $system, $public, $user, $limit, $dataBaseConnect
 		$query = $query . "AND u.created_by = $user ";
 	}
 	
-	$query = $query . "ORDER BY u.timestamp ";
+	$query = $query . "ORDER BY u.timestamp DESC ";
 	
 	if ($limit) {
 		
@@ -278,12 +307,14 @@ function getUpdates($building, $system, $public, $user, $limit, $dataBaseConnect
 	} else {
 		$return_array = array();
 		while ($row = $updates->fetch_assoc()) {
-			$return_array[$row["update_id"]] = array("timestamp" => $row["timestamp"], 
+			$return_array[] = array("timestamp" => $row["timestamp"], 
 			"text" => $row["text"],
 			"system_name" => $row["system_name"],
 			"system_id" => $row["system_id"],
 			"user" => $row["created_by"],
-			"building" => $row["building"]
+			"building" => $row["building"],
+			"id" => $row["update_id"],
+			"type" => "update"
 			);
 			
 			
@@ -295,19 +326,27 @@ function getUpdates($building, $system, $public, $user, $limit, $dataBaseConnect
 
 //gets issue data by various criteria.  Will either return an array of all issue IDs matching criteria, a database
 //error, or a message indicating no data could be found for those criteria.
-function getIssues($building, $status, $system, $open, $public, $user, $limit, $dataBaseConnection) {
+function getIssues($building, $status, $system, $open, $public, $user, $limit, $recent, $dataBaseConnection) {
 
 	//start building the query
-	$query = "SELECT i.*, s.system_name, s.building, r.status_type_text FROM  issue_entries i, systems s, status_type r, status_entries e 
-	WHERE s.system_id = i.system_id AND i.status_type_id = r.status_type_id AND e.issue_id = i.issue_id ";
-	//start checking the various parameters.  
+	$query = "SELECT i.*, s.system_name, s.building, r.status_type_text FROM  issue_entries i, systems s, status_type r 
+	WHERE s.system_id = i.system_id AND i.status_type_id = r.status_type_id ";
+	//start checking the various parameters. 
+	
+	//if recent is set to true, bring only issues created in the past year
+	if ($recent == true) {
+		$current_date = new DateTime();
+		$year_ago = $current_date->modify("-1 year");
+		$yearAgo = $current_date->getTimestamp();
+		$query = $query . "AND i.created_on > FROM_UNIXTIME($yearAgo) ";
+	}
 	
 	//if public is set to true, bring only public display items, otherwise, get all of them.
 	if ($public) {
 		$query = $query . "AND i.public = 1 ";
 	}
 	
-	//the acceptable values are to leave it blank (all issues)
+	//$building flag: the acceptable values are to leave it blank (all issues)
 	//"ALL"  (all non-system issues) and "NONE" (all non-building issues)
 	
 	if ($building == "ALL") {
@@ -316,6 +355,7 @@ function getIssues($building, $status, $system, $open, $public, $user, $limit, $
 	} elseif ($building == "NONE") {
 		$query = $query . "AND s.building IS NULL ";
 	} 
+
 	//if you set these to be anything other than false, use the numbers provided
 	if ($status) {
 		$query = $query . "AND i.status_type_id = $status ";
@@ -325,6 +365,7 @@ function getIssues($building, $status, $system, $open, $public, $user, $limit, $
 		$query = $query . "AND s.system_id = $system ";
 
 	}
+
 	//$open can be set to "OPEN" (all open issues)  "CLOSED" (all closed issues) or "ALL" for all open or closed issues
 	if ($open == "OPEN") {
 		$query = $query . "AND (i.end_time IS NULL OR (i.start_time > NOW() AND i.end_time < NOW())) ";
@@ -338,8 +379,8 @@ function getIssues($building, $status, $system, $open, $public, $user, $limit, $
 		$query = $query . "AND i.created_by = $user ";
 	}
 
-	//order issues by the ones with the most recent status updates.  This makes peeling off recent ones for the front display easy
-	$query = $query . "ORDER BY e.status_timestamp ASC ";
+	//order issues by most recently updated.  This makes peeling off recent ones and sorting easy
+	$query = $query . " ORDER BY i.last_updated DESC ";
 
 	if ($limit) {
 
@@ -355,13 +396,17 @@ function getIssues($building, $status, $system, $open, $public, $user, $limit, $
 	} else {
 		$return_array = array();
 		while ($row = $ids->fetch_assoc()) {
-			$return_array[$row["issue_id"]] = array("start_time" => $row["start_time"], 
+			$return_array[] = array("start_time" => $row["start_time"], 
 			"end_time" => $row["end_time"], 
 			"system_name" => $row["system_name"],
 			"status" => $row["status_type_id"],
 			"user" => $row["created_by"],
 			"building" => $row["building"],
-			"status_name" => $row["status_type_text"]
+			"status_name" => $row["status_type_text"],
+			"created_on" => $row["created_on"],
+			"last_updated" => $row["last_updated"],
+			"id" => $row["issue_id"],
+			"type" => "issue"
 		);
 		}
 		return $return_array;
@@ -390,8 +435,8 @@ function areUnresolvedSystemIssues($dataBaseConnection) {
 
 //get all status IDs for a given issue and return them as an array
 function getStatusIDs($issueID, $dataBaseConnection) {
-	$query = "SELECT status_id FROM status_entries WHERE issue_id = '$issueID'";
-	$IDs = $dataBaseConnection->query();
+	$query = "SELECT status_id FROM status_entries WHERE issue_id = '$issueID' ORDER BY status_timestamp ASC";
+	$IDs = $dataBaseConnection->query($query);
 	if ($IDs && ($IDs->num_rows > 0)) {
 		$IDsArray = array();
 		while($row = $IDs->fetch_assoc()) {
@@ -416,6 +461,8 @@ function getIssueData($issue_id, $dataBaseConnection) {
 			$issue_array["endTime"] = $row["end_time"];
 			$issue_array["userID"] = $row["created_by"];
 			$issue_array["resolved"] = $row["resolved"];
+			$issue_array["created_on"] = $row["created_on"];
+			$issue_array["last_updated"] = $row["last_updated"];
 		}
 		return $issue_array;
 	} else {
@@ -425,33 +472,34 @@ function getIssueData($issue_id, $dataBaseConnection) {
 }
 //get a status entry by ID number
 function getStatusData($statusID, $dataBaseConnection) {
-	$query = "SELECT * from status_entries WHERE status_id = '$statusID'";
+	$query = "SELECT * from status_entries WHERE status_id = $statusID";
 	$status = $dataBaseConnection->query($query);
 	if (!$status) {
 		return $dataBaseConnection->error;
 	}
-	if ($status->num_rows > 0) {
-		return "No user found in database.";
+	if ($status->num_rows <= 0) {
+		return "No status found in database.";
 
 	}
-
+	$row = $status->fetch_assoc(); 
 	
-	$status_array = array("statusID" => $issue_id);
-	while($row = $status->fetch->assoc()) {
-		$status_array["issueID"] = $row["issue_id"];
-		$status_array["timestamp"] = $row["issue_timestamp"];
-		$status_array["public"] = $row["status_public"];
-		$status_array["userID"] = $row["status_user_id"];
-		$status_array["text"] = $row["status_text"];	
+	$status_array = array("statusID" => $statusID);
+	$status_array["timestamp"] = $row["status_timestamp"];
+	$status_array["userID"] = $row["status_user_id"];
+	$status_array["text"] = $row["status_text"];	
 			
-	}
+	
 	return $status_array;
 	
 }
-//gets user information about a logged-in user and returns it as a PHP array for easy reference
-function MakeUserArray ($userName, $dataBaseConnection) {
-
-	$user_result=$dataBaseConnection->query("SELECT * FROM user WHERE user_username = '$userName' LIMIT 1");
+//gets user information about a user and returns it as a PHP array for easy reference
+function MakeUserArray ($userName, $userid, $dataBaseConnection) {
+	if ($userName) {
+		$criteria = "WHERE user_username = '$userName'";
+	} else {
+		$criteria = "WHERE user_id = '$userid'";
+	}
+	$user_result=$dataBaseConnection->query("SELECT * FROM user $criteria LIMIT 1");
 	
 	if(($user_result) && ($user_result->num_rows > 0)) { // Query was successful, a user was found
 	
@@ -460,6 +508,7 @@ function MakeUserArray ($userName, $dataBaseConnection) {
 			$user["access"] = $row["user_access"];
 			$user["id"] = $row["user_id"];
 			$user["fn"] = $row["user_fn"];
+			$user["ln"] = $row["user_ln"];
 		}
 	
 		
@@ -468,38 +517,132 @@ function MakeUserArray ($userName, $dataBaseConnection) {
 		return "User could not be found in table";
 	}
 }
-//verifies and formats user-supplied time values
-function verifyFormatTime($time) {
-	// Create a time one year back to see use to check if posting time is in range.
-	$time_check = time();
-	$time_check = strtotime('-1 month');
 
-	// If time is something special or ready or for now and is within the last year.
-	if (($time != 'Now') && ($time > $time_check)) {
-		$time = strtotime($time);
+//FUNCTIONS TO DISPLAY THINGS
+
+function displayNewStatusForm($issue_id, $userid, $text, $resolved, $when, $system, $filter) {
+	
+	if ($resolved) {
+		$resolved = "checked";
 	} else {
-		$time = time();
+		$resolved = '';
 	}
-	return $time;
+
+	if (!$when) {
+		$when = "Now";
+	}
+	
+	$str = <<< EOD
+
+	<div name="new_status" style="clear: all">
+	<form name="status-form" method="POST">
+		<fieldset>
+			<input name="issue_id" type="hidden" value="$issue_id">
+			<input name="user_id" type="hidden" value="$userid">
+			<input name="system" type="hidden" value="$system">
+			<input name="filter" type="hidden" value="$filter">
+			<legend>Update the Status of this issue</legend>
+			<textarea required style="margin-top: .5em; height: 5em; font-size: 1em; width: 100%;" id="status-872" name="status" placeholder="Update the status of this issue (required)">$text</textarea>
+			<div class="row" style="margin-top:.5em;">
+				<div class="span2">
+
+					<label style="margin-left: 1em;display:inline;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
+					<input type="checkbox" name="issue_resolved" id="issue_resolved" value="1" $resolved>
+
+					<label class="lib-inline" style="display:inline;margin-left:1em;" for="comment-when-872">When (required)</label>
+					<input type="text" style="width:6em; display:inline-block;" name="when" id="comment-when-872" value="$when" required>
+					<span class="date_format">date format: YYYY-MM-DD hh:mm AM/PM</span>
+				</div>
+				<div class="left unit span1 lastUnit" style="text-align:right;">
+					<input class="status-button" name="submit_status" type="submit" value="Update">
+				</div>
+				<div class="cms-clear" style="padding-bottom:.5em;"></div>
+
+			</div>
+
+
+		</fieldset>
+	</form>
+</div>
+EOD;
+
+return $str;
+}
+
+//code to format an issue for display
+function displayIssue($issue, $logged_in) {
+	//what's the status of the issue?  Display the correct flag
+	if (strtotime($issue["end_time"]) > time() || is_null($issue["end_time"])) {
+		$current_status = '<span class="tag-unresolved">Unresolved</span>';
+		$resolved = 0;
+	} else {
+		$current_status = '<span class="tag-resolved">Resolved</span>';
+		$resolved = 1;
+	}
+	if (!is_null($issue["building"])) {
+		$building = "at " . $issue["building"];
+	} else {
+		$building = '';
+	}
+	if ($logged_in == 1 && $resolved == 0) {echo '<div class="right status-update has-js">Add Update</div>';}
+	echo '<h2><a href="detail.php?id=' . $issue["id"] . '">' . $issue['status_name'] . ' for ' . $issue['system_name'] . $building . $current_status .'</a></h2>';
+	echo '<span name="issue_times"><strong>Began:</strong> ' . formatDateTime($issue["start_time"]);
+	if (!is_null($issue["end_time"])) {echo " <strong>Resolved:</strong> " . formatDateTime($issue["end_time"]); }
+	echo '</span>';
+	echo '<br><span name="created_updated"><strong>Created On:</strong>' . formatDateTime($issue["created_on"]) . ' <strong>Last Updated:</strong> ' . formatDatetime($issue["last_updated"]); 
+	
+	echo "</span>";
 
 }
+
+//format an update for display. note that this one needs a database object because it has to look up the name of the user
+//who created it
+function displayUpdate($update, $dataBaseConnection) {
+	$user = MakeUserArray ('', $update["user"], $dataBaseConnection);
+	
+
+	if (!is_null($update["building"])) {
+		$building = "at " . $update["building"];
+	} else {
+		$building = '';
+	}
+	
+	echo '<h2><a href="detail.php?id=' . $update["user"] . '">Update for ' . $update['system_name'] . $building . '</a></h2>';
+	echo '<span name="issue_times"><strong>Created On:</strong> ' . formatDateTime($update["timestamp"]);
+	echo "</span>";
+	echo '<div class"comment-text">';
+	echo '<strong class="timestamp">By: ' . $user["fn"] . " " . $user["ln"] . "</strong>";
+	echo Markdown($update["text"]);
+	echo '</div>';
+}
+
+
 
 //FUNCTIONS THAT MODIFY DATA IN THE DATABASE
 
 //inserts new issues into the database.  All issues MUST HAVE at least one status.
-function createNewIssue($system_id,$status_type_id, $time, $end_time, $userid, $issue_text, $dataBaseConnection) {
+function createNewIssue($system_id, $status_type_id, $time, $end_time, $userid, $issue_text, $dataBaseConnection) {
 	//if the user doesn't supply a start time, create one
 	if ($time == "") {$time = time();}
 
 	//currently, only safety issues (status type 7) are private.
 	if ($status_type_id = 7) {$public = 0;} else {$public = 1;}
-	$query = "INSERT INTO issue_entries VALUES ('','$system_id', $status_type_id, FROM_UNIXTIME($time), FROM_UNIXTIME($end_time), '$userid', '$public')";
+	
+	$query = "INSERT INTO issue_entries VALUES ('', $system_id, $status_type_id, FROM_UNIXTIME($time),";
+	
+	
+	if ($end_time) { 
+		$query = $query . " FROM_UNIXTIME($end_time), ";}
+	else {
+		$query = $query . " NULL, ";
+	}
+	 $query = $query . "'$userid', '$public', NOW(), NOW()";
 	//we need to do multiple updates simultaneously, and submit them all at once, so we need to turn autocommit off.  
 	//this ensures the entire commit succeeds or fails.  We don't want issues without status updates or vice versa!
 	$dataBaseConnection->autocommit(FALSE);
 	$dataBaseConnection->query($query);
 	$issue_id = $dataBaseConnection->insert_id;
-	$query = "INSERT INTO status_entries VALUES ('','$issue_id',FROM_UNIXTIME($time),'$public','$userid','$issue_text')";
+	$query = "INSERT INTO status_entries VALUES ('',$issue_id,FROM_UNIXTIME($time),$userid,'$issue_text')";
 	$dataBaseConnection->query($query);
 	
 	//does the commit work?
@@ -519,35 +662,47 @@ function createNewIssue($system_id,$status_type_id, $time, $end_time, $userid, $
 function deleteIssue($issueID, $dataBaseConnection) {
 	$query = "DELETE FROM issue_entries WHERE issue_id = '$issue_id'";
 	if ($dataBaseConnection->query($query)) {
-		return 1;
+		return true;
 	} else {
-		return $dataBaseConnection->error;
+		return "Could not delete issue: " . $dataBaseConnection->error;
 	}
 
 
 }
 
 //create a new status message.  If the new status sets the status of the main issue, change the status of the issue
-function createNewStatus( $issue_id, $time, $public, $userID, $status_text, $closing, $dataBaseConnection) {
-	//is this status closing the issue?  If so, change it in the issue table
+function createNewStatus( $issue_id, $time, $userID, $status_text, $dataBaseConnection) {
 	$dataBaseConnection->autocommit(FALSE);
-	if ($time == "") {$time = time();}
-	if ($closing) {
-		$query = "UPDATE issue_entries SET end_time = FROM_UNIXTIME('$time') WHERE issue_id = '$issue_id' ";
-		$dataBaseConnection->query($query);
-	} 
-
 	// Create the new status entry
-	$query = "INSERT INTO status_entries VALUES ('','$issue_id',FROM_UNIXTIME('$time'),'$public','$userID','$status_text')";
+	$query = "INSERT INTO status_entries VALUES ('','$issue_id',FROM_UNIXTIME($time),'$userID','$status_text')";
+	
 	$dataBaseConnection->query($query);
+
+	$setTime = "UPDATE issue_entries SET last_updated = FROM_UNIXTIME($time) WHERE issue_id = $issue_id";
+	
+	$dataBaseConnection->query($setTime);
+
 	if ($dataBaseConnection->commit()) {
-		$dataBaseConnection->autocommit(TRUE);
 		$returnValue = 1;
 	} else {
-		$dataBaseConnection->autocommit(TRUE);
-		$returnValue = $dataBaseConnection->error;
-	}	
+		$returnValue = "Problem creating new status: " . $dataBaseConnection->error;
+	}
+	$dataBaseConnection->autocommit(FALSE);
+	return $returnValue;
+}
 
+//closes an issue by inserting an end time.  If a time is not supplied, the current time is used.  
+//If passed a time, it must be a unix timestamp.
+function closeIssue($issueid, $time, $dataBaseConnection) {
+	
+	$query = "UPDATE issue_entries SET end_time = FROM_UNIXTIME($time), last_updated = NOW() WHERE issue_id = $issueid ";
+	if ($dataBaseConnection->query($query)) {
+		return true;
+	} else {
+		return "Issue could not be closed: " . $dataBaseConnection->error . $query;
+	}
+
+	
 }
 
 
@@ -599,3 +754,18 @@ function editStatus($status_id, $public, $status_text, $time, $dataBaseConnectio
 	}
 	
 }
+
+//function that creates a new update
+function createNewUpdate($userid, $text, $time, $systemid, $public, $dataBaseConnection) {
+	
+
+	$query = "INSERT INTO updates values('', FROM_UNIXTIME($time), $userid, '$text', $public, $systemid)";
+	
+	if ($dataBaseConnection->query($query)) {
+		return 1;
+	} else {
+		return "Could not add Update: " . $dataBaseConnection->error;
+	}
+
+}
+
