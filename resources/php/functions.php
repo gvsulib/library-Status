@@ -354,7 +354,7 @@ function getUpdates($building, $system, $public, $user, $limit, $recent, $dataBa
 	if (!$updates) {
 		return $dataBaseConnection->error;
 	} elseif ($updates->num_rows <= 0) {
-		return "No updates found.";
+		return false;
 	} else {
 		$return_array = array();
 		while ($row = $updates->fetch_assoc()) {
@@ -443,7 +443,7 @@ function getIssues($building, $status, $system, $open, $public, $user, $limit, $
 	if (!$ids) {
 		return $dataBaseConnection->error;
 	} elseif ($ids->num_rows <= 0) {
-		return "No issues found.";
+		return false;
 	} else {
 		$return_array = array();
 		while ($row = $ids->fetch_assoc()) {
@@ -678,7 +678,7 @@ function displayIssue($issue) {
 		$resolved = 1;
 	}
 	if (!is_null($issue["building"])) {
-		$building = "at " . $issue["building"];
+		$building = " at " . $issue["building"];
 	} else {
 		$building = '';
 	}

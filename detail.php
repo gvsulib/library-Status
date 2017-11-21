@@ -8,7 +8,7 @@ if(!session_status() == PHP_SESSION_ACTIVE) {
 	$_SESSION['location'] = $actual_url;
 }
  //as well as loads required library files
-include 'resources/secret/config.php';
+include 'resources/config/config.php';
 include 'resources/php/functions.php';
 
 

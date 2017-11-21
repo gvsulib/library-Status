@@ -6,7 +6,7 @@ if(!session_status() == PHP_SESSION_ACTIVE) {
 	$_SESSION['location'] = $actual_url;
 }
  //as well as loads required library files
-include 'resources/secret/config.php';
+include 'resources/config/config.php';
 include 'resources/php/functions.php';
 
 
@@ -20,7 +20,7 @@ require 'resources/php/startup.php';
 $userMessage = NULL;
 
 // uncomment to force a login
-//$_SESSION['username'] = 'felkerk';
+$_SESSION['username'] = 'felkerk';
 
 
 if (isset($_SESSION['username'])) { // User has logged in
@@ -363,7 +363,13 @@ include 'resources/php/header.php';
 								$systemArray[$row['system_id']] = $row["system_name"];
 
 								echo '<dl class="system">';
-								echo '<dt>' . $row["system_name"] . '</dt> ';
+								echo '<dt>' . $row["system_name"];
+								if (!is_null($row["building"])){
+									echo '<br>' . $row["building"];
+
+								}
+								
+								echo '</dt> ';
 								echo '<dd class = "col2 name" style="';
 
 								$status = getSystemStatus($row['system_id'], $db);
@@ -493,18 +499,23 @@ include 'resources/php/header.php';
 		$issues = getIssues($building, '', $systemID, $open, $public, "", $limit, true, $db);
 		$updates = getUpdates($building, $systemID, $public, '', $limit, true, $db);
 
-		//now compare the last updated date of each issue to the timestamp of each update, pulling the more recenet one off the end of the array and putting it 
-		//into our new array, producing a mixed array or issues and updates, soreted by date
+		
 		$results = array();
 
 		//if there's an error, echo it and set the variable to be an empty array
 		if (is_string($issues)) {
 			echo "problem getting issues: " . $issues;
 			$issues = array();
-		} 
+		} else if ($issues === false) {
+		 echo '<P>No issues found.</P>';
+		 	$issues = array();
+		}
 
 		if (is_string($updates) ) {
 			echo "Problem getting updates: " . $updates;
+			$updates = array();
+		} else if ($updates === false) {
+			echo '<P>No updates found.</P>';
 			$updates = array();
 		}
 
@@ -547,12 +558,18 @@ include 'resources/php/header.php';
 		if (is_string($results)) {
 			echo "problem getting issues: " . $results;
 			$results = array();
+		} else if ($results === false) {
+			echo "<P>No issues found</P>";
+			$results = array();
 		}
 	} else if ($filter == 3) {
 		$results = getUpdates($building, $systemID, $public, '', $limit, true, $db);
 		if (is_string($results)) {
 			echo "problem getting updates: " . $results;
 			$results = array();
+		} else if ($results === false) {
+			echo "<P>No updates found</P>";
+			$updates = array();
 		}
 	}
 	
