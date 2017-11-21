@@ -13,8 +13,16 @@
 	<meta name="keywords" content="course reserve,course reserves,reserves,gvsu,grand valley,library, libraries,research tools">
 
 	<!-- Custom CSS -->
-
+	<!--
 	<link rel="stylesheet" type="text/css" href="https://prod.library.gvsu.edu/status/resources/css/styles.css" />
+	-->
+	
+	<link rel="stylesheet" type="text/css" href="https://prod.library.gvsu.edu/libs/fonts/fonts.css" />
+	<link rel="stylesheet" type="text/css" href="https://gvsu.edu/cms4/skeleton/0/files/css/cms4.0.min.css" />
+	<link rel="stylesheet" type="text/css" href="https://gvsu.edu/library/files/css/base.css" />
+	<link rel="stylesheet" type="text/css" href="https://gvsu.edu/includes/topbanner/3/header.min.css" />
+	<link rel="stylesheet" type="text/css" href="resources/css/styles-new.css" />
+	<link rel="stylesheet" type="text/css" href="https://prod.library.gvsu.edu/labs/cms4/lib-cms4.css" />
 
 </head>
 

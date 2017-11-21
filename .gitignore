@@ -1,4 +1,4 @@
-resources/secret/config.php
+resources/config/config.php
 completer.hist
 resources/css/styles.css
 .htaccess

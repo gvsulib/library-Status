@@ -9,11 +9,9 @@
 
 function send_email($name,$email,$message) {
 
-	global $m, $to_email, $from_email, $email_subject;
+	global $to_email, $from_email, $email_subject;
 
-	// If there is an error, the message suggests calling the library. Add your
-	// Library's phone number here.
-	$library_phone = '(616) 331-3500';
+	
 
 /*
 	Uncomment the following line if you want to require emails. You should also
@@ -35,11 +33,21 @@ function send_email($name,$email,$message) {
 	$headers .= "X-Mailer: PHP/".phpversion();
 
 	// Check to make sure there are no really sneaky naught bits in the message
-	contains_bad_str($message);
-	contains_bad_str($email);
-	contains_bad_str($name);
-	contains_newlines($email);
-	contains_newlines($name);
+	if (contains_bad_str($message)) {
+		return false;
+	}
+	if (contains_bad_str($email)) {
+		return false;
+	}
+	if (contains_bad_str($name)){
+		return false;
+	}
+	if (contains_newlines($email)) {
+		return false;
+	}
+	if (contains_newlines($name)) {
+		return false;
+	}
 
 	// Build the message
 	$error_report = $message;
@@ -48,13 +56,61 @@ function send_email($name,$email,$message) {
 
 	// Attempt to send the mail, then set the message variable $m to success or
 	// error.
-	if($m == NULL) { // There have been no errors, send the email
-		if(mail($to_email, $email_subject, $error_report, $headers)) {
-				$m = '<div class="lib-success">Thanks for reporting this issue! We&#8217;ll get right on it.</div>';
-			} else {
-				$m = '<div class="lib-error">Uh-oh. There was a problem sending your report. Maybe try calling the library at ' . $library_phone . '?</div>';
-			}
+	
+	if(mail($to_email, $email_subject, $error_report, $headers)) {
+			return true;
+	} else {
+			return false;
 	}
+	
+}
+
+
+/*
+
+This function verifies that the user has filled out the captcha
+
+*/
+
+
+function verifyRecaptcha($token, $secret){
+
+	$fields = array("secret" => $secret,
+					"response" => $token
+					);
+
+	$ch = curl_init(); 
+	curl_setopt($ch, CURLOPT_URL, "https://www.google.com/recaptcha/api/siteverify"); 
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_FAILONERROR, TRUE);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+
+	$output = curl_exec($ch); 
+
+
+	if($output === false) {
+		
+		return 'Curl error: ' . curl_error($ch);
+	} 
+
+	curl_close($ch);
+
+	$response = json_decode($output, true);
+
+	if (is_null($response)) {
+		return "Json object could not be decoded.";
+
+	}
+
+	if ($response["success"] === true) {
+		return true;
+	} else {
+		return false;
+	}
+
+
+
 }
 
 /*
@@ -76,8 +132,6 @@ function is_valid_email($email) {
 
 function contains_bad_str($str_to_test) {
 
-	global $m;
-
   $bad_strings = array(
                 "content-type:"
                 ,"mime-version:"
@@ -87,14 +141,20 @@ function contains_bad_str($str_to_test) {
 		,"cc:"
 		,"to:"
   );
+  foreach ($bad_strings as $key => $string) {
+	  $bad_strings[$key] = preg_quote($string);
 
+
+  }
 	// Check the field for each of the bad strings, and if you we find one, set the
 	// message variable $m to show the error.
   foreach($bad_strings as $bad_string) {
     if(preg_match($bad_string, strtolower($str_to_test))) {
-      $m = '<div class="lib-error">Your message looks a lot like what a spambot would try to submit. Try again without the naughty bits.</div>';
-    }
+      return true;
+	}
   }
+
+  return false;
 }
 
 /*
@@ -105,73 +165,13 @@ function contains_bad_str($str_to_test) {
 
 function contains_newlines($str_to_test) {
 
-	global $m;
-
    if(preg_match("/(%0A|%0D|\\n+|\\r+)/i", $str_to_test) != 0) {
-     $m = '<div class="lib-error">Your email address was formatted in a way that looks a lot like what a spambot would do if they wanted to send out a zillion emails.  Try again without the naughty bits.</div>';
-     exit;
+     return true;
+   } else {
+	return false;
    }
 }
 
-/*
-	This function checks to make sure that a required value was provided and
-	prompts the user to supply it before continuing.
-*/
-function require_field($value, $key) {
-
-	global $m;
-
-	if(($value == NULL) || ($value == "")) {
-		$m = '<div class="lib-error">Please include your ' . $key . '.</div>';
-	}
-
-}
-
-/*
-	This function adds a comment form at the end of an open issue, only if the
-	item has not been resolved and the user is logged in.
-*/
-
-function add_comment_field($issue_id, $status_type_id) {
-
-	global $logged_in, $resolved;
-
-	if(($logged_in == 1) && ($resolved == 0)) {
-
-		echo '<div class="lib-form add-comment-form" style="margin-top: .5em; padding-top: .5em; border-top: 1px dotted #bbb;">
-
-			<form action="" method="POST" name="status-form">
-				<fieldset>
-				<legend>Add a Status Update</legend>
-				<label for="status-' . $issue_id . '" style="display:none;">Update Status</label>
-				<textarea style="margin-top: .5em; height: 5em; font-size: 1em; width: 100%;" id="status-' . $issue_id . '" name="status" placeholder="Update the Status of this Issue"></textarea>
-
-			<div class="row" style="margin-top:.5em;">
-				<div class="span2" >
-
-					<label style="margin-left: 1em;display:inline;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
-					<input type="checkbox" name="issue_resolved" id="issue_resolved" value="1">
-
-					<label class="lib-inline" style="display:inline;margin-left:1em;" for="comment-when-' . $issue_id . '" >When</label>
-					<input type="text" style="width:6em; display:inline-block;" name="when" id="comment-when-' . $issue_id . '" value="Now" />
-				</div>
-				<div class="left unit span1 lastUnit" style="text-align:right;">
-					<input class="status-button" name="submit_status" type="submit" value="Update" />
-				</div>
-																						<div class="cms-clear" style="padding-bottom:.5em;"></div>
-
-			</div>
-
-
-				<input type="hidden" name="issue_id" value="' . $issue_id . '" />
-				<input type="hidden" name="status_type_id" value="' . $status_type_id . '" />
-			</fieldset>
-			</form>
-
-		</div>';
-
-	}
-}
 
 //function to wrap error messages in HTML if we need to display them without loading the page
 ///this is most often done because we can't connect to the database
@@ -197,24 +197,75 @@ EOD;
 //formats the DATETIME values returned form the database into more readable format for display
 function formatDateTime ($string) {
 	$date = new DateTime($string);
-	return $date-> format('Y-m-d @ g:i A');
+	return $date->format('Y-m-d g:i A');
 }
 
 
 //used to verify and format the time returned from user-filled forms into a unix timestamp
-function verifyFormatTime($time) {
-	// Create a time one year back to see use to check if posting time is in range.
-	$time_check = time();
-	$time_check = strtotime('-1 month');
-
-	// If time is something special or ready or for now and is within the last year.
-	if (($time != 'Now') && ($time > $time_check)) {
-		$time = strtotime($time);
-	} else {
-		$time = time();
+function verifyTime($time) {
+	$unixtime = strtotime($time);
+	if (!$unixtime) {
+		return false;
 	}
-	return $time;
+	// Create a time one year back to see use to check if posting time is in range.
+	$year_ago = strtotime('-1 year');
+	$year_from_now = strtotime('+1 year');
 
+	// Check if time is something special or ready or for now and is within the last year.
+	if ($unixtime < $year_ago || $unixtime >  $year_from_now) {
+		return false;
+	
+	}
+	return true;
+
+}
+
+
+//verify issue form data
+function verifyReportFormData($starttime, $endtime, $statusid, $systemid, $dataBaseConnection) {
+	//if it's a safety issue, make sure it's being attached to a building-related system
+	$return = "";
+	if ($statusid == 7) {
+		$isBuildingSystem = FALSE;
+		$query = "SELECT system_id FROM systems WHERE building IS NOT NULL";
+		$result = $dataBaseConnection->query($query);
+		while ($row = $result->fetch_assoc()) {
+			if ($row["system_id"] == $systemid) {
+				$isBuildingSystem = TRUE;
+
+			}
+
+		}
+	
+		if (!$isBuildingSystem) {
+			$return = "Non-building systems cannot have safety issues.</br>";
+
+		}
+	}
+
+	if($endtime == '' && $statusid == 4) { // Scheduled Maintenance requires an End time
+		
+		$return = $return . "Scheduled maintenance requires an end time be set.</br>";
+	}
+
+	//verify that time data can be changed to timestamps and that start date is within the last month
+	$time_check = strtotime('-1 month');
+	if (!strtotime($starttime)) {
+		$return = $return . "Invalid start time</br>";
+
+	} else if (strtotime($starttime) < $time_check) {
+		$return = $return . "Start time cannot be more than a month ago.</br>";
+	}
+
+	if ($endtime != "") {
+		if (!strtotime($endtime)) {
+			$return = $return . "Invalid end time</br>";
+		} 
+		if (strtotime($starttime) >= strtotime($endtime)) {
+			$return = $return . "End time cannot be earlier than start time.</br>";
+		}
+	}
+	return $return;
 }
 
 //FUNCTIONS TO GET DATA FROM DATABASE
@@ -313,7 +364,7 @@ function getUpdates($building, $system, $public, $user, $limit, $recent, $dataBa
 			"system_id" => $row["system_id"],
 			"user" => $row["created_by"],
 			"building" => $row["building"],
-			"id" => $row["update_id"],
+			"update_id" => $row["update_id"],
 			"type" => "update"
 			);
 			
@@ -450,24 +501,39 @@ function getStatusIDs($issueID, $dataBaseConnection) {
 
 //get data on an issue and return it as an array of values
 function getIssueData($issue_id, $dataBaseConnection) {
-	$query = "SELECT * from issue_entries WHERE issue_id = '$issueID'";
+	$query = "SELECT * from issue_entries WHERE issue_id = $issue_id";
 	$issue = $dataBaseConnection->query($query);
-	if ($issue && ($issue->num_rows > 0)) {
-		$issue_array = array("issueID" => $issue_id);
-		while($row = $issue->fetch->assoc()) {
-			$issue_array["systemID"] = $row["system_id"];
-			$issue_array["status"] = $row["status_type_id"];
-			$issue_array["startTime"] = $row["start_time"];
-			$issue_array["endTime"] = $row["end_time"];
-			$issue_array["userID"] = $row["created_by"];
-			$issue_array["resolved"] = $row["resolved"];
-			$issue_array["created_on"] = $row["created_on"];
-			$issue_array["last_updated"] = $row["last_updated"];
-		}
-		return $issue_array;
-	} else {
-		return $dataBaseConnection->error;
+	if (!$issue) {
+		return "Problem getting data: " . $dataBaseConnection->error;
 	}
+
+	if ($issue->num_rows <= 0) {
+		return "Issue Not Found.";
+	}
+		
+	$issue_array = array("id" => $issue_id);
+	$row = $issue->fetch_assoc();
+	$issue_array["systemID"] = $row["system_id"];
+	$issue_array["status"] = $row["status_type_id"];
+	$issue_array["start_time"] = $row["start_time"];
+	$issue_array["end_time"] = $row["end_time"];
+	$issue_array["userID"] = $row["created_by"];
+	$issue_array["created_on"] = $row["created_on"];
+	$issue_array["last_updated"] = $row["last_updated"];
+	$issue_array["public"] = $row["public"];
+	$status_type_id = $row["status_type_id"];
+	$query = "SELECT status_type_text from status_type WHERE status_type_id = $status_type_id";
+	$result = $dataBaseConnection->query($query);
+	$status_name = $result->fetch_assoc();
+	$issue_array["status_name"] = $status_name["status_type_text"];
+	$systemid = $row["system_id"];
+	$query = "SELECT system_name, building FROM systems WHERE system_id = $systemid";
+	$result = $dataBaseConnection->query($query);
+	$system = $result->fetch_assoc();
+	$issue_array["system_name"] = $system["system_name"];
+	$issue_array["building"] = $system["building"];
+
+	return $issue_array;
 
 }
 //get a status entry by ID number
@@ -492,6 +558,38 @@ function getStatusData($statusID, $dataBaseConnection) {
 	return $status_array;
 	
 }
+
+//get update data by update ID number
+
+function getUpdateData($updateID, $dataBaseConnection) {
+	$query = "SELECT * from updates WHERE update_id = $updateID";
+	$update = $dataBaseConnection->query($query);
+	if (!$update) {
+		return $dataBaseConnection->error;
+	}
+	if ($update->num_rows <= 0) {
+		return "No update found in database.";
+
+	}
+	$row = $update->fetch_assoc(); 
+	$systemID = $row["system_id"];
+	$query = "SELECT system_name FROM systems WHERE system_id = $systemID";
+	$result = $dataBaseConnection->query($query);
+	$systemName = $result->fetch_assoc();
+
+
+	$update_array = array("update_id" => $updateID);
+	$update_array["timestamp"] = $row["timestamp"];
+	$update_array["user"] = $row["created_by"];
+	$update_array["text"] = $row["text"];
+	$update_array["systemID"] = $row["system_id"];
+	$update_array["public"] = $row["public"];
+	$update_array["system_name"] = $systemName["system_name"];
+
+	return $update_array;
+
+}
+
 //gets user information about a user and returns it as a PHP array for easy reference
 function MakeUserArray ($userName, $userid, $dataBaseConnection) {
 	if ($userName) {
@@ -520,6 +618,8 @@ function MakeUserArray ($userName, $userid, $dataBaseConnection) {
 
 //FUNCTIONS TO DISPLAY THINGS
 
+//display the new status form.  This works better as a function than an include, because it needs to be 
+//prepopulated with a bunch of data.
 function displayNewStatusForm($issue_id, $userid, $text, $resolved, $when, $system, $filter) {
 	
 	if ($resolved) {
@@ -537,6 +637,7 @@ function displayNewStatusForm($issue_id, $userid, $text, $resolved, $when, $syst
 	<div name="new_status" style="clear: all">
 	<form name="status-form" method="POST">
 		<fieldset>
+		
 			<input name="issue_id" type="hidden" value="$issue_id">
 			<input name="user_id" type="hidden" value="$userid">
 			<input name="system" type="hidden" value="$system">
@@ -548,10 +649,6 @@ function displayNewStatusForm($issue_id, $userid, $text, $resolved, $when, $syst
 
 					<label style="margin-left: 1em;display:inline;" class="lib-inline" for="issue_resolved">Issue Resolved:</label>
 					<input type="checkbox" name="issue_resolved" id="issue_resolved" value="1" $resolved>
-
-					<label class="lib-inline" style="display:inline;margin-left:1em;" for="comment-when-872">When (required)</label>
-					<input type="text" style="width:6em; display:inline-block;" name="when" id="comment-when-872" value="$when" required>
-					<span class="date_format">date format: YYYY-MM-DD hh:mm AM/PM</span>
 				</div>
 				<div class="left unit span1 lastUnit" style="text-align:right;">
 					<input class="status-button" name="submit_status" type="submit" value="Update">
@@ -569,8 +666,9 @@ EOD;
 return $str;
 }
 
-//code to format an issue for display
-function displayIssue($issue, $logged_in) {
+//code to format an issue for display, expects an array of issue data in the format output by the issue lookup function, above
+//it needs to know if the user is logged in so that it can decide to show a form to enter a new status or close the issue.
+function displayIssue($issue) {
 	//what's the status of the issue?  Display the correct flag
 	if (strtotime($issue["end_time"]) > time() || is_null($issue["end_time"])) {
 		$current_status = '<span class="tag-unresolved">Unresolved</span>';
@@ -584,12 +682,12 @@ function displayIssue($issue, $logged_in) {
 	} else {
 		$building = '';
 	}
-	if ($logged_in == 1 && $resolved == 0) {echo '<div class="right status-update has-js">Add Update</div>';}
-	echo '<h2><a href="detail.php?id=' . $issue["id"] . '">' . $issue['status_name'] . ' for ' . $issue['system_name'] . $building . $current_status .'</a></h2>';
+	
+	echo '<h2>' . $issue['status_name'] . ' for ' . $issue['system_name'] . $building . $current_status .'</h2>';
 	echo '<span name="issue_times"><strong>Began:</strong> ' . formatDateTime($issue["start_time"]);
 	if (!is_null($issue["end_time"])) {echo " <strong>Resolved:</strong> " . formatDateTime($issue["end_time"]); }
 	echo '</span>';
-	echo '<br><span name="created_updated"><strong>Created On:</strong>' . formatDateTime($issue["created_on"]) . ' <strong>Last Updated:</strong> ' . formatDatetime($issue["last_updated"]); 
+	echo '<br><span name="created_updated"><strong>Created On:</strong>' . formatDateTime($issue["created_on"]) . ' <br><strong>Last Updated:</strong> ' . formatDatetime($issue["last_updated"]); 
 	
 	echo "</span>";
 
@@ -601,13 +699,13 @@ function displayUpdate($update, $dataBaseConnection) {
 	$user = MakeUserArray ('', $update["user"], $dataBaseConnection);
 	
 
-	if (!is_null($update["building"])) {
+	if (isset($update["building"])) {
 		$building = "at " . $update["building"];
 	} else {
 		$building = '';
 	}
 	
-	echo '<h2><a href="detail.php?id=' . $update["user"] . '">Update for ' . $update['system_name'] . $building . '</a></h2>';
+	echo '<h2><a href="detail.php?type=update&id=' . $update["update_id"] . '">Update for ' . $update['system_name'] . $building . '</a></h2>';
 	echo '<span name="issue_times"><strong>Created On:</strong> ' . formatDateTime($update["timestamp"]);
 	echo "</span>";
 	echo '<div class"comment-text">';
@@ -617,26 +715,37 @@ function displayUpdate($update, $dataBaseConnection) {
 }
 
 
+//format and display status data for issues.  Expects an array of status data arranged in the form provided by the getStatusData function
+function displayStatus($statusData, $dataBaseConnection) {
+	$status_user = MakeUserArray('', $statusData["userID"], $dataBaseConnection);
+	echo '<div class"comment-text" id="status_id"' . $statusData ["statusID"]. '">';
+	echo '<strong class="timestamp">[' . formatDateTime($statusData["timestamp"]) . ']-' . $status_user["fn"] . " " . $status_user["ln"] . "</strong>";
+	echo Markdown($statusData["text"]);
+	echo '</div>';
+}
+
 
 //FUNCTIONS THAT MODIFY DATA IN THE DATABASE
 
 //inserts new issues into the database.  All issues MUST HAVE at least one status.
-function createNewIssue($system_id, $status_type_id, $time, $end_time, $userid, $issue_text, $dataBaseConnection) {
+function createNewIssue($system_id, $status_type_id, $time, $end_time, $userid, $issue_text, $public, $dataBaseConnection) {
 	//if the user doesn't supply a start time, create one
-	if ($time == "") {$time = time();}
+	if ($time == "") {$time = time();} else {$time = strtotime($time);}
+	
 
-	//currently, only safety issues (status type 7) are private.
-	if ($status_type_id = 7) {$public = 0;} else {$public = 1;}
+	//currently, safety issues (status type 7) are always private
+	if ($status_type_id == 7) {$public = 0;} 
 	
-	$query = "INSERT INTO issue_entries VALUES ('', $system_id, $status_type_id, FROM_UNIXTIME($time),";
+	$query = "INSERT INTO issue_entries VALUES ('', $system_id, $status_type_id, FROM_UNIXTIME($time), ";
 	
 	
-	if ($end_time) { 
-		$query = $query . " FROM_UNIXTIME($end_time), ";}
+	if ($end_time != '') { 
+		$end_time = strtotime($end_time);
+		$query = $query . "FROM_UNIXTIME($end_time), ";}
 	else {
-		$query = $query . " NULL, ";
+		$query = $query . "NULL, ";
 	}
-	 $query = $query . "'$userid', '$public', NOW(), NOW()";
+	 $query = $query . "$userid, $public, NOW(), NOW())";
 	//we need to do multiple updates simultaneously, and submit them all at once, so we need to turn autocommit off.  
 	//this ensures the entire commit succeeds or fails.  We don't want issues without status updates or vice versa!
 	$dataBaseConnection->autocommit(FALSE);
@@ -660,7 +769,7 @@ function createNewIssue($system_id, $status_type_id, $time, $end_time, $userid, 
 //delete an issue.  Note that because of the way the database is set, deleting an issue automatically deletes all status updates
 //associated with an issue
 function deleteIssue($issueID, $dataBaseConnection) {
-	$query = "DELETE FROM issue_entries WHERE issue_id = '$issue_id'";
+	$query = "DELETE FROM issue_entries WHERE issue_id = '$issueID'";
 	if ($dataBaseConnection->query($query)) {
 		return true;
 	} else {
@@ -670,20 +779,68 @@ function deleteIssue($issueID, $dataBaseConnection) {
 
 }
 
+//function to edit an existing issue.  Once an issue is created, the only things you can edit are the start and end time
+// and the status.  All the values are required except endTime.  Time values must be strings that can be parsed by strtotime() 
+//(verify beforehand)
+
+function updateIssue($issueID, $startTime, $endTime, $statusID, $public, $building, $dataBaseConnection) {
+
+	if ($endTime != "") {
+		$endTime = strtotime($endTime);
+		
+		if ($statusID != 4 && $endTime > strtotime("now")) {
+			return "Only Scheduled Maintenance can have a future scheduled end time.";
+
+		}
+		$endTime = "FROM_UNIXTIME($endTime)";
+	} else {
+		$endTime = "NULL";
+	}
+
+	if ($statusID == 7 && !$building) {
+		return "Non-Building systems cannot have a safety issues.";
+	}
+
+	$startTime = strtotime($startTime);
+	$startTime = "FROM_UNIXTIME($startTime)";
+
+	$query = "UPDATE issue_entries SET public = $public, status_type_id = $statusID, end_time = $endTime, start_time = $startTime WHERE issue_id = $issueID";
+
+	$result = $dataBaseConnection->query($query);
+
+	if ($result) {
+		return true;
+	} else {
+		return "Could not update issue:" . $dataBaseConnection->error .$query;
+	}
+
+}
+
+//remove an update from the database.  This is very straightforward.
+function deleteUpdate($updateID, $dataBaseConnection) {
+	$query = "DELETE FROM updates WHERE update_id = '$updateID'";
+	if ($dataBaseConnection->query($query)) {
+		return true;
+	} else {
+		return "Could not delete update: " . $dataBaseConnection->error;
+	}
+}
+
+
 //create a new status message.  If the new status sets the status of the main issue, change the status of the issue
-function createNewStatus( $issue_id, $time, $userID, $status_text, $dataBaseConnection) {
+function createNewStatus( $issue_id, $userID, $status_text, $dataBaseConnection) {
 	$dataBaseConnection->autocommit(FALSE);
 	// Create the new status entry
-	$query = "INSERT INTO status_entries VALUES ('','$issue_id',FROM_UNIXTIME($time),'$userID','$status_text')";
+	$query = "INSERT INTO status_entries VALUES ('','$issue_id',NOW(),'$userID','$status_text')";
 	
 	$dataBaseConnection->query($query);
 
-	$setTime = "UPDATE issue_entries SET last_updated = FROM_UNIXTIME($time) WHERE issue_id = $issue_id";
+	$setTime = "UPDATE issue_entries SET last_updated = NOW() WHERE issue_id = $issue_id";
 	
 	$dataBaseConnection->query($setTime);
 
 	if ($dataBaseConnection->commit()) {
-		$returnValue = 1;
+		$returnValue = true;
 	} else {
 		$returnValue = "Problem creating new status: " . $dataBaseConnection->error;
 	}
@@ -693,31 +850,18 @@ function createNewStatus( $issue_id, $time, $userID, $status_text, $dataBaseConn
 
 //closes an issue by inserting an end time.  If a time is not supplied, the current time is used.  
 //If passed a time, it must be a unix timestamp.
-function closeIssue($issueid, $time, $dataBaseConnection) {
+function closeIssue($issueid, $dataBaseConnection) {
 	
-	$query = "UPDATE issue_entries SET end_time = FROM_UNIXTIME($time), last_updated = NOW() WHERE issue_id = $issueid ";
+	$query = "UPDATE issue_entries SET end_time = NOW(), last_updated = NOW() WHERE issue_id = $issueid ";
 	if ($dataBaseConnection->query($query)) {
 		return true;
 	} else {
-		return "Issue could not be closed: " . $dataBaseConnection->error . $query;
+		return "Issue could not be closed: " . $dataBaseConnection->error;
 	}
 
 	
 }
 
-
-function changeIssueStatus($issueID, $statusID, $dataBaseConnection) {
-	
-	$query = "UPDATE issue_entries SET status_type_id = '$statusID' WHERE issue_id = '$issueID'";
-	if ($dataBaseConnection->query($query)) {
-		
-		return 1;
-	} else {
-		
-		return $dataBaseConnection->error;
-	}
-  	
-}
 
 //function to delete a status update.  Note that this does not work if there's only one status update left.
 //in that case, use $deleteIssue to get rid of both the issue and all associated status updates
@@ -736,21 +880,21 @@ function deleteStatus($statusID, $dataBaseConnection) {
 	
 	$query = "DELETE from status_entries WHERE status_id = $statusID";
 		if ($dataBaseConnection->query($query)) {
-			return 1;
+			return true;
 		} else {
-			return "Could not Delete Issue: " . $dataBaseConnection->error;
+			return "Could not Delete Status: " . $dataBaseConnection->error;
 		}
 	
 
 }
-//the only things you are allowed to edit on status messages is wether they are public, the text of the status, and the time
-function editStatus($status_id, $public, $status_text, $time, $dataBaseConnection) {
+//the only things you are allowed to edit on status messages is the text of the status
+function editStatus($status_id, $status_text, $dataBaseConnection) {
 	$status_text = $dataBaseConnection->real_escape_string($status_text);
-	$query = "UPDATE status_entries SET status_timestamp = '$time', status_public = '$public', status_text = '$status_text' WHERE status_id = $status_id";
+	$query = "UPDATE status_entries SET status_timestamp = NOW(), status_text = '$status_text' WHERE status_id = $status_id";
 	if (!$dataBaseConnection->query($query)) {
 		return $dataBaseConnection->error;
 	} else {
-		return 1;
+		return true;
 	}
 	
 }
@@ -758,14 +902,26 @@ function editStatus($status_id, $public, $status_text, $time, $dataBaseConnectio
 //function that creates a new update
 function createNewUpdate($userid, $text, $time, $systemid, $public, $dataBaseConnection) {
 	
-
+	$time = strtotime($time);
 	$query = "INSERT INTO updates values('', FROM_UNIXTIME($time), $userid, '$text', $public, $systemid)";
 	
 	if ($dataBaseConnection->query($query)) {
-		return 1;
+		return true;
 	} else {
 		return "Could not add Update: " . $dataBaseConnection->error;
 	}
 
 }
 
+//edit an existing update.  You can only change the text and wether it's public
+function editUpdate($updateID, $text, $public, $dataBaseConnection) {
+	$query = "UPDATE updates SET public = $public, text = '$text' WHERE update_id = $updateID";
+	if ($dataBaseConnection->query($query)) {
+		return true;
+	} else {
+		return "Could not edit Update: " . $dataBaseConnection->error;
+	}
+
+
+
+}

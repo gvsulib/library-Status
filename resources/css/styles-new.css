@@ -24,7 +24,16 @@ h2 a { text-decoration: none; color: #333;}
 	margin-right: .5em;
 
 }
-.status-bar { margin-top: 1em;}
+.status-bar { 
+	margin-top: 2em;
+	clear: both; 
+	margin: 2em 0; 
+	padding: .75em 1%; 
+	background: #eee; 
+	border: 1px solid #bbb;
+
+
+}
 .status-button.active {
 	font-weight: bold;
 }
@@ -65,15 +74,14 @@ color: #fff;}
 .feedback input[type="text"],.feedback textarea { width: 95%; }
 .right { float: right;}
 .feedback {
-	position: fixed;
-	top: 0;
+	
 	max-width: 56em;
 	width: 60%;
 	margin: 0 auto;
 	background-color: #fff;
 	padding: 3%;
 	border: 1px solid #bbb;
-	border-top: none;
+	margin-top: 30px;
 }
 #library-chat a {
 	padding: .65em .85em .65em 3em !important;
@@ -83,4 +91,19 @@ color: #fff;}
 }
 @media screen and (min-width: 768px) {
 	.half { width: 48%; padding: 0 1%; float: left;}
+}
+
+.lib-form {
+	margin-top: 2em;
+}
+
+.detail-display {
+	float: left;
+	width: 45%;
+	
+}
+
+.detail-edit {
+	float: right;
+	width: 45%;
 }
