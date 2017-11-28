@@ -1,10 +1,10 @@
 <?php
-if(!session_status() == PHP_SESSION_ACTIVE) {
-	session_start();
-	$actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+session_start();
+	
+$actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 
-	$_SESSION['location'] = $actual_url;
-}
+$_SESSION['location'] = $actual_url;
+
  //as well as loads required library files
 include 'resources/config/config.php';
 include 'resources/php/functions.php';
@@ -20,7 +20,7 @@ require 'resources/php/startup.php';
 $userMessage = NULL;
 
 // uncomment to force a login
-$_SESSION['username'] = 'felkerk';
+//$_SESSION['username'] = 'felkerk';
 
 
 if (isset($_SESSION['username'])) { // User has logged in

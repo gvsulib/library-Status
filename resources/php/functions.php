@@ -852,7 +852,7 @@ function createNewStatus( $issue_id, $userID, $status_text, $dataBaseConnection)
 //If passed a time, it must be a unix timestamp.
 function closeIssue($issueid, $dataBaseConnection) {
 	
-	$query = "UPDATE issue_entries SET end_time = NOW(), last_updated = NOW() WHERE issue_id = $issueid ";
+	$query = "UPDATE issue_entries SET end_time = NOW() WHERE issue_id = $issueid ";
 	if ($dataBaseConnection->query($query)) {
 		return true;
 	} else {
@@ -890,7 +890,7 @@ function deleteStatus($statusID, $dataBaseConnection) {
 //the only things you are allowed to edit on status messages is the text of the status
 function editStatus($status_id, $status_text, $dataBaseConnection) {
 	$status_text = $dataBaseConnection->real_escape_string($status_text);
-	$query = "UPDATE status_entries SET status_timestamp = NOW(), status_text = '$status_text' WHERE status_id = $status_id";
+	$query = "UPDATE status_entries SET status_text = '$status_text' WHERE status_id = $status_id";
 	if (!$dataBaseConnection->query($query)) {
 		return $dataBaseConnection->error;
 	} else {

@@ -1,12 +1,9 @@
 <?php
+session_start();
+$actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 
+$_SESSION['location'] = $actual_url;
 
-if(!session_status() == PHP_SESSION_ACTIVE) {
-	session_start();
-	$actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
-
-	$_SESSION['location'] = $actual_url;
-}
  //as well as loads required library files
 include 'resources/config/config.php';
 include 'resources/php/functions.php';
@@ -41,7 +38,7 @@ if (!$results) {
 }
 
 // uncomment to force a login
-$_SESSION['username'] = 'felkerk';
+//$_SESSION['username'] = 'felkerk';
 
 //you should only get to this page by following a link from index.php or by sumbitting a form on the page.
 //in all cases, a type and an id for the issue or update must be passed or the page won't display
