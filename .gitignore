@@ -1,3 +1,4 @@
 resources/secret/config.php
 /install
 completer.hist
+resources/config/config.php

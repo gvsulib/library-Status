@@ -1,11 +1,17 @@
 <?php
-
-session_start();
+//set up the cookie variables for login
+$actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+setcookie("referrer", $actual_url, 0, "/");
+if (!isset($_COOKIE["login"])) {
+	setcookie("login", "", 0, "/");
+	
+	$_COOKIE['login'] = "";
+}
 error_reporting(0);
 
-$actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 
-	$_SESSION['location'] = $actual_url;
+
+	
 	
 	date_default_timezone_set('America/Detroit');
 	$logged_in = 0; // By default, user is logged out
@@ -21,7 +27,7 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 	require 'resources/php/functions.php';
 	require 'resources/php/markdown.php';
 
-	if(isset($_GET['login']) && !(isset($_SESSION['username']))) { // No $_SESSION['username'] variable, send to login script
+	if(isset($_GET['login']) && $_COOKIE['login'] == "") { // No login name variable, send to login script
 
 		// User has not logged in
 		if ($use_native_login == true){
@@ -40,15 +46,14 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
     	exit();
 	}
 
-	if(isset($_SESSION['username'])) { // User has logged in
+	if($_COOKIE['login'] != "") { // User has logged in
 
 		if (isset($_REQUEST['logout'])) {
-			$_SESSION = array();
-			session_destroy();
+			setcookie("login", "", 0, "/");
 			header('Location: index.php');
 		}
 
-		$username = $_SESSION['username'];
+		$username = $_COOKIE['login'];
 		// User names are unique, so only need a single row
 		// Get all the bits from the user name so you don't have to ask again
 		$user_result=$db->query("SELECT * FROM user WHERE user_username = '$username' LIMIT 1");
