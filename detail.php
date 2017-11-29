@@ -5,15 +5,33 @@ $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVE
 $_SESSION['location'] = $actual_url;
 
  //as well as loads required library files
-include 'resources/config/config.php';
-include 'resources/php/functions.php';
+require 'resources/config/config.php';
+require 'resources/php/functions.php';
 
 
 //markdown is used to display the status entries for issues and the text of updates
-include ('resources/php/markdown.php');
+require ('resources/php/markdown.php');
 
 //load all starting session and other variables and required libraries
-require 'resources/php/startup.php';
+date_default_timezone_set('America/Detroit');
+
+
+
+//if using native login, set the URL
+if ($use_native_login == true){
+    $loginUrl = "login.php";
+
+} else {
+    $loginUrl = $non_native_login_url;
+}
+//can we connect to the database?  If not, display an error and cease loading the app
+$db = new mysqli($db_host, $db_user, $db_pass, $db_database);
+if ($db->connect_errno) {
+    HTML_error_message($db->connect_error);
+    exit;
+}
+//variable to track if user is logged in
+$logged_in = 0; 
 
 //holds system messages we want to show to the user.  By default, there are none
 $userMessage = NULL;
