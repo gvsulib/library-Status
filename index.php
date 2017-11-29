@@ -422,10 +422,10 @@ include 'resources/php/header.php';
 	<?php 
 	
 	if ($logged_in == 1) {
-		require "resources/php/Report_problem_logged_in.php";
+		require "resources/php/report_problem_logged_in.php";
 	
 	}  else {
-		require "resources/php/Report_problem_not_logged_in.php";
+		require "resources/php/report_problem_not_logged_in.php";
 	}
 	?>
 
