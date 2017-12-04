@@ -1,9 +1,11 @@
 <?php
-session_start();
-	
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+setcookie("referrer", $actual_url, 0, "/");
+if (!isset($_COOKIE["login"])) {
+	setcookie("login", "", 0, "/");
+        $_COOKIE["login"] = "";
+}
 
-$_SESSION['location'] = $actual_url;
 
  //as well as loads required library files
 require 'resources/config/config.php';
@@ -44,18 +46,25 @@ $logged_in = 0;
 // uncomment to force a login
 //$_SESSION['username'] = 'felkerk';
 
+if (isset($_GET["login"]) && $_COOKIE["login"] == "") {
+	//login code goes here once I figure it out
+    
 
-if (isset($_SESSION['username'])) { // User has logged in
+}
+
+
+
+if ($_COOKIE['login'] != "") { // User has logged in
 	//if the user is logging out, don't bother to check anything, destroy the session
 	//and reload the page
 	if (isset($_REQUEST['logout'])) {
-		$_SESSION = array();
-		session_destroy();
+		setcookie("login", "", 0, "/");
+		header('Location: index.php');;
 		
 	} else {
 		//otherwise, attempt to make a user object
 		
-		$user = MakeUserArray($_SESSION['username'],'', $db);
+		$user = MakeUserArray($_COOKIE['login'],'', $db);
 		if (is_array($user)) {
 			$logged_in = 1;
 		} else {
