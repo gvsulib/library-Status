@@ -1,8 +1,10 @@
 <?php
-session_start();
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
-
-$_SESSION['location'] = $actual_url;
+setcookie("referrer", $actual_url, 0, "/");
+if (!isset($_COOKIE["login"])) {
+	setcookie("login", "", 0, "/");
+        $_COOKIE["login"] = "";
+}
 
  //as well as loads required library files
 require 'resources/config/config.php';
@@ -36,6 +38,13 @@ $logged_in = 0;
 //holds system messages we want to show to the user.  By default, there are none
 $userMessage = NULL;
 
+//if the user is trying to log out, send them to the logout script with a flag set
+
+if (isset($_GET["logout"])) {
+	setcookie("login", "", 0, "/");
+	$_COOKIE["login"] = "";
+	header("Location: index.php");
+}
 
 //get list of status types for issue editing drop-down
 $query = "SELECT * from status_type";
@@ -83,24 +92,18 @@ if (isset($_GET['type'])) {
 
 }
 
-if (isset($_SESSION['username'])) { // User has logged in
-	//if the user is logging out, don't bother to check anything, destroy the session
-	//and reload the page
-	if (isset($_REQUEST['logout'])) {
-		$_SESSION = array();
-		session_destroy();
+if ($_COOKIE['login'] != "") { // User has logged in
+
+	//attempt to make a user object
 		
+	$user = MakeUserArray($_COOKIE['login'],'', $db);
+	if (is_array($user)) {
+		$logged_in = 1;
 	} else {
-		//otherwise, attempt to make a user object
-		
-		$user = MakeUserArray($_SESSION['username'],'', $db);
-		if (is_array($user)) {
-			$logged_in = 1;
-		} else {
-			//set a message for the user if they couldn't be found
-			$userMessage = "<div class=\"alert alert-danger\">" . $user . "</div>";
-		}
+		//set a message for the user if they couldn't be found
+		$userMessage = "<div class=\"alert alert-danger\">" . $user . "</div>";
 	}
+	
 }
 
 //delete an issue entirely.  This cannot be reversed and will also delete all the issue status updates automatically
