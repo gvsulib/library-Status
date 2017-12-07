@@ -43,35 +43,22 @@ $userMessage = NULL;
 //variable to track if user is logged in
 $logged_in = 0; 
 
-// uncomment to force a login
-//$_SESSION['username'] = 'felkerk';
-
-if (isset($_GET["login"]) && $_COOKIE["login"] == "") {
-	//login code goes here once I figure it out
-    
-
-}
-
 
 
 if ($_COOKIE['login'] != "") { // User has logged in
-	//if the user is logging out, don't bother to check anything, destroy the session
-	//and reload the page
-	if (isset($_REQUEST['logout'])) {
-		setcookie("login", "", 0, "/");
-		header('Location: index.php');;
+	
 		
+
+	//attempt to make a user object
+		
+	$user = MakeUserArray($_COOKIE['login'],'', $db);
+	if (is_array($user)) {
+		$logged_in = 1;
 	} else {
-		//otherwise, attempt to make a user object
-		
-		$user = MakeUserArray($_COOKIE['login'],'', $db);
-		if (is_array($user)) {
-			$logged_in = 1;
-		} else {
-			//set a message for the user if they couldn't be found
-			$userMessage = "<div class=\"alert alert-danger\">" . $user . "</div>";
-		}
+		//set a message for the user if they couldn't be found
+		$userMessage = "<div class=\"alert alert-danger\">" . $user . "</div>";
 	}
+	
 }
 
 // User has filled out the asana problem submission form, process and submit
@@ -296,7 +283,7 @@ include 'resources/php/header.php';
 		<ul>
 
 				
-				<li style="float:right;margin-right: 8%;"><?php  echo (($logged_in == 1) ? 'Hello, ' . $user["fn"] . '&nbsp;//&nbsp;<a href="?logout" title="Log out" style="text-decoration: none; font-size: .9em;">Log out</a>' : "<a href=\"$loginUrl\" title=\"Log in\" style=\"text-decoration: none; font-size: .9em;\">Log in</a>"); ?></li>
+				<li style="float:right;margin-right: 8%;"><?php  echo (($logged_in == 1) ? 'Hello, ' . $user["fn"] . '&nbsp;//&nbsp;<a href="' . $loginUrl . '?logout" title="Log out" style="text-decoration: none; font-size: .9em;">Log out</a>' : "<a href=\"$loginUrl\" title=\"Log in\" style=\"text-decoration: none; font-size: .9em;\">Log in</a>"); ?></li>
 		</ul>
 	</div>
 </div> <!-- end line -->
