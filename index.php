@@ -23,7 +23,8 @@ date_default_timezone_set('America/Detroit');
 //if the user is trying to log out, send them to the logout script with a flag set
 
 if (isset($_GET["logout"])) {
-	header("Location: https://dev.library.gvsu.edu/login/index.php?logout=true");
+	setcookie("login", "", 0, "/");
+	$_COOKIE["login"] = "";
 }
 
 
