@@ -1,15 +1,12 @@
 <?php
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 setcookie("referrer", $actual_url, 0, "/");
-setcookie("login", "felkerk", 0, "/");
-        $_COOKIE["login"] = "felkerk";
 
-/*
 if (!isset($_COOKIE["login"])) {
 	setcookie("login", "", 0, "/");
         $_COOKIE["login"] = "";
 }
-*/
+
 
  //as well as loads required library files
 require 'resources/config/config.php';
@@ -314,7 +311,7 @@ include 'resources/php/header.php';
 		<ul>
 
 				
-				<li style="float:right;margin-right: 8%;"><?php  echo (($logged_in == 1) ? 'Hello, ' . $user["fn"] . '&nbsp;//&nbsp;<a href="' . $loginUrl . "?logout=true" . '" title="Log out" style="text-decoration: none; font-size: .9em;">Log out</a>' : "<a href=\"$loginUrl\" title=\"Log in\" style=\"text-decoration: none; font-size: .9em;\">Log in</a>"); ?></li>
+				<li style="float:right;margin-right: 8%;"><?php  echo (($logged_in == 1) ? 'Hello, ' . $user["fn"] . '&nbsp;//&nbsp;<a href="' . $loginUrl . "index.php?logout=true" . '" title="Log out" style="text-decoration: none; font-size: .9em;">Log out</a>' : "<a href=\"$loginUrl\" title=\"Log in\" style=\"text-decoration: none; font-size: .9em;\">Log in</a>"); ?></li>
 		</ul>
 	</div>
 </div> <!-- end line -->
