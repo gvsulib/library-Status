@@ -1,11 +1,15 @@
 <?php
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 setcookie("referrer", $actual_url, 0, "/");
+setcookie("login", "felkerk", 0, "/");
+        $_COOKIE["login"] = "felkerk";
+
+/*
 if (!isset($_COOKIE["login"])) {
 	setcookie("login", "", 0, "/");
         $_COOKIE["login"] = "";
 }
-
+*/
 
  //as well as loads required library files
 require 'resources/config/config.php';
@@ -25,8 +29,8 @@ date_default_timezone_set('America/Detroit');
 if (isset($_GET["logout"])) {
 	setcookie("login", "", 0, "/");
 	$_COOKIE["login"] = "";
+	Location ();
 }
-
 
 //if using native login, set the URL
 if ($use_native_login == true){
@@ -121,7 +125,7 @@ if (isset($_POST['submit_issue']) && $logged_in == 1) {
 		$end_time = '';
 		
 	} else {
-		$end_time = $_POST['end_time'];
+			$end_time = $_POST['end_time'];
 		
 	}
 
@@ -130,18 +134,19 @@ if (isset($_POST['submit_issue']) && $logged_in == 1) {
 	}
 
 	//check data for problems
-
-	$return = verifyReportFormData($time, $end_time, $statusid, $systemid, $db);
+	
+	$verify = verifyReportFormData($time, $end_time, $statusid, $systemid, $db);
 				
 	
-	if ($return != "") {
-		$userMessage = '<div class="alert alert-danger">' . $return . '</div>';
-		$submitted = false;
+	if ($verify !== true) {
+		$userMessage = '<div class="alert alert-danger">' . $verify . '</div>';
+		$verify = false;
 	}
 	
+	
 
 				
-	if($statusid == 0 && $return == "") { // Update
+	if($statusid == 0 && $verify) { // Update
 		
 		$created = createNewUpdate($userid, $text, $time, $systemid, $public, $db);
 		if (is_string($created)) {
@@ -151,28 +156,48 @@ if (isset($_POST['submit_issue']) && $logged_in == 1) {
 			$userMessage = '<div class="alert alert-success">update created.</div>';
 			
 		}
-	} else if ($statusid != 0 && $return == "") {//otherwise issue
-		$created = createNewIssue($systemid,$statusid,$time,$end_time,$userid,$text,$public,$db);
-		if (is_string($created)) {
-			$userMessage = '<div class="alert alert-danger">' . $created . '</div>';
-			$submitted = false;
+	} else if ($statusid != 0 && $verify) {//otherwise issue
+
+		//is someone trying to report a building problem?
+		$building = getBuilding($_POST['system_id'], $db);
+
+		echo $building;
+		//do you have access to report building problems?
+		if (is_null($building)) {
+	
+			$can_post = true;
+
+		} else if ($building === false) {
+			$can_post = false;
+			$userMessage = '<div class="alert alert-danger">Unable to post: cannot get information on system from the database.</div>';
 		} else {
-			$userMessage = '<div class="alert alert-success">issue created.</div>';
+			if ($_POST['status_type_id'] == 7 && ($user["access"] != 2 || $user["access"] != 9)) {
+				$can_post = false;
+				$userMessage = '<div class="alert alert-danger">You are not authorized to log this type of issue on this system.</div>';
+
+			}
+		}
+
+		if ($can_post) {
+
+			$created = createNewIssue($systemid,$statusid,$time,$end_time,$userid,$text,$public,$db);
+			if (is_string($created)) {
+				$userMessage = '<div class="alert alert-danger">' . $created . '</div>';
+				$submitted = false;
+			} else {
+				$userMessage = '<div class="alert alert-success">issue created.</div>';
 			
+			}
 		}
 	}
-	
-
-	
-	
 }
 
-// create new status post for an existing issue
-if (isset($_POST['submit_status']) && $logged_in = 1) {
-	$userid = $_POST['user_id'];
-	$issue_id = $_POST['issue_id'];
-	$status_text = $db->real_escape_string($_POST['status']);
-	//verify and format time 
+	// create new status post for an existing issue
+	if (isset($_POST['submit_status']) && $logged_in = 1) {
+		$userid = $_POST['user_id'];
+		$issue_id = $_POST['issue_id'];
+		$status_text = $db->real_escape_string($_POST['status']);
+		//verify and format time 
 	
 	
 	//is the user closing the issue?  If so, try to close it, and if that doesn't work, STOP
@@ -289,7 +314,7 @@ include 'resources/php/header.php';
 		<ul>
 
 				
-				<li style="float:right;margin-right: 8%;"><?php  echo (($logged_in == 1) ? 'Hello, ' . $user["fn"] . '&nbsp;//&nbsp;<a href="?logout=true" title="Log out" style="text-decoration: none; font-size: .9em;">Log out</a>' : "<a href=\"$loginUrl\" title=\"Log in\" style=\"text-decoration: none; font-size: .9em;\">Log in</a>"); ?></li>
+				<li style="float:right;margin-right: 8%;"><?php  echo (($logged_in == 1) ? 'Hello, ' . $user["fn"] . '&nbsp;//&nbsp;<a href="' . $loginUrl . "?logout=true" . '" title="Log out" style="text-decoration: none; font-size: .9em;">Log out</a>' : "<a href=\"$loginUrl\" title=\"Log in\" style=\"text-decoration: none; font-size: .9em;\">Log in</a>"); ?></li>
 		</ul>
 	</div>
 </div> <!-- end line -->

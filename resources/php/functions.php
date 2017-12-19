@@ -265,11 +265,34 @@ function verifyReportFormData($starttime, $endtime, $statusid, $systemid, $dataB
 			$return = $return . "End time cannot be earlier than start time.</br>";
 		}
 	}
-	return $return;
+	if ($return == "") {
+		return true;
+	} else {
+		return $return;
+	}
 }
 
 //FUNCTIONS TO GET DATA FROM DATABASE
 
+
+//figure out if a system is attached to a building or not, return the building if so.
+
+function getBuilding($systemID, $dataBaseConnection) {
+	$query = "SELECT building from systems WHERE system_id = $systemID";
+	$building = $dataBaseConnection->query($query);
+	if (!$building || $building->num_rows <= 0) {
+		return false;
+	}
+
+	$row = $building->fetch_assoc();
+	if (is_null($row["building"])) {
+		return null;
+	} else {
+		return $row["building"];
+	}
+
+
+}
 
 //get the status of a specific system
 function getSystemStatus($systemID, $dataBaseConnection) {
