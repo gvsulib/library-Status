@@ -459,51 +459,49 @@ include 'resources/php/header.php';
 
 	<div class="row status-bar">
 
-		<div class="span2 unit left lib-horizontal-list">
+		<div class="span2 unit left">
 			
 			<form action="index.php" method="get">
-	<ul>
-	<input type="hidden" name="system" value="<?php echo $system; ?>">
+	
+			<input type="hidden" name="system" value="<?php echo $system; ?>">
 
-	<div style="float: left">
-	<label for="filter"> Filter by type of post:</label>
-	<select name="filter">
-	
-	<option value="0" <?php if ($filter == "0") {echo "selected";}?>>All Recent</option>
-	<option value="1" <?php if ($filter == "1") {echo "selected";}?>>Unresolved</option>
-	<option value="2" <?php if ($filter == "2") {echo "selected";}?>>Resolved</option>
-	<option value="3" <?php if ($filter == "3") {echo "selected";}?>>Updates</option>
-	</select>
-	</div>
-	<div style="float: right">
-	<label for="systemID"> Filter by system:</label>
-	<select name="systemID">
-	<option value="ALL">All</option>
-	<?php
-	foreach ($systemArray as $id => $name) {
-		if ($id == $systemID) {$selected = "selected";} else {$selected = "";}
-		echo '<option value="' . $id . '" '. $selected .'>' . $name . '</option>';
-
-	}
-	?>
-	</select>
-	<input type="submit" value="Filter">
-	</div>
-	
-	
-	</form>
 			
+			<label for="filter"> Filter by type of post:</label>
+			<select name="filter">
+	
+				<option value="0" <?php if ($filter == "0") {echo "selected";}?>>All Recent</option>
+				<option value="1" <?php if ($filter == "1") {echo "selected";}?>>Unresolved</option>
+				<option value="2" <?php if ($filter == "2") {echo "selected";}?>>Resolved</option>
+				<option value="3" <?php if ($filter == "3") {echo "selected";}?>>Updates</option>
+			</select>
 		</div>
+		<div class="span1 unit right">
+			<label for="systemID"> Filter by system:</label>
+				<select name="systemID">
+				<option value="ALL">All</option>
+				<?php
+					foreach ($systemArray as $id => $name) {
+					if ($id == $systemID) {$selected = "selected";} else {$selected = "";}
+					echo '<option value="' . $id . '" '. $selected .'>' . $name . '</option>';
 
-		
+					}
+				?>
+				</select>
+				<input type="submit" value="Filter">
+				</form>
+		</div>
 		<div class="cms-clear"></div>
 	</div>
-	<!--
-	<div class="span1 unit right subscription-list" style="text-align:right;">
-			<p>Subscribe: <a href="<?php echo $rss_url; ?>" title="Subscribe to the RSS feed">RSS</a>&nbsp;
-				//&nbsp;
-				<a href="<?php echo $email_subscription_url; ?>" title="Subscribe to updates via Email">Email</a></p>
-		</div>-->
+	
+	
+<div class="row">
+	<div class="span3 unit left subscription-list" style="text-align:right;">
+                        <p>Subscribe: <a href="<?php echo $rss_url; ?>" title="Subscribe to the RSS feed">RSS</a>&nbsp;
+                                //&nbsp;
+                                <a href="<?php echo $email_subscription_url; ?>" title="Subscribe to updates via Email">Email</a></p>
+    </div>
+</div>
+
 		
 
 	
