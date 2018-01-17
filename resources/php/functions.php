@@ -728,7 +728,7 @@ function displayUpdate($update, $dataBaseConnection) {
 		$building = '';
 	}
 	
-	echo '<h2><a href="detail.php?type=update&id=' . $update["update_id"] . '">Update for ' . $update['system_name'] . $building . '</a></h2>';
+	echo '<h2>Update for ' . $update['system_name'] . $building . '</h2>';
 	echo '<span name="issue_times"><strong>Created On:</strong> ' . formatDateTime($update["timestamp"]);
 	echo "</span>";
 	echo '<div class"comment-text">';
@@ -741,7 +741,7 @@ function displayUpdate($update, $dataBaseConnection) {
 //format and display status data for issues.  Expects an array of status data arranged in the form provided by the getStatusData function
 function displayStatus($statusData, $dataBaseConnection) {
 	$status_user = MakeUserArray('', $statusData["userID"], $dataBaseConnection);
-	echo '<div class"comment-text" id="status_id"' . $statusData ["statusID"]. '">';
+	echo '<div class"comment-text" id="status_id"' . $statusData["statusID"]. '">';
 	echo '<strong class="timestamp">[' . formatDateTime($statusData["timestamp"]) . ']-' . $status_user["fn"] . " " . $status_user["ln"] . "</strong>";
 	echo Markdown($statusData["text"]);
 	echo '</div>';

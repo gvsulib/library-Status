@@ -6,7 +6,7 @@ if (!isset($_COOKIE["login"])) {
         $_COOKIE["login"] = "";
 }
 
- //as well as loads required library files
+ //loads required library files
 require 'resources/config/config.php';
 require 'resources/php/functions.php';
 
