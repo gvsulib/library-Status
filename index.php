@@ -26,7 +26,7 @@ date_default_timezone_set('America/Detroit');
 if (isset($_GET["logout"])) {
 	setcookie("login", "", 0, "/");
 	$_COOKIE["login"] = "";
-	Location ();
+	Location ("https://prod.library.gvsu.edu/loginstatus/?logout=true");
 }
 
 //if using native login, set the URL
@@ -329,7 +329,7 @@ include 'resources/php/header.php';
 	
 			}
 
-			if (!areUnresolvedSystemIssues($db)) {
+			if (areUnresolvedSystemIssues($db) === false) {
 				$status = '<div class="alert alert-success" style="margin: 0;"> <p>All systems are online.</p></div>';
 			} else {
 				$status = '<div class="alert alert-danger" style="margin: 0;">
