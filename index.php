@@ -329,7 +329,7 @@ include 'resources/php/header.php';
 	
 			}
 
-			if (areUnresolvedSystemIssues($db) === false) {
+			if (areUnresolvedSystemIssues($db)) {
 				$status = '<div class="alert alert-success" style="margin: 0;"> <p>All systems are online.</p></div>';
 			} else {
 				$status = '<div class="alert alert-danger" style="margin: 0;">
