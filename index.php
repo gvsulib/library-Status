@@ -309,8 +309,7 @@ error_reporting(0);
 		</div>
 	</div> <!-- end line -->
 
-		<div class="alert alert-danger">This version of the status app is about to be retired.  Please go to the new status app at <a href="http://prod.library.gvsu.edu/libstatus">http://prod.library.gvsu.edu/libstatus</a> To report problems.</div>
-
+		
 	<?php
 
 		if(isset($m)) {
@@ -320,6 +319,8 @@ error_reporting(0);
 		if($logged_in == 1) {
 
 	?>
+
+	
 	<div class="row lib-form feedback">
 			<div>
 				<h3>Report an Issue</h3>
