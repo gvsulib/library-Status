@@ -26,7 +26,7 @@ date_default_timezone_set('America/Detroit');
 if (isset($_GET["logout"])) {
 	setcookie("login", "", 0, "/");
 	$_COOKIE["login"] = "";
-	Location ();
+	Location ("https://prod.library.gvsu.edu/loginstatus/?>logout=true");
 }
 
 //if using native login, set the URL
@@ -329,12 +329,18 @@ include 'resources/php/header.php';
 	
 			}
 
-			if (!areUnresolvedSystemIssues($db)) {
-				$status = '<div class="alert alert-success" style="margin: 0;"> <p>All systems are online.</p></div>';
-			} else {
+			$systemQuery = "SELECT i.issue_id FROM issue_entries i, systems s WHERE s.system_id = i.system_id AND s.building IS NULL AND i.status_type_id in (2,4) AND (i.end_time IS NULL OR i.end_time > NOW()) ";
+			$unResolvedIssues = $db->query($systemQuery);
+
+			if ($unResolvedIssues === false) {
+				$status = '<div class="alert alert-danger" style="margin: 0;"> <p>Unable to retrieve status information.</p>' . $db->error . '</div>';
+
+			} elseif ($unResolvedIssues->num_rows > 0) {
 				$status = '<div class="alert alert-danger" style="margin: 0;">
 									<p>Uh-oh, we have a system down. You can bet that we&#8217;re working on it!</p>
 									</div>';
+			} else {
+				$status = '<div class="alert alert-success" style="margin: 0;"> <p>All systems are online.</p></div>';
 			}
 			echo $status;
 

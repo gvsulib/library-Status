@@ -487,24 +487,7 @@ function getIssues($building, $status, $system, $open, $public, $user, $limit, $
 	}
 }
 
-//used to check and see if any systems currently have an outstanding major issue
-function areUnresolvedSystemIssues($dataBaseConnection) {
-	$time = time();
-	//first check to see if there are any major issues with no end time set
-	$query = "SELECT i.issue_id FROM issue_entries i, systems s WHERE s.system_id = i.system_id AND s.building IS NULL AND i.status_type_id in (2,4) AND (i.end_time IS NULL OR i.end_time > NOW)) ";
-	$unresolvedIssues = $dataBaseConnection->query($query);
-	if (!$unresolvedIssues) {
-		return $dataBaseConnection->error;
-	}
 
-	if ($unresolvedIssues->num_rows > 0) {
-		return true;
-	} else {
-		return false;
-	}
-	
-
-}
 
 
 //get all status IDs for a given issue and return them as an array
