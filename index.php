@@ -329,7 +329,7 @@ include 'resources/php/header.php';
 	
 			}
 
-			$systemQuery = "SELECT i.issue_id FROM issue_entries i, systems s WHERE s.system_id = i.system_id AND s.building IS NULL AND i.status_type_id in (2,4) AND (i.end_time IS NULL OR i.end_time > NOW()) ";
+			$systemQuery = "SELECT i.issue_id FROM issue_entries i, systems s WHERE s.system_id = i.system_id AND s.building IS NULL AND i.status_type_id in (2,4)AND start_time < NOW() AND (i.end_time IS NULL OR i.end_time > NOW()) ";
 			$unResolvedIssues = $db->query($systemQuery);
 
 			if ($unResolvedIssues === false) {
