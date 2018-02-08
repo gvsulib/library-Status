@@ -569,7 +569,7 @@ error_reporting(0);
 								}
 								
 								$attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
-								echo '</div>';
+								
 								
 								
 
@@ -644,10 +644,10 @@ error_reporting(0);
 
 					if($attribution != NULL) {
 
-						echo $attribution . ' </div><!-- End .line -->';
+						echo $attribution . '<!-- End .line -->';
 
 					}
-					 
+					 echo "/div>";
 				} // close status loop
 		
 
