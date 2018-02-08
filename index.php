@@ -570,6 +570,11 @@ error_reporting(0);
 								
 								$attribution = '<p class="tagline">This ' . $status_entries['status_type_text'] . $attribution_verb . '.</p>';
 								
+
+								echo $attribution . '<!-- End .line -->';
+			
+								
+								 echo "/div>";
 								
 								
 
@@ -642,12 +647,7 @@ error_reporting(0);
 
 					echo '<!--rc = ' . $rc . '-->';
 
-					if($attribution != NULL) {
-
-						echo $attribution . '<!-- End .line -->';
-
-					}
-					 echo "/div>";
+					
 				} // close status loop
 		
 
