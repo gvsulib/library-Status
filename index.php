@@ -26,7 +26,11 @@ date_default_timezone_set('America/Detroit');
 if (isset($_GET["logout"])) {
 	setcookie("login", "", 0, "/");
 	$_COOKIE["login"] = "";
+<<<<<<< HEAD
 	Location ("https://prod.library.gvsu.edu/loginstatus/?>logout=true");
+=======
+	Location ("https://prod.library.gvsu.edu/loginstatus/?logout=true");
+>>>>>>> e6ba10cff5aa1c702def113c3db4f4143177966e
 }
 
 //if using native login, set the URL
@@ -329,6 +333,7 @@ include 'resources/php/header.php';
 	
 			}
 
+<<<<<<< HEAD
 			$systemQuery = "SELECT i.issue_id FROM issue_entries i, systems s WHERE s.system_id = i.system_id AND s.building IS NULL AND i.status_type_id in (2,4) AND (i.end_time IS NULL OR i.end_time > NOW()) ";
 			$unResolvedIssues = $db->query($systemQuery);
 
@@ -336,6 +341,11 @@ include 'resources/php/header.php';
 				$status = '<div class="alert alert-danger" style="margin: 0;"> <p>Unable to retrieve status information.</p>' . $db->error . '</div>';
 
 			} elseif ($unResolvedIssues->num_rows > 0) {
+=======
+			if (areUnresolvedSystemIssues($db)) {
+				$status = '<div class="alert alert-success" style="margin: 0;"> <p>All systems are online.</p></div>';
+			} else {
+>>>>>>> e6ba10cff5aa1c702def113c3db4f4143177966e
 				$status = '<div class="alert alert-danger" style="margin: 0;">
 									<p>Uh-oh, we have a system down. You can bet that we&#8217;re working on it!</p>
 									</div>';
