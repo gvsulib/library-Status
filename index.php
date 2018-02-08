@@ -309,7 +309,7 @@ error_reporting(0);
 		</div>
 	</div> <!-- end line -->
 
-		<div id="message-update"><div id="alert alert-danger">This version of the status app is about to be retired.  Please go to the new status app at <a href="http://prod.library.gvsu.edu/libstatus">http://prod.library.gvsu.edu/libstatus</a> To report problems.</div></div>
+		<div class="alert alert-danger">This version of the status app is about to be retired.  Please go to the new status app at <a href="http://prod.library.gvsu.edu/libstatus">http://prod.library.gvsu.edu/libstatus</a> To report problems.</div>
 
 	<?php
 
