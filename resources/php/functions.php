@@ -296,7 +296,7 @@ function getBuilding($systemID, $dataBaseConnection) {
 
 //get the status of a specific system
 function getSystemStatus($systemID, $dataBaseConnection) {
-	$query = "SELECT status_type_id FROM issue_entries WHERE system_id = $systemID AND (end_time > NOW() OR end_time IS NULL)";
+	$query = "SELECT status_type_id FROM issue_entries WHERE system_id = $systemID AND (end_time > NOW() OR end_time IS NULL) AND start_time < NOW()";
 	$ids = $dataBaseConnection->query($query);
 	if (!$ids) {
 		return $dataBaseConnection->error;
