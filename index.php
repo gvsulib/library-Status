@@ -574,7 +574,7 @@ error_reporting(0);
 								echo $attribution . '<!-- End .line -->';
 			
 								
-								 echo "/div>";
+								 echo "</div>";
 								
 								
 
