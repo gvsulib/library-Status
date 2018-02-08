@@ -307,9 +307,11 @@ function getSystemStatus($systemID, $dataBaseConnection) {
 	}
 
 	while ($row = $ids->fetch_assoc()) {
-		if ($row["status_type_id"] == 2 || $row["status_type_id"] == 4 || $row["status_type_id"] == 7) {
+		if ($row["status_type_id"] == 2 || $row["status_type_id"] == 7) {
 			return "Offline";
 		
+		} elseif ($row["status_type_id"] == 4) {
+			return "Maintenance";
 		}
 	}
 

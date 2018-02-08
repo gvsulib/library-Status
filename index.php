@@ -318,6 +318,7 @@ include 'resources/php/header.php';
 
 <div class="cms-clear"></div>
 	<div class="row break" style="margin-top: 1em;">
+	<div class="alert alert-success" style="margin: 0;"> Welcome to the new Status App!  We are migrating data from the old app over as quickly as we can.  If you experience problems or bugs, email felkerk@gvsu.edu and our app developer will get right on it.</div>'
 
 		<?php
 
@@ -329,7 +330,7 @@ include 'resources/php/header.php';
 	
 			}
 
-			$systemQuery = "SELECT i.issue_id FROM issue_entries i, systems s WHERE s.system_id = i.system_id AND s.building IS NULL AND i.status_type_id in (2,4)AND start_time < NOW() AND (i.end_time IS NULL OR i.end_time > NOW()) ";
+			$systemQuery = "SELECT i.issue_id FROM issue_entries i, systems s WHERE s.system_id = i.system_id AND s.building IS NULL AND i.status_type_id = 2 AND start_time < NOW() AND (i.end_time IS NULL OR i.end_time > NOW()) ";
 			$unResolvedIssues = $db->query($systemQuery);
 
 			if ($unResolvedIssues === false) {
@@ -428,6 +429,8 @@ include 'resources/php/header.php';
 								
 								if ($status == "Online") {
 									echo 'color: #147D11;">Online';
+								} elseif ($status == "Maintenance") {
+									echo 'color: #cb0000;">' . $status;
 								} else {
 									echo 'color: #cb0000;">' . $status;
 								}
