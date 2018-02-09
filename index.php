@@ -555,9 +555,7 @@ include 'resources/php/header.php';
 		
 		$results = array();
 
-		if ($issues == false) {$issues = array();}
-
-		if ($updates == false) {$updates = array();}
+		
 
 		//if there's an error, echo it and set the variable to be an empty array
 		if (is_string($issues) || is_string($updates)) {
@@ -567,7 +565,13 @@ include 'resources/php/header.php';
 		} else if ($issues == false && $updates == false) {
 		 echo '<P>No entries found.  Try changing your filter options.</P>';
 		} 
+		if ($issues == false) {$issues = array();}
 
+		if (is_string($issues)) {$issues = array();}
+
+		if (is_string($updates)) {$updates = array();}
+
+		if ($updates == false) {$updates = array();}
 		
 
 		while (count($issues) != 0 || count($updates != 0)) {
@@ -601,7 +605,9 @@ include 'resources/php/header.php';
 		if (is_string($results)) {
 			echo "problem getting issues: " . $results;
 			$results = array();
-		} 
+		} else if () {
+
+		}
 
 	} else if ($filter == 2) {
 		$open = "CLOSED";
