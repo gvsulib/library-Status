@@ -1,4 +1,5 @@
 <div class="feedback lib-form row">
+<a href="#problem"><h3>Report an Issue/Update</h3></a>
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 		<form method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
 		<div class="span2 unit left">

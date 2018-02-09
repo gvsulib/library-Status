@@ -7,6 +7,9 @@ if (!isset($_COOKIE["login"])) {
         $_COOKIE["login"] = "";
 }
 
+if (isset($_GET["problem"])) {
+	header('Location: https://prod.library.gvsu.edu/status/#problem');
+}
 
  //as well as loads required library files
 require 'resources/config/config.php';
@@ -450,6 +453,8 @@ include 'resources/php/header.php';
 		Otherwise, show the form for non-logged in users (submits to Asana)
 	
 	-->
+
+	
 	<?php 
 	
 	if ($logged_in == 1) {

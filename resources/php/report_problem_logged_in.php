@@ -19,7 +19,7 @@ if (isset($_POST["submit_issue"]) && isset($submitted)) {
 
 <div class="row lib-form">
 			<div>
-				<h3>Report an Issue/Update</h3>
+			<a href="#problem"><h3>Report an Issue/Update</h3></a>
 			</div>
 
 			<form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" name="issue-form">
