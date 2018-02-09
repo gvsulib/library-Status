@@ -1,4 +1,4 @@
-<div class="feedback lib-form row" style="margin: auto">
+<div class="feedback lib-form row">
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 		<form method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
 		<div class="span2 unit left">
