@@ -429,8 +429,6 @@ include 'resources/php/header.php';
 								
 								if ($status == "Online") {
 									echo 'color: #147D11;">Online';
-								} elseif ($status == "Maintenance") {
-									echo 'color: #cb0000;">' . $status;
 								} else {
 									echo 'color: #cb0000;">' . $status;
 								}
@@ -631,9 +629,7 @@ include 'resources/php/header.php';
 		}
 	}
 	
-	//do we have issues to display?  Were there errors in getting the issues or updates?
-	//if so, display the errors, and set flags so that we don't try to display empty arrays
-
+	
 	
 	//display results if we have 'em
 

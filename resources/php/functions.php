@@ -312,6 +312,9 @@ function getSystemStatus($systemID, $dataBaseConnection) {
 		
 		} elseif ($row["status_type_id"] == 4) {
 			return "Maintenance";
+		} elseif ($row["status_type_id"] == 1) {
+			return "Minor Issue";
+
 		}
 	}
 
