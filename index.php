@@ -605,8 +605,9 @@ include 'resources/php/header.php';
 		if (is_string($results)) {
 			echo "problem getting issues: " . $results;
 			$results = array();
-		} else if () {
-
+		} else if ($results === false) {
+			echo "<P>No entries found.  Try changing your filter options.</P>";
+			$results = array();
 		}
 
 	} else if ($filter == 2) {
@@ -616,7 +617,7 @@ include 'resources/php/header.php';
 			echo "problem getting issues: " . $results;
 			$results = array();
 		} else if ($results === false) {
-			echo "<P>No issues found</P>";
+			echo "<P>No entries found.  Try changing your filter options.</P>";
 			$results = array();
 		}
 	} else if ($filter == 3) {
@@ -625,8 +626,8 @@ include 'resources/php/header.php';
 			echo "problem getting updates: " . $results;
 			$results = array();
 		} else if ($results === false) {
-			echo "<P>No updates found</P>";
-			$updates = array();
+			echo "<P>No entries found.  Try changing your filter options.</P>";
+			$results = array();
 		}
 	}
 	
