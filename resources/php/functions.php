@@ -444,7 +444,7 @@ function getIssues($building, $status, $system, $open, $public, $user, $limit, $
 
 	//$open can be set to "OPEN" (all open issues)  "CLOSED" (all closed issues) or "ALL" for all open or closed issues
 	if ($open == "OPEN") {
-		$query = $query . "AND (i.end_time IS NULL OR (i.start_time > NOW() AND i.end_time < NOW())) ";
+		$query = $query . "AND (i.end_time IS NULL OR i.end_time > NOW()) ";
 
 	} elseif ($open == "ALL") {
 		$query = $query;
