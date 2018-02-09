@@ -81,7 +81,10 @@ color: #fff;}
 	background-color: #fff;
 	padding: 3%;
 	border: 1px solid #bbb;
-	margin-top: 30px;
+	margin-top: 30px !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	margin-bottom: 30px !important;
 }
 #library-chat a {
 	padding: .65em .85em .65em 3em !important;
