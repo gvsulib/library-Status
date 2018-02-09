@@ -555,22 +555,20 @@ include 'resources/php/header.php';
 		
 		$results = array();
 
-		//if there's an error, echo it and set the variable to be an empty array
-		if (is_string($issues)) {
-			echo "problem getting issues: " . $issues;
-			$issues = array();
-		} else if ($issues === false) {
-		 echo '<P>No issues found.</P>';
-		 	$issues = array();
-		}
+		if ($issues == false) {$issues = array();}
 
-		if (is_string($updates) ) {
-			echo "Problem getting updates: " . $updates;
+		if ($updates == false) {$updates = array();}
+
+		//if there's an error, echo it and set the variable to be an empty array
+		if (is_string($issues) || is_string($updates)) {
+			echo "problem getting data: " . $issues;
+			$issues = array();
 			$updates = array();
-		} else if ($updates === false) {
-			echo '<P>No updates found.</P>';
-			$updates = array();
-		}
+		} else if ($issues == false && $updates == false) {
+		 echo '<P>No entries found.  Try changing your filter options.</P>';
+		} 
+
+		
 
 		while (count($issues) != 0 || count($updates != 0)) {
 			//if we've run out of updates, append all the remaining issues to the array in order
