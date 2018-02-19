@@ -95,7 +95,7 @@ if (isset($_POST["email-asana"])) {
 		$email = $_POST["email"];
 		$message = $_POST["feedback"];
 		if (isset($_POST["url"])) {
-			$message = $message . " url=" . $url;
+			$message = $message . " url=" . $_POST["url"];
 		}
 
 		$result = send_email($name,$email,$message);
