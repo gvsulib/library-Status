@@ -13,7 +13,7 @@ if (isset($_GET["url"])) {
 
 if (isset($_GET["problem"])) {
 	if (isset($url)) {
-		header('Location: https://prod.library.gvsu.edu/status/#problem?url=' . $url);
+		header('Location: https://prod.library.gvsu.edu/status/?url=' . $url . "#problem");
 	} else {
 		header('Location: https://prod.library.gvsu.edu/status/#problem');
 	}
