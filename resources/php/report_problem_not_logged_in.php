@@ -2,6 +2,7 @@
 <a name="problem"><h3>Report an Issue</h3></a>
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 		<form method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
+		<?php if (isset($_GET["url"])) {echo "<input type='hidden' name='url' value='" . $_GET["url"] . "'>";} ?>
 		<div class="span2 unit left">
 			<label for="name">Your Name:</label>
 			<input type="text" name="name" id="name" placeholder="Optional" />

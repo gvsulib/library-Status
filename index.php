@@ -7,8 +7,16 @@ if (!isset($_COOKIE["login"])) {
         $_COOKIE["login"] = "";
 }
 
+if (isset($_GET["url"])) {
+	$url = $_GET["url"];
+}
+
 if (isset($_GET["problem"])) {
-	header('Location: https://prod.library.gvsu.edu/status/#problem');
+	if (isset($url)) {
+		header('Location: https://prod.library.gvsu.edu/status/#problem?url=' . $url);
+	} else {
+		header('Location: https://prod.library.gvsu.edu/status/#problem');
+	}
 }
 
  //as well as loads required library files
@@ -86,6 +94,9 @@ if (isset($_POST["email-asana"])) {
 		if (isset($_POST["name"])) {$name = $_POST["name"];} else {$name = "none";}
 		$email = $_POST["email"];
 		$message = $_POST["feedback"];
+		if (isset($_POST["url"])) {
+			$message = $message . " url=" . $url;
+		}
 
 		$result = send_email($name,$email,$message);
 
