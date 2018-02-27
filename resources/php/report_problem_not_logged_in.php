@@ -9,7 +9,7 @@
 		</div>
 		<div class="span1 unit left lastUnit">
 			<label for="email">Your Email:</label>
-			<input type="email" name="email" id="email" required placeholder="Required" />
+			<input type="email" name="email" id="email" placeholder="email address" />
 		
 		<?php if (isset($_GET["url"])) {
 		echo '<input type="hidden" name="url" value="' . urldecode($_GET["url"]) . '">';
