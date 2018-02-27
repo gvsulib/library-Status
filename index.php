@@ -332,7 +332,7 @@ include 'resources/php/header.php';
 
 <div class="cms-clear"></div>
 	<div class="row break" style="margin-top: 1em;">
-	<div class="alert alert-success" style="margin: 0;"> Welcome to the new Status App!  We have migrated all currently-open issues form the old system to the new one.  If you experience problems or bugs, email felkerk@gvsu.edu and our app developer will get right on it.  The old status app can be accessed at: <a href="http://prod.library.gvsu.edu/oldstatus">http://prod.library.gvsu.edu/oldstatus</A></div>'
+	<div class="alert alert-success" style="margin: 0;"> Welcome to the new Status App!  We have migrated all currently-open issues form the old system to the new one.  If you experience problems or bugs, email felkerk@gvsu.edu and our app developer will get right on it.  The old status app can be accessed at: <a href="http://prod.library.gvsu.edu/oldstatus">http://prod.library.gvsu.edu/oldstatus</A></div>
 
 		<?php
 

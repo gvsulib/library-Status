@@ -30,7 +30,7 @@ function send_email($name,$email,$message) {
 	// Build the headers
 	$headers = "From: " . $from_email . "\r\n";
 	$headers .= "Reply-To: " . $from_email . "\r\n";
-	$headers .= "X-Mailer: PHP/".phpversion();
+	$headers .= "X-Mailer: PHP/".phpversion() . "\r\n";
 
 	// Check to make sure there are no really sneaky naught bits in the message
 	if (contains_bad_str($message)) {
@@ -49,13 +49,14 @@ function send_email($name,$email,$message) {
 		return false;
 	}
 
+	$headers .= "Cc: " . $email;
+
 	// Build the message
 	$error_report = $message;
 	$error_report .= "\n\n" . 'From: ' . $name;
 	$error_report .= "\n" . 'Email: ' . $email;
 
-	// Attempt to send the mail, then set the message variable $m to success or
-	// error.
+	// Attempt to send the mail, return false if unsuccessful
 	
 	if(mail($to_email, $email_subject, $error_report, $headers)) {
 			return true;
