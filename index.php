@@ -92,7 +92,7 @@ if (isset($_POST["email-asana"])) {
 
 	if ($verify === true) {
 		if (isset($_POST["name"])) {$name = $_POST["name"];} else {$name = "none";}
-		$email = $_POST["email"];
+		if (isset($_POST["email"])) {$email = $_POST["email"];} else {$email = "";}
 		$message = $_POST["feedback"];
 		if (isset($_POST["url"])) {
 			$message = $message . " url=" . $_POST["url"];
