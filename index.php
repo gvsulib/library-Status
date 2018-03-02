@@ -8,8 +8,11 @@ if (!isset($_COOKIE["login"])) {
 }
 
 if (isset($_GET["url"])) {
-	$url = $_GET["url"];
+	$url = urlencode($_GET["url"]);
+	
 }
+
+
 
 if (isset($_GET["problem"])) {
 	if (isset($url)) {
