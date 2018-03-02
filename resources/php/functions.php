@@ -1,5 +1,8 @@
 <?php
 
+
+use Michelf\Markdown;
+
 /*
 	When a user submits a problem report, this function checks
 	the input to make sure it isn't malicous (or a spambot!) and
@@ -708,7 +711,9 @@ function displayIssue($issue) {
 //format an update for display. note that this one needs a database object because it has to look up the name of the user
 //who created it
 function displayUpdate($update, $dataBaseConnection) {
+	
 	$user = MakeUserArray ('', $update["user"], $dataBaseConnection);
+	
 	
 
 	if (isset($update["building"])) {
@@ -722,17 +727,18 @@ function displayUpdate($update, $dataBaseConnection) {
 	echo "</span>";
 	echo '<div class"comment-text">';
 	echo '<strong class="timestamp">By: ' . $user["fn"] . " " . $user["ln"] . "</strong>";
-	echo Markdown($update["text"]);
+	echo Markdown::defaultTransform($update["text"]);
 	echo '</div>';
 }
 
 
 //format and display status data for issues.  Expects an array of status data arranged in the form provided by the getStatusData function
 function displayStatus($statusData, $dataBaseConnection) {
+	
 	$status_user = MakeUserArray('', $statusData["userID"], $dataBaseConnection);
 	echo '<div class"comment-text" id="status_id"' . $statusData["statusID"]. '">';
 	echo '<strong class="timestamp">[' . formatDateTime($statusData["timestamp"]) . ']-' . $status_user["fn"] . " " . $status_user["ln"] . "</strong>";
-	echo Markdown($statusData["text"]);
+	echo Markdown::defaultTransform($statusData["text"]);
 	echo '</div>';
 }
 

@@ -6,6 +6,13 @@
 
 h2 a { text-decoration: none; color: #333;}
 
+blockquote {
+    background-color: #efefef;
+    padding: .1em .5em;
+    margin-bottom: .5em;
+    font-size: .9em;
+}
+
 .def-list dt {font-weight:bold;margin-top:.8em;color:#222;}
 .def-list dd {margin-bottom:.7em;border-left:.3em solid #dedede;padding-left:.5em;}
 

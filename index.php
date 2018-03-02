@@ -19,13 +19,20 @@ if (isset($_GET["problem"])) {
 	}
 }
 
- //as well as loads required library files
+//loads required config file
 require 'resources/config/config.php';
+
+//markdown is used to display the status entries for issues and the text of updates
+require $markdown_path;
+
+
+
+//functions for doing various things
 require 'resources/php/functions.php';
 
 
-//markdown is used to display the status entries for issues and the text of updates
-require ('resources/php/markdown.php');
+
+
 
 //sets session and other variables that have to be initialized when any page of the status app is loaded
 
