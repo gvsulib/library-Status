@@ -12,7 +12,7 @@
 			<input type="email" name="email" id="email" placeholder="email address" />
 		
 		<?php if (isset($_GET["url"])) {
-		echo '<input type="hidden" name="url" value="' . urldecode($_GET["url"]) . '">';
+		echo '<input type="hidden" name="url" value="' . $_GET["url"] . '">';
 		} ?>
 		</div>
 		<label for="feedback">Have an idea? See a problem?</label>

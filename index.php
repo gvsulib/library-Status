@@ -102,10 +102,12 @@ if (isset($_POST["email-asana"])) {
 		if (isset($_POST["email"])) {$email = $_POST["email"];} else {$email = "";}
 		$message = $_POST["feedback"];
 		if (isset($_POST["url"])) {
-			$message = $message . " url=" . $_POST["url"];
+			$url  = $_POST["url"];
+		} else {
+			$url = "";
 		}
 
-		$result = send_email($name,$email,$message);
+		$result = send_email($name,$email,$message, $url);
 
 		if ($result) {
 			$userMessage = '<div class="alert alert-success">Report sent!  We will get on it ASAP!</div>';

@@ -10,7 +10,7 @@ use Michelf\Markdown;
 	email address.
 */
 
-function send_email($name,$email,$message) {
+function send_email($name,$email,$message, $url) {
 
 	global $to_email, $from_email, $email_subject;
 
@@ -58,6 +58,10 @@ function send_email($name,$email,$message) {
 	$error_report = $message;
 	$error_report .= "\n\n" . 'From: ' . $name;
 	$error_report .= "\n" . 'Email: ' . $email;
+
+	if ($url !== "") {
+		$error_report .= "\n" . 'URL: ' . $url;
+	}
 
 	// Attempt to send the mail, return false if unsuccessful
 	
