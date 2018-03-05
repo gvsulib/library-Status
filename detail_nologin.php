@@ -8,6 +8,10 @@ if (!isset($_COOKIE["login"])) {
 
  //loads required library files
 require 'resources/config/config.php';
+
+//markdown is used to display the status entries for issues and the text of updates
+require $markdown_path;
+
 require 'resources/php/functions.php';
 
 
@@ -46,23 +50,7 @@ if (isset($_GET["logout"])) {
 	header("Location: index.php");
 }
 
-//get list of status types for issue editing drop-down
-$query = "SELECT * from status_type";
 
-$results = $db->query($query);
-
-if (!$results) {
-	$userMessage = "<div class=\"alert alert-danger\">unable to contact database.</div>";
-	$status_types = false;
-	
-
-} else {
-	$status_types = array();
-	while($row = $results->fetch_assoc()) {
-		$status_types[$row["status_type_id"]] = $row["status_type_text"];
-
-	}
-}
 
 // uncomment to force a login
 //$_SESSION['username'] = 'felkerk';
@@ -106,124 +94,6 @@ if ($_COOKIE['login'] != "") { // User has logged in
 	
 }
 
-//delete an issue entirely.  This cannot be reversed and will also delete all the issue status updates automatically
-if ($logged_in == 1 && isset($_POST["deleteIssue"])) {
-	$result = deleteIssue($ID, $db);
-
-	if ($result === true) {
-		$userMessage = '<div class="alert alert-success">Issue Deleted.</div>';
-	} else {
-		$userMessage = "<div class=\"alert alert-danger\">" . $result . "</div";
-	}
-}
-
-
-//delete an update message.  this will throw an error if it is the last update message left-all issues must have at least one status
-if ($logged_in == 1 && isset($_POST["deleteUpdate"])) {
-	$result = deleteUpdate($ID, $db);
-
-	if ($result === true) {
-		$userMessage = '<div class="alert alert-success">Update Deleted.</div>';
-	} else {
-		$userMessage = "<div class=\"alert alert-danger\">" . $result . "</div";
-	}
-}
-
-//edit an update
-if ($logged_in ==1 && isset($_POST["editUpdate"])) {
-	if (isset($_POST["public"])) {
-		$public = 1;
-	} else {
-		$public = 0;
-	}
-	$updateText = $db->real_escape_string($_POST["updatetext"]);
-	$result = editUpdate($ID, $updateText, $public, $db);
-
-	if ($result === true) {
-		$userMessage = '<div class="alert alert-success">Update updated.</div>';
-	} else {
-		$userMessage = "<div class=\"alert alert-danger\">" . $result . "</div";
-	}
-}
-
-//delete a status entirely.  
-if ($logged_in == 1 && isset($_POST["deleteStatus"])) {
-	$result = deleteStatus($_POST["status_id"], $db);
-
-	if ($result === true) {
-		$userMessage = '<div class="alert alert-success">Status Deleted.</div>';
-	} else {
-		$userMessage = "<div class=\"alert alert-danger\">" . $result . "</div";
-	}
-}
-
-//edit an issue
-if ($logged_in == 1 && isset($_POST["editIssue"])) {
-	
-	//start extracting and processing all the data from the form
-	if (verifyTime($_POST["when"])) {
-		$startTime = $_POST["when"];
-	} else {
-		$startTime = false;
-	}
-
-	if (isset($_POST["public"])) {
-		$public = 1;
-	} else {
-		$public = 0;
-	}
-
-	if ($_POST["stop"] != "") {
-		if (verifyTime($_POST["stop"])) {
-			$endTime = $_POST["stop"];
-		} else {
-			$endTime = false;
-		}
-
-	} else {
-		$endTime = "";
-	}
-
-	$statusID = $_POST["status"];
-	if ($_POST["building"] == "true") {
-		$building = true;
-
-	} else {
-		$building = false;
-		
-	}
-
-	if ($endTime !== false && $startTime) {
-		$result = updateIssue($ID, $startTime, $endTime, $statusID, $public, $building, $db);
-
-		if ($result === true) {
-			$userMessage = '<div class="alert alert-success">Issue Updated.</div>';
-		} else {
-			$userMessage = "<div class=\"alert alert-danger\">" . $result . "</div";
-		}
-
-	} else {
-		$userMessage = "<div class=\"alert alert-danger\">Start or end times in incorrect format. </div";
-	}
-
-
-}
-
-//Edit a status.  This is actually done by making a new status, then deleting the old one.  
-//This forces the staus to show that it's been updated
-if ($logged_in == 1 && isset($_POST["editStatus"])) {
-	
-	$statusText = $db->real_escape_string($_POST["statustext"]);
-	$createResult = editStatus($_POST["status_id"], $statusText, $db);
-	if ($createResult === true) {
-		$userMessage = '<div class="alert alert-success">Status Updated.</div>';
-	} else {
-		$userMessage = "<div class=\"alert alert-danger\">Cannot edit status:". $createResult ." </div";
-	}
-	
-	
-
-}
 
 
 //now check to make sure we can get data for the parameters supplied-if we have deleted the entry, then we need to signal to the rest
@@ -295,24 +165,19 @@ include 'resources/php/header.php';
 	<P></P>
 	
 	<?php
-			if ($ID && $type && $logged_in == 1) {
+			if ($ID && $type) {
 				if ($type == "issue" && $issue) {
 					echo '<div class="span2">';
 					 displayIssue($issue);
 
-					echo '<form action="" method="POST">';
-					echo '<input type="hidden" name="id" value="' . $ID . '">';
-					echo '<input type="hidden" name="type" value="' . $type . '">';
-					echo '<input style="margin-top: 1em; margin-bottom: 1em" type="submit" class="issue-change" name="deleteIssue" value="Delete This Issue">';
 					
-
 					 if (is_null($issue["end_time"]) || strtotime($issue["end_time"]) > time()) {
 						$resolved = false;
 					 } else {
 						$resolved = true;
 					 }
 					
-					echo '</form>';
+					
 				
 
 					 $statusIDs = getStatusIDs($ID, $db);
@@ -332,68 +197,23 @@ include 'resources/php/header.php';
 					echo '<div class="span2">';
 					displayUpdate($update, $db);
 					echo '</div>';
-					echo '<div class="span1">';
-					if ($logged_in == 1 && $user["id"] == $update["user"]) {
-						
-						
-						echo '<form action="" method="POST">';
-						echo '<input type="hidden" name="id" value="' . $ID . '">';
-					
-						echo '<input type="hidden" name="type" value="' . $type . '">';
-						echo '<label for="updatetext">Update text of this update</label>';
-						echo '<textarea name="updatetext" required>' . $update["text"] . '</textarea>';
-						
-						echo '<label for="public"> Public </label><input name="public" type="checkbox" ';
-						if ($update["public"] == "1") {
-							echo 'checked ';
-						}
-						echo '><br>';
-						echo '<input type="submit" style="margin-top:1em; margin-right: 1em" name="editUpdate" value="Save Changes">';
-						echo '<input type="submit" style="margin-top:1em; margin-right: 1em" name="deleteUpdate" value="Delete This Update" onclick="return confirm(\'Deleted updates cannot be recovered.  Are you sure?\')">';
-						echo '</form>';
-						
-					}
-					echo '</div>';
+			
 				}
 
-				if ($logged_in == 1 && $type == "issue" && $issue) {
+				if ($type == "issue" && $issue) {
 					echo '<div class="span1">';
 					if (is_null($issue["end_time"])) {$end_time = "";} else {$end_time = formatDateTime($issue["end_time"]);}
 					
-					echo '<form action="" method="POST">';
-					echo '<input type="hidden" name="id" value="' . $ID . '">';
-				
-					echo '<input type="hidden" name="type" value="' . $type . '">';
-					echo '<label for="when">Change start time for this issue</label>';
-					echo '<input required type="text" name="when" value="' . formatDateTime($issue["start_time"]) . '">';
-					echo '<label for="stop">Change or set end time for this issue</label>';
-					echo '<input type="text" name="stop" value="' . $end_time . '">';
-					echo '<br><em>time format: YYYY-MM-DD HH:MM AM/PM<br> Erasing the end time or setting it in the future reopens the issue</em>';
+					
 					if ($status_types) {
 						if (is_null($issue["building"])) {
 							$building = false;
 						} else {
 							$building = true;
 						}
-						echo '<input type="hidden" name="building" value="true">';
-						echo '<label for="status">Change Status of this issue:</label>';
-						echo '<select style="margin-bottom: 1em" name="status">';
-							foreach ($status_types as $status_number => $status_name) {
-								if ($issue["status"] == $status_number) {$selected = "selected";} else {$selected = "";}
-								if (!$building && $status_number == 7){continue;}
+						
+					}
 					
-								echo '<option value="' . $status_number . '" '. $selected .'>' . $status_name . '</option>';
-							}
-						echo "</select>";
-					}
-					echo '<label for="public"> Public </label><input name="public" type="checkbox" ';
-					if ($issue["public"] == "1") {
-						echo 'checked ';
-					}
-					echo '>';
-					echo "<P>";
-					echo '<input type="submit" class="issue-change" name="editIssue" value="Save Changes">';
-					echo '</form></div>';
 
 					foreach ($statusIDs as $statusID) {
 						
