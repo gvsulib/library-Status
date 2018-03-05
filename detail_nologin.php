@@ -167,7 +167,7 @@ include 'resources/php/header.php';
 	<?php
 			if ($ID && $type) {
 				if ($type == "issue" && $issue) {
-					echo '<div class="span2">';
+					echo '<div class="span3">';
 					 displayIssue($issue);
 
 					
@@ -194,51 +194,12 @@ include 'resources/php/header.php';
 
 					 
 				} else if ($type == "update" && $update) {
-					echo '<div class="span2">';
+					echo '<div class="span3">';
 					displayUpdate($update, $db);
 					echo '</div>';
 			
 				}
 
-				if ($type == "issue" && $issue) {
-					echo '<div class="span1">';
-					if (is_null($issue["end_time"])) {$end_time = "";} else {$end_time = formatDateTime($issue["end_time"]);}
-					
-					
-					if ($status_types) {
-						if (is_null($issue["building"])) {
-							$building = false;
-						} else {
-							$building = true;
-						}
-						
-					}
-					
-
-					foreach ($statusIDs as $statusID) {
-						
-						$statusData = getStatusData($statusID, $db);
-						if ($statusData["userID"] == $user["id"]) {						
-												
-							echo '<div class="row"><div class="span3">';
-							echo '<form action="" method="POST">';
-							echo '<input type="hidden" name="id" value="' . $ID . '">';
-							echo '<input type="hidden" name="status_id" value="' . $statusData["statusID"] . '">';
-												
-							echo '<input type="hidden" name="type" value="' . $type . '">';
-
-							echo '<label for="when">Edit this status:</label>';
-							echo '<textarea name="statustext">' . $statusData["text"] . '</textarea>';
-							
-							echo '<input style="margin-left: 1em" type="submit" name="editStatus" value="Save Changes">';
-							echo '<input style="margin-left: 1em" type="submit" name="deleteStatus" value="Delete This Status">';
-							echo '</form></div></div>';
-						}
-					
-					}
-
-					
-				}
 			}
 			
 

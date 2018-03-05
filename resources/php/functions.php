@@ -703,6 +703,7 @@ function displayIssue($issue) {
 	}
 	
 	echo '<h2>' . $issue['status_name'] . ' for ' . $issue['system_name'] . $building . $current_status .'</h2>';
+	echo "<a class='permalink' href='detail_nologin.php?type=issue&id=" . $issue['id'] . "'>Link to this Issue</a><br>";
 	echo '<span name="issue_times"><strong>Began:</strong> ' . formatDateTime($issue["start_time"]);
 	if (!is_null($issue["end_time"])) {echo " <strong>Resolved:</strong> " . formatDateTime($issue["end_time"]); }
 	echo '</span>';
@@ -727,6 +728,7 @@ function displayUpdate($update, $dataBaseConnection) {
 	}
 	
 	echo '<h2>Update for ' . $update['system_name'] . $building . '</h2>';
+	echo "<a class='permalink' href='detail_nologin.php?type=update&id=" . $update['update_id'] . "'>Link to this Update</a><br>";
 	echo '<span name="issue_times"><strong>Created On:</strong> ' . formatDateTime($update["timestamp"]);
 	echo "</span>";
 	echo '<div class"comment-text">';
