@@ -8,10 +8,6 @@ if (!isset($_COOKIE["login"])) {
 
  //loads required library files
 require 'resources/config/config.php';
-
-//markdown is used to display the status entries for issues and the text of updates
-require $markdown_path;
-
 require 'resources/php/functions.php';
 
 
