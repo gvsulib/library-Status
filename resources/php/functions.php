@@ -3,6 +3,10 @@
 
 use Michelf\Markdown;
 
+if ($use_SMTP) {
+	require_once "Mail.php";
+}
+
 /*
 	When a user submits a problem report, this function checks
 	the input to make sure it isn't malicous (or a spambot!) and
@@ -10,9 +14,59 @@ use Michelf\Markdown;
 	email address.
 */
 
+function send_email_SMTP($name,$email,$message, $url) {
+
+	//get general email settings
+	global $to_email, $from_email, $email_subject, $use_SMTP;
+
+	//get SMTP settings
+	global $SMTP_username, $SMTP_password, $SMTP_server, $SMTP_port;
+	
+	// Build the message
+	$error_report = $message;
+	$error_report .= "\n\n" . 'From: ' . $name;
+	$error_report .= "\n" . 'Email: ' . $email;
+
+	if ($url !== "") {
+		$error_report .= "\n" . 'URL: ' . $url;
+	}
+	
+
+	$headers = array ('From' => $from_email,
+	'To' => $to_email,
+	'Subject' => $email_subject,
+	"X-Mailer:" =>  PHP/".phpversion()");
+
+	$smtp = Mail::factory('smtp',
+		array ('host' => $SMTP_server,
+		'port' => $SMTP_port, 
+		'auth' => true,
+		'username' => $SMTP_username,
+		'password' => $SMTP_password));
+
+	$mail = $smtp->send($to_email, $headers, $error_report);
+
+	if (PEAR::isError($mail)) {
+          	return $mail->getMessage();
+	} else {
+          return true;
+	} 
+
+
+	
+}
+
 function send_email($name,$email,$message, $url) {
 
-	global $to_email, $from_email, $email_subject;
+	global $to_email, $from_email, $email_subject, $use_SMTP;
+
+	if ($use_SMTP) {
+		global $SMTP_username,
+		$SMTP_password,
+		$SMTP_server,
+		$SMTP_port;
+
+	}
 
 	
 

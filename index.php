@@ -109,10 +109,15 @@ if (isset($_POST["email-asana"])) {
 		} else {
 			$url = "";
 		}
+		if ($use_SMTP) {
+			$result = send_email_SMTP($name,$email,$message, $url);
+			
+		} else {
+			
+			$result = send_email($name,$email,$message, $url);
+		}
 
-		$result = send_email($name,$email,$message, $url);
-
-		if ($result) {
+		if ($result === true) {
 			$userMessage = '<div class="alert alert-success">Report sent!  We will get on it ASAP!</div>';
 		} else {
 			$userMessage = '<div class="lib-error">Uh-oh. There was a problem sending your report. Maybe try calling the library at ' . $library_phone . '?</div>';
