@@ -35,7 +35,7 @@ function send_email_SMTP($name,$email,$message, $url) {
 	$headers = array ('From' => $from_email,
 	'To' => $to_email,
 	'Subject' => $email_subject,
-	"X-Mailer:" =>  PHP/".phpversion()");
+	"X-Mailer:" =>  "PHP/" . phpversion());
 
 	$smtp = Mail::factory('smtp',
 		array ('host' => $SMTP_server,

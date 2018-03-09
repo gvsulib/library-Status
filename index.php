@@ -120,7 +120,7 @@ if (isset($_POST["email-asana"])) {
 		if ($result === true) {
 			$userMessage = '<div class="alert alert-success">Report sent!  We will get on it ASAP!</div>';
 		} else {
-			$userMessage = '<div class="lib-error">Uh-oh. There was a problem sending your report. Maybe try calling the library at ' . $library_phone . '?</div>';
+			$userMessage = '<div class="lib-error">Uh-oh. There was a problem sending your report. Maybe try calling the library at ' . $library_phone . '?  Error message:' . $result . '  </div>';
 		
 		}
 	} else {
