@@ -35,7 +35,10 @@ function send_email_SMTP($name,$email,$message, $url) {
 	$headers = array ('From' => $from_email,
 	'To' => $to_email,
 	'Subject' => $email_subject,
-	"X-Mailer:" =>  "PHP/" . phpversion());
+	'Cc' => $email,
+	'Reply-To' => 'felkerk@gvsu.edu',
+	"X-Mailer" =>  "PHP/" . phpversion()
+	);
 
 	$smtp = Mail::factory('smtp',
 		array ('host' => $SMTP_server,
@@ -60,14 +63,6 @@ function send_email($name,$email,$message, $url) {
 
 	global $to_email, $from_email, $email_subject, $use_SMTP;
 
-	if ($use_SMTP) {
-		global $SMTP_username,
-		$SMTP_password,
-		$SMTP_server,
-		$SMTP_port;
-
-	}
-
 	
 
 /*
@@ -86,7 +81,7 @@ function send_email($name,$email,$message, $url) {
 
 	// Build the headers
 	$headers = "From: " . $from_email . "\r\n";
-	$headers .= "Reply-To: " . $from_email . "\r\n";
+	$headers .= "Reply-To: felkerk@gvsu.edu\r\n";
 	$headers .= "X-Mailer: PHP/".phpversion() . "\r\n";
 
 	// Check to make sure there are no really sneaky naught bits in the message
