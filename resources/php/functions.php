@@ -282,6 +282,8 @@ function verifyTime($time) {
 function verifyReportFormData($starttime, $endtime, $statusid, $systemid, $dataBaseConnection) {
 	//if it's a safety issue, make sure it's being attached to a building-related system
 	$return = "";
+
+	
 	if ($statusid == 7) {
 		$isBuildingSystem = FALSE;
 		$query = "SELECT system_id FROM systems WHERE building IS NOT NULL";
@@ -335,46 +337,64 @@ function verifyReportFormData($starttime, $endtime, $statusid, $systemid, $dataB
 //figure out if a system is attached to a building or not, return the building if so.
 
 function getBuilding($systemID, $dataBaseConnection) {
-	$query = "SELECT building from systems WHERE system_id = $systemID";
-	$building = $dataBaseConnection->query($query);
-	if (!$building || $building->num_rows <= 0) {
+	settype($systemID, "integer");
+
+	$query = "SELECT building from systems WHERE system_id = ?";
+	$stmt = $dataBaseConnection->prepare($query);
+	if (!$stmt->bind_param("s", $systemID)) {
+		return "Could not prepare query.";
+	}
+	if (!$stmt->execute()) {
+		return "Could not execute query.";
+	}
+	$stmt->bind_result($building);
+	$buildingID = NULL;
+
+	while ($stmt->fetch()) {
+        $buildingID = $building;
+    }
+	
+	if (is_null($buildingID)) {
 		return false;
-	}
-
-	$row = $building->fetch_assoc();
-	if (is_null($row["building"])) {
-		return null;
 	} else {
-		return $row["building"];
+		return $buildingID;
 	}
 
+		
 
 }
 
 //get the status of a specific system
 function getSystemStatus($systemID, $dataBaseConnection) {
-	$query = "SELECT status_type_id FROM issue_entries WHERE system_id = $systemID AND (end_time > NOW() OR end_time IS NULL) AND start_time < NOW()";
-	$ids = $dataBaseConnection->query($query);
-	if (!$ids) {
-		return $dataBaseConnection->error;
+	settype($systemID, "integer");
+	$query = "SELECT status_type_id FROM issue_entries WHERE system_id = ? AND (end_time > NOW() OR end_time IS NULL) AND start_time < NOW()";
+	$stmt = $dataBaseConnection->prepare($query);
+	if (!$stmt->bind_param("s", $systemID)) {
+		return "Failed to prepare statement";
 	}
-	if ($ids->num_rows <= 0) {
+	if (!$stmt->execute()) {
+		return "Could not execute query.";
+	}
+	$stmt->store_result();
+
+	if ($stmt->num_rows < 1) {
 		return "Online";
-
-	}
-
-	while ($row = $ids->fetch_assoc()) {
-		if ($row["status_type_id"] == 2 || $row["status_type_id"] == 7) {
-			return "Offline";
-		
-		} elseif ($row["status_type_id"] == 4) {
-			return "Maintenance";
-		} elseif ($row["status_type_id"] == 1) {
-			return "Minor Issue";
-
+	} else {
+		$stmt->bind_result($id);
+		while ($stmt->fetch()) {
+			if ($id == 2 || $id == 7) {
+				return "Offline";
+			
+			} elseif ($id == 4) {
+				return "Maintenance";
+			} elseif ($id == 1) {
+				return "Minor Issue";
+	
+			}
+			
 		}
-	}
 
+	}
 	return "Minor Issue";
 
 	
@@ -416,20 +436,24 @@ function getUpdates($building, $system, $public, $user, $limit, $recent, $dataBa
 	} elseif ($building == "NONE") {
 		$query = $query . "AND s.building IS NULL ";
 	} else {
+		$bulding = $dataBaseConnection->real_escape_string($building);
 		$query = $query . "AND s.building = \"$building\" ";
 	}
 	if ($system) {
+		settype($system, "integer");
+
 		$query = $query . "AND s.system_id = $system ";
 
 	}
 	if ($user) {
-		
+		settype($user, "integer");
 		$query = $query . "AND u.created_by = $user ";
 	}
 	
 	$query = $query . "ORDER BY u.timestamp DESC ";
 	
 	if ($limit) {
+		settype($limit, "integer");
 		
 		$query = $query . "LIMIT $limit";
 	}
@@ -494,6 +518,8 @@ function getIssues($building, $status, $system, $open, $public, $user, $limit, $
 
 	//if you set these to be anything other than false, use the numbers provided
 	if ($status) {
+
+
 		$query = $query . "AND i.status_type_id = $status ";
 
 	}
@@ -569,37 +595,49 @@ function getStatusIDs($issueID, $dataBaseConnection) {
 
 //get data on an issue and return it as an array of values
 function getIssueData($issue_id, $dataBaseConnection) {
-	$query = "SELECT * from issue_entries WHERE issue_id = $issue_id";
-	$issue = $dataBaseConnection->query($query);
-	if (!$issue) {
-		return "Problem getting data: " . $dataBaseConnection->error;
+	settype($issue_id, "integer");
+	$query = "SELECT * from issue_entries WHERE issue_id = ?";
+	$stmt = $dataBaseConnection->prepare($query);
+	if (!$stmt->bind_param("s", $issue_id)) {
+		return "Failed to bind parameters: " . $stmt->error;
+	}
+	if (!$stmt->execute()) {
+		return "Failed to execute query: " . $stmt->error;
 	}
 
-	if ($issue->num_rows <= 0) {
+	$stmt->store_result();
+
+	if ($stmt->num_rows <= 0) {
 		return "Issue Not Found.";
-	}
+	} else {
+		$stmt->bind_result($issue_id, $system_id, $status_type_id, $start_time, $end_time, $created_by, $public, $last_updated, $created_on);
+		$issue_array = array();
+		while($stmt->fetch()) {
+			$issue_array["id"] = $issue_id;
+			$issue_array["systemID"] = $system_id;
+			$issue_array["status"] = $status_type_id;
+			$issue_array["start_time"] = $start_time;
+			$issue_array["end_time"] = $end_time;
+			$issue_array["userID"] = $created_by;
+			$issue_array["created_on"] = $created_on;
+			$issue_array["last_updated"] = $last_updated;
+			$issue_array["public"] = $public;
+			$query = "SELECT status_type_text from status_type WHERE status_type_id = $status_type_id";
+			$result = $dataBaseConnection->query($query);
+			$status_name = $result->fetch_assoc();
+			$issue_array["status_name"] = $status_name["status_type_text"];
+			$systemid = $system_id;
+			$query = "SELECT system_name, building FROM systems WHERE system_id = $systemid";
+			$result = $dataBaseConnection->query($query);
+			$system = $result->fetch_assoc();
+			$issue_array["system_name"] = $system["system_name"];
+			$issue_array["building"] = $system["building"];
+		}
 		
-	$issue_array = array("id" => $issue_id);
-	$row = $issue->fetch_assoc();
-	$issue_array["systemID"] = $row["system_id"];
-	$issue_array["status"] = $row["status_type_id"];
-	$issue_array["start_time"] = $row["start_time"];
-	$issue_array["end_time"] = $row["end_time"];
-	$issue_array["userID"] = $row["created_by"];
-	$issue_array["created_on"] = $row["created_on"];
-	$issue_array["last_updated"] = $row["last_updated"];
-	$issue_array["public"] = $row["public"];
-	$status_type_id = $row["status_type_id"];
-	$query = "SELECT status_type_text from status_type WHERE status_type_id = $status_type_id";
-	$result = $dataBaseConnection->query($query);
-	$status_name = $result->fetch_assoc();
-	$issue_array["status_name"] = $status_name["status_type_text"];
-	$systemid = $row["system_id"];
-	$query = "SELECT system_name, building FROM systems WHERE system_id = $systemid";
-	$result = $dataBaseConnection->query($query);
-	$system = $result->fetch_assoc();
-	$issue_array["system_name"] = $system["system_name"];
-	$issue_array["building"] = $system["building"];
+		
+		
+	}
+
 
 	return $issue_array;
 

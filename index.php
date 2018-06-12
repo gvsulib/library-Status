@@ -64,6 +64,8 @@ if ($db->connect_errno) {
     exit;
 }
 
+$db->set_charset('utf8');
+
 
 //holds system messages we want to show to the user.  By default, there are none
 $userMessage = NULL;
@@ -453,9 +455,13 @@ include 'resources/php/header.php';
 								}
 								
 								echo '</dt> ';
+
+								
 								echo '<dd class = "col2 name" style="';
+								
 
 								$status = getSystemStatus($row['system_id'], $db);
+								
 								
 								if ($status == "Online") {
 									echo 'color: #147D11;">Online';
