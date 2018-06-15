@@ -710,7 +710,7 @@ function getUpdateData($updateID, $dataBaseConnection) {
 	if ($stmt->num_rows < 1) {
 		return "No update found in database.";
 	} else {
-		$stmt->bind_results($update_id, $timestamp, $created_by, $text, $public, $system_id);
+		$stmt->bind_result($update_id, $timestamp, $created_by, $text, $public, $system_id);
 		
 		$stmt->fetch();
 		
@@ -769,16 +769,10 @@ function MakeUserArray($userName, $userID, $dataBaseConnection) {
 	}
 
 
-
-	
-
 	if (!$stmt->execute()) {
 		return "Failed to execute query: " . $stmt->error;
 	}
 	
-	if (!$stmt->execute()) {
-		return "Failed to execute query: " . $stmt->error;
-	}
 	$stmt->store_result();
 
 
