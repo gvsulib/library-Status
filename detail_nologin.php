@@ -100,16 +100,18 @@ if ($_COOKIE['login'] != "") { // User has logged in
 //of the script not to show anything
 if ($type == "issue") {
 	$issue = getIssueData($ID, $db);
+	
 	if (!is_array($issue)) {
-		$m = $issue;
+		$userMessage = $issue;
 		$issue = false;
+		
 
 	}
 
 } else {
 	$update = getUpdateData($ID, $db);
 	if (!is_array($update)) {
-		$m = $update;
+		$userMessage = $update;
 		$update = false;
 
 	}
@@ -151,6 +153,7 @@ include 'resources/php/header.php';
 	
 				
 				echo $userMessage;
+				echo "<P>";
 		
 	
 			}
@@ -178,13 +181,16 @@ include 'resources/php/header.php';
 					 }
 					
 					
-				
+					 
 
-					 $statusIDs = getStatusIDs($ID, $db);
+					 $statusIDs = getStatusIDs($issue["id"], $db);
+
+				
 
 					 foreach ($statusIDs as $statusID) {
 
 						$statusData = getStatusData($statusID, $db);
+						
 						displayStatus($statusData, $db);
 						
 					 } 

@@ -69,7 +69,7 @@ if (!$results) {
 }
 
 // uncomment to force a login
-//$_SESSION['username'] = 'felkerk';
+//$_COOKIE['login'] = "felkerk";
 
 //you should only get to this page by following a link from index.php or by sumbitting a form on the page.
 //in all cases, a type and an id for the issue or update must be passed or the page won't display
@@ -95,6 +95,8 @@ if (isset($_GET['type'])) {
 	$userMessage = "<div class=\"alert alert-danger\">Type of data not specified</div>";
 
 }
+
+
 
 if ($_COOKIE['login'] != "") { // User has logged in
 
@@ -172,10 +174,13 @@ if ($logged_in == 1 && isset($_POST["editIssue"])) {
 	}
 
 	if (isset($_POST["public"])) {
+		
 		$public = 1;
 	} else {
 		$public = 0;
 	}
+
+	
 
 	if ($_POST["stop"] != "") {
 		if (verifyTime($_POST["stop"])) {
@@ -213,12 +218,11 @@ if ($logged_in == 1 && isset($_POST["editIssue"])) {
 
 }
 
-//Edit a status.  This is actually done by making a new status, then deleting the old one.  
-//This forces the staus to show that it's been updated
+//Edit a status.  
 if ($logged_in == 1 && isset($_POST["editStatus"])) {
 	
-	$statusText = $db->real_escape_string($_POST["statustext"]);
-	$createResult = editStatus($_POST["status_id"], $statusText, $db);
+	
+	$createResult = editStatus($_POST["status_id"], $_POST["statustext"], $db);
 	if ($createResult === true) {
 		$userMessage = '<div class="alert alert-success">Status Updated.</div>';
 	} else {

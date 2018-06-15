@@ -341,24 +341,21 @@ function getBuilding($systemID, $dataBaseConnection) {
 
 	$query = "SELECT building from systems WHERE system_id = ?";
 	$stmt = $dataBaseConnection->prepare($query);
-	if (!$stmt->bind_param("s", $systemID)) {
-		return "Could not prepare query.";
+	if (!$stmt->bind_param("i", $systemID)) {
+		return "Could not prepare query:" . $stmt->error;
 	}
 	if (!$stmt->execute()) {
-		return "Could not execute query.";
+		return "Could not execute query:" . $stmt->error;
 	}
 	$stmt->bind_result($building);
-	$buildingID = NULL;
+	$buildingID = FALSE;
 
 	while ($stmt->fetch()) {
         $buildingID = $building;
     }
-	
-	if (is_null($buildingID)) {
-		return false;
-	} else {
+
 		return $buildingID;
-	}
+
 
 		
 
@@ -369,7 +366,7 @@ function getSystemStatus($systemID, $dataBaseConnection) {
 	settype($systemID, "integer");
 	$query = "SELECT status_type_id FROM issue_entries WHERE system_id = ? AND (end_time > NOW() OR end_time IS NULL) AND start_time < NOW()";
 	$stmt = $dataBaseConnection->prepare($query);
-	if (!$stmt->bind_param("s", $systemID)) {
+	if (!$stmt->bind_param("i", $systemID)) {
 		return "Failed to prepare statement";
 	}
 	if (!$stmt->execute()) {
@@ -404,6 +401,7 @@ function getSystemStatus($systemID, $dataBaseConnection) {
 //get updates from the updates table based on different criteria.  Return the update data as an array,
 //or an error message if none are found
 function getUpdates($building, $system, $public, $user, $limit, $recent, $dataBaseConnection) {
+	//can't use prepared statements here-so have to be careful about typing and sanitizing inputs.
 	
 	
 	$query = "SELECT u.*, s.system_name, s.building FROM updates u, systems s WHERE u.system_id = s.system_id ";
@@ -487,7 +485,8 @@ function getUpdates($building, $system, $public, $user, $limit, $recent, $dataBa
 //gets issue data by various criteria.  Will either return an array of all issue IDs matching criteria, a database
 //error, or a message indicating no data could be found for those criteria.
 function getIssues($building, $status, $system, $open, $public, $user, $limit, $recent, $dataBaseConnection) {
-
+	//prepared queries won't work for this function because of the way the query is built.  I'm therefore relying on explicitly
+	//typing integers, escaping strings, and indirect input
 	//start building the query
 	$query = "SELECT i.*, s.system_name, s.building, r.status_type_text FROM  issue_entries i, systems s, status_type r 
 	WHERE s.system_id = i.system_id AND i.status_type_id = r.status_type_id ";
@@ -519,11 +518,12 @@ function getIssues($building, $status, $system, $open, $public, $user, $limit, $
 	//if you set these to be anything other than false, use the numbers provided
 	if ($status) {
 
-
+		settype($status, "int");
 		$query = $query . "AND i.status_type_id = $status ";
 
 	}
 	if ($system) {
+		settype($system, "int");
 		$query = $query . "AND s.system_id = $system ";
 
 	}
@@ -545,7 +545,7 @@ function getIssues($building, $status, $system, $open, $public, $user, $limit, $
 	$query = $query . " ORDER BY i.last_updated DESC ";
 
 	if ($limit) {
-
+		settype($limit, "int");
 		$query = $query . "LIMIT $limit";
 	}
 
@@ -580,17 +580,27 @@ function getIssues($building, $status, $system, $open, $public, $user, $limit, $
 
 //get all status IDs for a given issue and return them as an array
 function getStatusIDs($issueID, $dataBaseConnection) {
-	$query = "SELECT status_id FROM status_entries WHERE issue_id = '$issueID' ORDER BY status_timestamp ASC";
-	$IDs = $dataBaseConnection->query($query);
-	if ($IDs && ($IDs->num_rows > 0)) {
-		$IDsArray = array();
-		while($row = $IDs->fetch_assoc()) {
-			$IDsArray[] = $row["status_id"];
-		}
-		return $IDsArray;
-	} else {
-		return "Status IDs could not be retrieved for this issue: " . $issueID;
+	settype($issueID, "integer");
+	
+	$query = "SELECT status_id FROM status_entries WHERE issue_id = ? ORDER BY status_timestamp ASC";
+	$stmt = $dataBaseConnection->prepare($query);
+	if (!$stmt->bind_param("i", $issueID)) {
+		return "Failed to bind parameters: " . $stmt->error;
 	}
+	if (!$stmt->execute()) {
+		return "Failed to execute query: " . $stmt->error;
+	}
+
+	$stmt->store_result();
+	$stmt->bind_result($status_id);
+	$status_ids = array();
+	while ($stmt->fetch()) {
+		$status_ids[] = $status_id;
+	}
+	return $status_ids;
+
+
+	
 }
 
 //get data on an issue and return it as an array of values
@@ -598,7 +608,7 @@ function getIssueData($issue_id, $dataBaseConnection) {
 	settype($issue_id, "integer");
 	$query = "SELECT * from issue_entries WHERE issue_id = ?";
 	$stmt = $dataBaseConnection->prepare($query);
-	if (!$stmt->bind_param("s", $issue_id)) {
+	if (!$stmt->bind_param("i", $issue_id)) {
 		return "Failed to bind parameters: " . $stmt->error;
 	}
 	if (!$stmt->execute()) {
@@ -609,123 +619,182 @@ function getIssueData($issue_id, $dataBaseConnection) {
 
 	if ($stmt->num_rows <= 0) {
 		return "Issue Not Found.";
+		$stmt->close();
 	} else {
 		$stmt->bind_result($issue_id, $system_id, $status_type_id, $start_time, $end_time, $created_by, $public, $last_updated, $created_on);
 		$issue_array = array();
-		while($stmt->fetch()) {
-			$issue_array["id"] = $issue_id;
-			$issue_array["systemID"] = $system_id;
-			$issue_array["status"] = $status_type_id;
-			$issue_array["start_time"] = $start_time;
-			$issue_array["end_time"] = $end_time;
-			$issue_array["userID"] = $created_by;
-			$issue_array["created_on"] = $created_on;
-			$issue_array["last_updated"] = $last_updated;
-			$issue_array["public"] = $public;
-			$query = "SELECT status_type_text from status_type WHERE status_type_id = $status_type_id";
-			$result = $dataBaseConnection->query($query);
-			$status_name = $result->fetch_assoc();
-			$issue_array["status_name"] = $status_name["status_type_text"];
-			$systemid = $system_id;
-			$query = "SELECT system_name, building FROM systems WHERE system_id = $systemid";
-			$result = $dataBaseConnection->query($query);
-			$system = $result->fetch_assoc();
-			$issue_array["system_name"] = $system["system_name"];
-			$issue_array["building"] = $system["building"];
-		}
+		$stmt->fetch();
+		$issue_array["id"] = $issue_id;
+		$issue_array["systemID"] = $system_id;
+		$issue_array["status"] = $status_type_id;
+		$issue_array["start_time"] = $start_time;
+		$issue_array["end_time"] = $end_time;
+		$issue_array["userID"] = $created_by;
+		$issue_array["created_on"] = $created_on;
+		$issue_array["last_updated"] = $last_updated;
+		$issue_array["public"] = $public;
+		$query = "SELECT status_type_text from status_type WHERE status_type_id = $status_type_id";
+		$result = $dataBaseConnection->query($query);
+		$status_name = $result->fetch_assoc();
+		$issue_array["status_name"] = $status_name["status_type_text"];
+		$systemid = $system_id;
+		$query = "SELECT system_name, building FROM systems WHERE system_id = $systemid";
+		$result = $dataBaseConnection->query($query);
+		$system = $result->fetch_assoc();
+		$issue_array["system_name"] = $system["system_name"];
+		$issue_array["building"] = $system["building"];
+		$stmt->close();
 		
+		return $issue_array;
 		
 		
 	}
 
-
-	return $issue_array;
 
 }
 //get a status entry by ID number
 function getStatusData($statusID, $dataBaseConnection) {
-	$query = "SELECT * from status_entries WHERE status_id = $statusID";
-	$status = $dataBaseConnection->query($query);
-	if (!$status) {
-		return $dataBaseConnection->error;
+	settype($statusID, "integer");
+	$query = "SELECT * from status_entries WHERE status_id = ?";
+	$stmt = $dataBaseConnection->prepare($query);
+	if (!$stmt->bind_param("i", $statusID)) {
+		return "Failed to bind parameters: " . $stmt->error;
 	}
-	if ($status->num_rows <= 0) {
-		return "No status found in database.";
+	if (!$stmt->execute()) {
+		return "Failed to execute query: " . $stmt->error;
+	}
 
+	$stmt->store_result();
+	
+	if ($stmt->num_rows < 1) {
+		return "No status found in database.";
+	} else {
+		$stmt->bind_result($status_id, $issue_id, $status_timestamp, $status_user_id, $status_text);
+		$status_array = array();
+		$stmt->fetch();
+		$status_array["statusID"] = $status_id;
+		$status_array["issueID"] = $issue_id;
+		$status_array["timestamp"] = $status_timestamp;
+		$status_array["userID"] = $status_user_id;
+		$status_array["text"] = $status_text;
+		return $status_array;
 	}
-	$row = $status->fetch_assoc(); 
-	
-	$status_array = array("statusID" => $statusID);
-	$status_array["timestamp"] = $row["status_timestamp"];
-	$status_array["userID"] = $row["status_user_id"];
-	$status_array["text"] = $row["status_text"];	
-			
-	
-	return $status_array;
+
 	
 }
 
 //get update data by update ID number
 
 function getUpdateData($updateID, $dataBaseConnection) {
-	$query = "SELECT * from updates WHERE update_id = $updateID";
-	$update = $dataBaseConnection->query($query);
-	if (!$update) {
-		return $dataBaseConnection->error;
+	$query = "SELECT * from updates WHERE update_id = ?";
+	$stmt = $dataBaseConnection->prepare($query);
+	if (!$stmt->bind_param("i", $updateID)) {
+		return "Failed to bind parameters: " . $stmt->error;
 	}
-	if ($update->num_rows <= 0) {
+	if (!$stmt->execute()) {
+		return "Failed to execute query: " . $stmt->error;
+	}
+
+	$stmt->store_result();
+
+	if ($stmt->num_rows < 1) {
 		return "No update found in database.";
+	} else {
+		$stmt->bind_results($update_id, $timestamp, $created_by, $text, $public, $system_id);
+		
+		$stmt->fetch();
+		
+		$query = "SELECT system_name FROM systems WHERE system_id = $system_id";
+		$result = $dataBaseConnection->query($query);
+		$systemName = $result->fetch_assoc();
+		$update_array = array("update_id" => $update_id);
+		$update_array["timestamp"] = $timestamp;
+		$update_array["user"] = $created_by;
+		$update_array["text"] = $text;
+		$update_array["systemID"] = $system_id;
+		$update_array["public"] = $public;
+		$update_array["system_name"] = $systemName["system_name"];
+
+		return $update_array;
+
 
 	}
-	$row = $update->fetch_assoc(); 
-	$systemID = $row["system_id"];
-	$query = "SELECT system_name FROM systems WHERE system_id = $systemID";
-	$result = $dataBaseConnection->query($query);
-	$systemName = $result->fetch_assoc();
 
-
-	$update_array = array("update_id" => $updateID);
-	$update_array["timestamp"] = $row["timestamp"];
-	$update_array["user"] = $row["created_by"];
-	$update_array["text"] = $row["text"];
-	$update_array["systemID"] = $row["system_id"];
-	$update_array["public"] = $row["public"];
-	$update_array["system_name"] = $systemName["system_name"];
-
-	return $update_array;
+	
+	
 
 }
 
 //gets user information about a user and returns it as a PHP array for easy reference
-function MakeUserArray ($userName, $userid, $dataBaseConnection) {
+//you can select by username or ID number, the function will prefer username if both are provided	
+function MakeUserArray($userName, $userID, $dataBaseConnection) {
+
+	if ($userID) {
+		settype($userID, "int");
+	}
+	
 	if ($userName) {
-		$criteria = "WHERE user_username = '$userName'";
+		$criteria = "user_username LIKE ?";
 	} else {
-		$criteria = "WHERE user_id = '$userid'";
+		$criteria = "user_id = ?";
 	}
-	$user_result=$dataBaseConnection->query("SELECT * FROM user $criteria LIMIT 1");
+
+	$query = "SELECT * FROM user WHERE $criteria";
+
 	
-	if(($user_result) && ($user_result->num_rows > 0)) { // Query was successful, a user was found
+	if (!$stmt = $dataBaseConnection->prepare($query)) {
+		return "" . $stmt->error;
+	}
+
 	
-		$user = array("username" => $userName);
-		while($row = $user_result->fetch_assoc()) {
-			$user["access"] = $row["user_access"];
-			$user["id"] = $row["user_id"];
-			$user["fn"] = $row["user_fn"];
-			$user["ln"] = $row["user_ln"];
+
+	if ($userName) {
+		if (!$stmt->bind_param("s", $userName)) {
+			return "Failed to bind parameters: " . $stmt->error;
 		}
-	
-		
-		return $user;
 	} else {
-		return "User could not be found in table";
+		if (!$stmt->bind_param("i", $userID)) {
+			return "Failed to bind parameters: " . $stmt->error;
+		}
 	}
+
+
+
+	
+
+	if (!$stmt->execute()) {
+		return "Failed to execute query: " . $stmt->error;
+	}
+	
+	//for reasons opaque to me, I can't use the same bind_results method I use elsewhere to retrieve user data from the perpared statement
+	//no idea why.  I get an error that says the bind method does not exist.
+	//I do not get this error anywhere else in the program.
+	$result = $stmt->get_result();
+
+	if ($result->num_rows < 1) {
+		return "No user found";
+	} else {
+
+		$row = $result->fetch_array(MYSQLI_NUM);
+		$user = array();
+		$user["id"] = $row[0];
+		$user["username"] = $row[1];
+		$user["fn"] = $row[2];
+		$user["ln"] = $row[3];
+		$user["email"] = $row[4];
+		$user["access"] = $row[7];
+
+		return $user;
+
+	}
+
+
 }
 
 //FUNCTIONS TO DISPLAY THINGS
 
 //display the new status form.  This works better as a function than an include, because it needs to be 
-//prepopulated with a bunch of data.
+//prepopulated with a bunch of data if the user has previously tried to submit the form
 function displayNewStatusForm($issue_id, $userid, $text, $resolved, $when, $system, $filter) {
 	
 	if ($resolved) {
@@ -840,36 +909,75 @@ function displayStatus($statusData, $dataBaseConnection) {
 
 //inserts new issues into the database.  All issues MUST HAVE at least one status.
 function createNewIssue($system_id, $status_type_id, $time, $end_time, $userid, $issue_text, $public, $dataBaseConnection) {
-	//if the user doesn't supply a start time, create one
+	//we need to do multiple updates simultaneously, and submit them all at once, so we need to turn autocommit off.  
+	//this ensures the entire commit succeeds or fails.  We don't want issues without status updates or vice versa!
+
+	$dataBaseConnection->autocommit(FALSE);
+	//type integer variables.  
+	settype($system_id, "int");
+	settype($status_type_id, "int");
+	settype($userid, "int");
+	settype($public, "int");
+
+	
+
+	//figure our the start time of the issue, if it's not supplied, use the current time
 	if ($time == "") {$time = time();} else {$time = strtotime($time);}
 	
 
 	//currently, safety issues (status type 7) are always private
 	if ($status_type_id == 7) {$public = 0;} 
+
+	//begin building the query
 	
-	$query = "INSERT INTO issue_entries VALUES ('', $system_id, $status_type_id, FROM_UNIXTIME($time), ";
+	$query = "INSERT INTO issue_entries VALUES ('', ?, ?, FROM_UNIXTIME(?), ";
 	
 	
 	if ($end_time != '') { 
 		$end_time = strtotime($end_time);
-		$query = $query . "FROM_UNIXTIME($end_time), ";}
+		$query = $query . "FROM_UNIXTIME(?), ";}
 	else {
 		$query = $query . "NULL, ";
 	}
-	 $query = $query . "$userid, $public, NOW(), NOW())";
-	//we need to do multiple updates simultaneously, and submit them all at once, so we need to turn autocommit off.  
-	//this ensures the entire commit succeeds or fails.  We don't want issues without status updates or vice versa!
-	$dataBaseConnection->autocommit(FALSE);
-	$dataBaseConnection->query($query);
+	 $query = $query . "?, ?, NOW(), NOW())";
+
+	$stmt = $dataBaseConnection->prepare($query);
+
+	if ($end_time != '') {
+		if (!$stmt->bind_param("iissii", $system_id, $status_type_id, $time, $end_time, $userid, $public)) {
+			return "Failed to bind parameters: " . $stmt->error;
+		}
+	} else {
+		if (!$stmt->bind_param("iisii", $system_id, $status_type_id, $time, $userid, $public)) {
+			return "Failed to bind parameters: " . $stmt->error;
+		}
+	}
+
+	
+
+	if (!$stmt->execute()) {
+		return "Failed to execute query: " . $stmt->error;
+	}
+
+	
+	//get the id of the last inserted row
 	$issue_id = $dataBaseConnection->insert_id;
-	$query = "INSERT INTO status_entries VALUES ('',$issue_id,FROM_UNIXTIME($time),$userid,'$issue_text')";
-	$dataBaseConnection->query($query);
+
+	//prepare the second insert for the status
+	$query = "INSERT INTO status_entries VALUES ('',?,FROM_UNIXTIME(?),?,?)";
+	$stmt2 = $dataBaseConnection->prepare($query);
+	if (!$stmt2->bind_param("ssss", $issue_id, $time, $userid, $issue_text)) {
+		return "Failed to bind parameters: " . $stmt->error;
+	}
+	if (!$stmt2->execute()) {
+		return "Failed to execute query: " . $stmt->error;
+	}
 	
 	//does the commit work?
 	if ($dataBaseConnection->commit()) {
 		$returnValue = 1;
 	} else {
-		$returnValue = $dataBaseConnection->error;
+		$returnValue = "Cannot Create Issue:  " . $dataBaseConnection->error;
 	}
 	//things in the function shouldn't modify the main DB object, but just in case, make sure to turn autocommit back on.
 	$dataBaseConnection->autocommit(TRUE);
@@ -877,24 +985,42 @@ function createNewIssue($system_id, $status_type_id, $time, $end_time, $userid, 
 	
 }
 
-//delete an issue.  Note that because of the way the database is set, deleting an issue automatically deletes all status updates
+//delete an issue.  Note that because of the way the database is set up, deleting an issue automatically deletes all status updates
 //associated with an issue
 function deleteIssue($issueID, $dataBaseConnection) {
-	$query = "DELETE FROM issue_entries WHERE issue_id = '$issueID'";
-	if ($dataBaseConnection->query($query)) {
-		return true;
-	} else {
-		return "Could not delete issue: " . $dataBaseConnection->error;
+
+	settype($issueID, "int");
+	$query = "DELETE FROM issue_entries WHERE issue_id = ?";
+
+	$stmt = $dataBaseConnection->prepare($query);
+	if (!$stmt->bind_param("i", $issueID)) {
+		return "Failed to bind parameters: " . $stmt->error;
 	}
+	if (!$stmt->execute()) {
+		return "Failed to delete issue: " . $stmt->error;
+	} else {
+		return true;
+	}
+
+
+
 
 
 }
 
-//function to edit an existing issue.  Once an issue is created, the only things you can edit are the start and end time
-// and the status.  All the values are required except endTime.  Time values must be strings that can be parsed by strtotime() 
+//function to edit an existing issue.  Once an issue is created, the only things you can edit are the start and end time, 
+//visibility to the public, and the status.  
+//The building value is neccessary to make sure a status inappropriate for building issues isn't assigned.
+//  All the values are required except endTime.  
+//Time values must be strings that can be parsed by strtotime() 
 //(verify beforehand)
 
 function updateIssue($issueID, $startTime, $endTime, $statusID, $public, $building, $dataBaseConnection) {
+
+	settype($public, "int");
+	settype($statusID, "int");
+	settype($issueID, "int");
+
 
 	if ($endTime != "") {
 		$endTime = strtotime($endTime);
@@ -903,9 +1029,11 @@ function updateIssue($issueID, $startTime, $endTime, $statusID, $public, $buildi
 			return "Only Scheduled Maintenance can have a future scheduled end time.";
 
 		}
-		$endTime = "FROM_UNIXTIME($endTime)";
+
+		$queryEnd = "FROM_UNIXTIME(?)";
+		
 	} else {
-		$endTime = "NULL";
+		$queryEnd = "NULL";
 	}
 
 	if ($statusID == 7 && !$building) {
@@ -913,43 +1041,83 @@ function updateIssue($issueID, $startTime, $endTime, $statusID, $public, $buildi
 	}
 
 	$startTime = strtotime($startTime);
-	$startTime = "FROM_UNIXTIME($startTime)";
+	
 
-	$query = "UPDATE issue_entries SET public = $public, status_type_id = $statusID, end_time = $endTime, start_time = $startTime WHERE issue_id = $issueID";
+	$query = "UPDATE issue_entries SET public = ?, status_type_id = ?, end_time = $queryEnd, start_time = FROM_UNIXTIME(?) WHERE issue_id = ?";
+	
+	$stmt = $dataBaseConnection->prepare($query);
 
-	$result = $dataBaseConnection->query($query);
+	if ($queryEnd == "NULL") {
 
-	if ($result) {
-		return true;
+		
+		if (!$stmt->bind_param("iisi", $public, $statusID, $startTime, $issueID)) {
+			return "Failed to bind parameters: " . $stmt->error;
+		}
 	} else {
-		return "Could not update issue:" . $dataBaseConnection->error .$query;
+		if (!$stmt->bind_param("iissi", $public, $statusID, $endTime, $startTime, $issueID)) {
+			return "Failed to bind parameters: " . $stmt->error;
+		}
 	}
+
+	if (!$stmt->execute()) {
+		return "Could not update issue: " . $stmt->error;
+	} else {
+		return true;
+	}
+	
 
 }
 
 //remove an update from the database.  This is very straightforward.
 function deleteUpdate($updateID, $dataBaseConnection) {
-	$query = "DELETE FROM updates WHERE update_id = '$updateID'";
-	if ($dataBaseConnection->query($query)) {
-		return true;
+	settype($updateID, "int");
+
+	$query = "DELETE FROM updates WHERE update_id = ?";
+	$stmt = $dataBaseConnection->prepare($query);
+	if (!$stmt->bind_param("i", $updateID)) {
+		return "Failed to bind parameters: " . $stmt->error;
+	}
+
+	if (!$stmt->execute()) {
+		return "Could not remove update: " . $stmt->error;
 	} else {
-		return "Could not delete update: " . $dataBaseConnection->error;
+		return true;
 	}
 }
 
 
-//create a new status message.  If the new status sets the status of the main issue, change the status of the issue
+//create a new status message.  Update the last updated time of the issue to reflect the update
 function createNewStatus( $issue_id, $userID, $status_text, $dataBaseConnection) {
+	settype($issue_id, "int");
+	settype($userID, "int");
+
+	//we need to make mutliple updates at once, so turn autocommit off
 	$dataBaseConnection->autocommit(FALSE);
 	// Create the new status entry
-	$query = "INSERT INTO status_entries VALUES ('','$issue_id',NOW(),'$userID','$status_text')";
-	
-	$dataBaseConnection->query($query);
+	$query = "INSERT INTO status_entries VALUES ('',?,NOW(),?,?)";
+	$stmt = $dataBaseConnection->prepare($query);
 
-	$setTime = "UPDATE issue_entries SET last_updated = NOW() WHERE issue_id = $issue_id";
+	if (!$stmt->bind_param("iis", $issue_id, $userID, $status_text)) {
+		return "Failed to bind parameters: " . $stmt->error;
+	}
+	if (!$stmt->execute()) {
+		return "Could not change status: " . $stmt->error;
+	} 
 	
-	$dataBaseConnection->query($setTime);
 
+	$setTime = "UPDATE issue_entries SET last_updated = NOW() WHERE issue_id = ?";
+
+	$stmt = $dataBaseConnection->prepare($setTime);
+
+	if (!$stmt->bind_param("i", $issue_id)) {
+		return "Failed to bind parameters: " . $stmt->error;
+	}
+
+	if (!$stmt->execute()) {
+		return "Could not change update time of issue: " . $stmt->error;
+	} 
+	
+	//does the commit work?
 	if ($dataBaseConnection->commit()) {
 		$returnValue = true;
 	} else {
@@ -959,15 +1127,22 @@ function createNewStatus( $issue_id, $userID, $status_text, $dataBaseConnection)
 	return $returnValue;
 }
 
-//closes an issue by inserting an end time.  If a time is not supplied, the current time is used.  
-//If passed a time, it must be a unix timestamp.
+//closes an issue.  Note that this is done by setting an end time for the issue-issues without end times are considered open.
+
 function closeIssue($issueid, $dataBaseConnection) {
-	
-	$query = "UPDATE issue_entries SET end_time = NOW() WHERE issue_id = $issueid ";
-	if ($dataBaseConnection->query($query)) {
-		return true;
+	settype($issueid, "int");
+	$query = "UPDATE issue_entries SET end_time = NOW() WHERE issue_id = ?";
+
+	$stmt = $dataBaseConnection->prepare($query);
+
+	if (!$stmt->bind_param("i", $issueid)) {
+		return "Failed to bind parameters: " . $stmt->error . $issueid;
+	}
+
+	if (!$stmt->execute()) {
+		return "Issue could not be closed: " . $stmt->error;
 	} else {
-		return "Issue could not be closed: " . $dataBaseConnection->error;
+		return true;
 	}
 
 	
@@ -975,35 +1150,51 @@ function closeIssue($issueid, $dataBaseConnection) {
 
 
 //function to delete a status update.  Note that this does not work if there's only one status update left.
-//in that case, use $deleteIssue to get rid of both the issue and all associated status updates
+//ALL ISSUES MUST HAVE AT LEAST ONE STATUS MESSAGE EXPLAINING THE ISSUE.
 function deleteStatus($statusID, $dataBaseConnection) {
 	//first figure out if this is the last remaining status for this issue.  If it is, we can't delete.
-	$query = "SELECT issue_id from status_entries WHERE issue_id = (SELECT issue_id from status_entries WHERE status_id = $statusID)";
-	$result = $dataBaseConnection->query($query);
-	if (!$result) {
-		return "Could not contact database: " . $dataBaseConnection->error;
+	$query = "SELECT issue_id from status_entries WHERE issue_id = (SELECT issue_id from status_entries WHERE status_id = ?)";
+	$stmt = $dataBaseConnection->prepare($query);
+	if (!$stmt->bind_param("i", $statusID)) {
+		return "Failed to bind parameters: " . $stmt->error;
 	}
-	if ($result->num_rows <= 1) {
+
+	if (!$stmt->execute()) {
+		return "cannot extract data from database: " . $stmt->error;
+	}
+
+	$stmt->store_result();
+
+	if ($stmt->num_rows <= 1) {
 		//this is the only status for this issue.  Tell user to delete the issue instead.
 		return "Only remaining status for this issue.  Delete the issue instead.";
 	}
 
-	
-	$query = "DELETE from status_entries WHERE status_id = $statusID";
-		if ($dataBaseConnection->query($query)) {
-			return true;
-		} else {
-			return "Could not Delete Status: " . $dataBaseConnection->error;
-		}
+	//if we get this far, then delete the status
+	$query = "DELETE from status_entries WHERE status_id = ?";
+	$stmt = $dataBaseConnection->prepare($query);
+	if (!$stmt->bind_param("i", $statusID)) {
+		return "Failed to bind parameters: " . $stmt->error;
+	}
+	if (!$stmt->execute()) {
+		return "cannot extract data from database: " . $stmt->error;
+	} else {
+		return true;
+	}
 	
 
 }
 //the only things you are allowed to edit on status messages is the text of the status
 function editStatus($status_id, $status_text, $dataBaseConnection) {
-	$status_text = $dataBaseConnection->real_escape_string($status_text);
-	$query = "UPDATE status_entries SET status_text = '$status_text' WHERE status_id = $status_id";
-	if (!$dataBaseConnection->query($query)) {
-		return $dataBaseConnection->error;
+	settype($status_id, "int");
+	$query = "UPDATE status_entries SET status_text = ? WHERE status_id = ?";
+	$stmt = $dataBaseConnection->prepare($query);
+	if (!$stmt->bind_param("si", $status_text, $status_id)) {
+		return "Failed to bind parameters: " . $stmt->error;
+	}
+
+	if (!$stmt->execute()) {
+		return "cannot update status: " . $stmt->error;
 	} else {
 		return true;
 	}
@@ -1012,26 +1203,43 @@ function editStatus($status_id, $status_text, $dataBaseConnection) {
 
 //function that creates a new update
 function createNewUpdate($userid, $text, $time, $systemid, $public, $dataBaseConnection) {
-	
+	settype($userid, "int");
+	settype($systemid, "int");
+	settype($public, "int");
 	$time = strtotime($time);
-	$query = "INSERT INTO updates values('', FROM_UNIXTIME($time), $userid, '$text', $public, $systemid)";
-	
-	if ($dataBaseConnection->query($query)) {
-		return true;
+	$query = "INSERT INTO updates values('', FROM_UNIXTIME(?), ?, ?, ?, ?)";
+	$stmt = $dataBaseConnection->prepare($query);
+
+	if (!$stmt->bind_param("sisii", $time, $userid, $text, $public, $systemid)) {
+		return "Failed to bind parameters: " . $stmt->error;
+	}
+	if (!$stmt->execute()) {
+		return "cannot create update: " . $stmt->error;
 	} else {
-		return "Could not add Update: " . $dataBaseConnection->error;
+		return true;
 	}
 
 }
 
 //edit an existing update.  You can only change the text and wether it's public
 function editUpdate($updateID, $text, $public, $dataBaseConnection) {
-	$query = "UPDATE updates SET public = $public, text = '$text' WHERE update_id = $updateID";
-	if ($dataBaseConnection->query($query)) {
-		return true;
-	} else {
-		return "Could not edit Update: " . $dataBaseConnection->error;
+	settype($updateID, "int");
+	settype($public, "int");
+	$query = "UPDATE updates SET public = ?, text = ? WHERE update_id = ?";
+
+	$stmt = $dataBaseConnection->prepare($query);
+
+	if (!$stmt->bind_param("isi", $public, $text, $updateID)) {
+		return "Failed to bind parameters: " . $stmt->error;
 	}
+
+	if (!$stmt->execute()) {
+		return "cannot edit update: " . $stmt->error;
+	} else {
+		return true;
+	}
+
+	
 
 
 

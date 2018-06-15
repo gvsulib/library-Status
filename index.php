@@ -72,8 +72,9 @@ $userMessage = NULL;
 
 //variable to track if user is logged in
 $logged_in = 0; 
+//uncomment to force a login
 
-
+//$_COOKIE['login'] = "felkerk";
 
 if ($_COOKIE['login'] != "") { // User has logged in
 	
@@ -81,7 +82,8 @@ if ($_COOKIE['login'] != "") { // User has logged in
 
 	//attempt to make a user object
 		
-	$user = MakeUserArray($_COOKIE['login'],'', $db);
+	$user = MakeUserArray($_COOKIE['login'], '', $db);
+	
 	if (is_array($user)) {
 		$logged_in = 1;
 	} else {
@@ -90,6 +92,8 @@ if ($_COOKIE['login'] != "") { // User has logged in
 	}
 	
 }
+
+
 
 // User has filled out the asana problem submission form, process and submit
 if (isset($_POST["email-asana"])) {
@@ -145,7 +149,7 @@ if (isset($_POST['submit_issue']) && $logged_in == 1) {
 	}
 	
 	
-	$text = $db->real_escape_string($_POST['issue_text']);
+	$text = $_POST['issue_text'];
 	$systemid = $_POST['system_id'];
 	$statusid = $_POST['status_type_id'];
 	$userid = $_POST['userid'];
@@ -166,7 +170,7 @@ if (isset($_POST['submit_issue']) && $logged_in == 1) {
 	//check data for problems
 	
 	$verify = verifyReportFormData($time, $end_time, $statusid, $systemid, $db);
-				
+		
 	
 	if ($verify !== true) {
 		$userMessage = '<div class="alert alert-danger">' . $verify . '</div>';
@@ -179,7 +183,9 @@ if (isset($_POST['submit_issue']) && $logged_in == 1) {
 	if($statusid == 0 && $verify) { // Update
 		
 		$created = createNewUpdate($userid, $text, $time, $systemid, $public, $db);
-		if (is_string($created)) {
+		
+		if ($created != 1) {
+			
 			$userMessage = '<div class="alert alert-danger">' . $created . '</div>';
 			$submitted = false;
 		} else {
@@ -190,21 +196,22 @@ if (isset($_POST['submit_issue']) && $logged_in == 1) {
 
 		//is someone trying to report a building problem?
 		$building = getBuilding($_POST['system_id'], $db);
+		
 
-		echo $building;
-		//do you have access to report building problems?
-		if (is_null($building)) {
-	
-			$can_post = true;
-
-		} else if ($building === false) {
-			$can_post = false;
-			$userMessage = '<div class="alert alert-danger">Unable to post: cannot get information on system from the database.</div>';
+		
+		//if not, post away
+		 if ($building === false) {
+			$can_post = TRUE;
+			
 		} else {
+			//if so, then do you have access?  if not, stop and give error
 			if ($_POST['status_type_id'] == 7 && ($user["access"] != 2 || $user["access"] != 9)) {
 				$can_post = false;
 				$userMessage = '<div class="alert alert-danger">You are not authorized to log this type of issue on this system.</div>';
 
+			} else {
+				//if you do, post away
+				$can_post = TRUE;
 			}
 		}
 
@@ -226,9 +233,7 @@ if (isset($_POST['submit_issue']) && $logged_in == 1) {
 	if (isset($_POST['submit_status']) && $logged_in = 1) {
 		$userid = $_POST['user_id'];
 		$issue_id = $_POST['issue_id'];
-		$status_text = $db->real_escape_string($_POST['status']);
-		//verify and format time 
-	
+		
 	
 	//is the user closing the issue?  If so, try to close it, and if that doesn't work, STOP
 	//if it does work, or the user is not closing the issue, make the new status update
@@ -683,7 +688,7 @@ include 'resources/php/header.php';
 			foreach ($status_ids as $statusid) {
 				
 				$status = getStatusData($statusid, $db);
-
+				
 				displayStatus($status, $db);
 
 			}
