@@ -233,6 +233,7 @@ if (isset($_POST['submit_issue']) && $logged_in == 1) {
 	if (isset($_POST['submit_status']) && $logged_in = 1) {
 		$userid = $_POST['user_id'];
 		$issue_id = $_POST['issue_id'];
+		$status_text = $_POST['status'];
 		
 	
 	//is the user closing the issue?  If so, try to close it, and if that doesn't work, STOP

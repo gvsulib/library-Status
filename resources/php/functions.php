@@ -776,27 +776,30 @@ function MakeUserArray($userName, $userID, $dataBaseConnection) {
 		return "Failed to execute query: " . $stmt->error;
 	}
 	
-	//for reasons opaque to me, I can't use the same bind_results method I use elsewhere to retrieve user data from the perpared statement
-	//no idea why.  I get an error that says the bind method does not exist.
-	//I do not get this error anywhere else in the program.
-	$result = $stmt->get_result();
+	if (!$stmt->execute()) {
+		return "Failed to execute query: " . $stmt->error;
+	}
+	$stmt->store_result();
 
-	if ($result->num_rows < 1) {
+
+
+	if ($stmt->num_rows < 1) {
 		return "No user found";
 	} else {
-
-		$row = $result->fetch_array(MYSQLI_NUM);
+		$stmt->bind_result($id, $username, $fn, $ln, $email, $delete, $notifications, $access);
+		$stmt->fetch();
 		$user = array();
-		$user["id"] = $row[0];
-		$user["username"] = $row[1];
-		$user["fn"] = $row[2];
-		$user["ln"] = $row[3];
-		$user["email"] = $row[4];
-		$user["access"] = $row[7];
+		$user["id"] = $id;
+		$user["username"] = $username;
+		$user["fn"] = $fn;
+		$user["ln"] = $ln;
+		$user["email"] = $email;
+		$user["access"] = $access;
 
 		return $user;
 
 	}
+
 
 
 }
