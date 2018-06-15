@@ -4,6 +4,7 @@
 use Michelf\Markdown;
 
 if ($use_SMTP) {
+	
 	require_once "Mail.php";
 }
 
@@ -15,12 +16,21 @@ if ($use_SMTP) {
 */
 
 function send_email_SMTP($name,$email,$message, $url) {
-
+	
 	//get general email settings
 	global $to_email, $from_email, $email_subject, $use_SMTP;
 
 	//get SMTP settings
 	global $SMTP_username, $SMTP_password, $SMTP_server, $SMTP_port;
+
+
+	$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+	$name = filter_var($name, FILTER_SANITIZE_STRING);
+	
+
+	if (!$email || !$name){
+		return "invalid email or name parameter.";
+	}
 	
 	// Build the message
 	$error_report = $message;
@@ -50,7 +60,7 @@ function send_email_SMTP($name,$email,$message, $url) {
 	$mail = $smtp->send($to_email, $headers, $error_report);
 
 	if (PEAR::isError($mail)) {
-          	return $mail->getMessage();
+          	return "can't send mail:" . $mail->getMessage();
 	} else {
           return true;
 	} 
