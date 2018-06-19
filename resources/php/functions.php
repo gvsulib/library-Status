@@ -23,14 +23,18 @@ function send_email_SMTP($name,$email,$message, $url) {
 	//get SMTP settings
 	global $SMTP_username, $SMTP_password, $SMTP_server, $SMTP_port;
 
-
+	$verify = filter_var($email, FILTER_VALIDATE_EMAIL);
 	$email = filter_var($email, FILTER_SANITIZE_EMAIL);
 	$name = filter_var($name, FILTER_SANITIZE_STRING);
-	
 
-	if (!$email || !$name){
-		return "invalid email or name parameter.";
+	if (!$email || !$verify) {
+		return "Cannot verify or sanitize email address.";
 	}
+
+	if (!$name) {
+		return "Problem with entered name.";
+	}
+	
 	
 	// Build the message
 	$error_report = $message;
@@ -73,6 +77,18 @@ function send_email($name,$email,$message, $url) {
 
 	global $to_email, $from_email, $email_subject, $use_SMTP;
 
+	$verify = filter_var($email, FILTER_VALIDATE_EMAIL);
+	$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+	$name = filter_var($name, FILTER_SANITIZE_STRING);
+
+	if (!$email || !$verify) {
+		return "Cannot verify or sanitize email address.";
+	}
+
+	if (!$name) {
+		return "Problem with entered name.";
+	}
+
 	
 
 /*
@@ -93,24 +109,6 @@ function send_email($name,$email,$message, $url) {
 	$headers = "From: " . $from_email . "\r\n";
 	$headers .= "Reply-To: felkerk@gvsu.edu\r\n";
 	$headers .= "X-Mailer: PHP/".phpversion() . "\r\n";
-
-	// Check to make sure there are no really sneaky naught bits in the message
-	if (contains_bad_str($message)) {
-		return false;
-	}
-	if (contains_bad_str($email)) {
-		return false;
-	}
-	if (contains_bad_str($name)){
-		return false;
-	}
-	if (contains_newlines($email)) {
-		return false;
-	}
-	if (contains_newlines($name)) {
-		return false;
-	}
-
 	$headers .= "Cc: " . $email;
 
 	// Build the message
