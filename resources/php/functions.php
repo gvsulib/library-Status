@@ -546,6 +546,7 @@ function getIssues($building, $status, $system, $open, $public, $user, $limit, $
 		$query = $query . "AND (i.end_time IS NOT NULL AND i.end_time < NOW()) ";
 	}
 	if ($user) {
+		settype($user, "int");
 		$query = $query . "AND i.created_by = $user ";
 	}
 
