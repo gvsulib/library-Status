@@ -1,6 +1,13 @@
 <?php
+
+header("Access-Control-Allow-Origin: https://" . $_SERVER["HTTP_HOST"]);
+
+
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 setcookie("referrer", $actual_url, 0, "/");
+
+
+
 
 if (!isset($_COOKIE["login"])) {
 	setcookie("login", "", 0, "/");
