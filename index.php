@@ -345,9 +345,7 @@ if(isset($_GET['url'])) {
 include 'resources/php/header.php';	
 
 
-//var_dump($_SERVER);
-echo $stringVerify;
-echo $_SERVER["HTTP_ORIGIN"];
+
 ?>
 
 
