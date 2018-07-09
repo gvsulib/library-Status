@@ -3,8 +3,8 @@
 
 if (isset($_SERVER['HTTP_ORIGIN']) && isset($_SERVER["SERVER_NAME"])) {
 	$stringVerify = "https://" . $_SERVER["SERVER_NAME"];
-	$verify = strcmp($_SERVER['HTTP_ORIGIN'], $stringVerify);
-	if ($verify == 0) {
+	
+	if (strcmp($_SERVER['HTTP_ORIGIN'], $stringVerify) == 0) {
 		$spamEmail = false;
 	} else {
 		$spamEmail = true;
@@ -345,8 +345,9 @@ if(isset($_GET['url'])) {
 include 'resources/php/header.php';	
 
 
-var_dump($_SERVER);
-
+//var_dump($_SERVER);
+echo $stringVerify;
+echo $_SERVER["HTTP_ORIGIN"];
 ?>
 
 
