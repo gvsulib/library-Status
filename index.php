@@ -1,10 +1,17 @@
 <?php
 
-$allowed_origins = array('https://gvsu.edu');
-if (isset($_SERVER['HTTP_ORIGIN']) && !in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
-    $spamEmail = true;
+
+if (isset($_SERVER['HTTP_ORIGIN']) && isset($_SERVER["SERVER_NAME"])) {
+	$stringVerify = "https://" . $_SERVER["SERVER_NAME"];
+	$verify = strcmp($_SERVER['HTTP_ORIGIN'], $stringVerify);
+	if ($verify == 0) {
+		$spamEmail = false;
+	} else {
+		$spamEmail = true;
+	}
+    
 } else {
-	$spamEmail = false;
+	$spamEmail = true;
 }
 
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
@@ -141,7 +148,7 @@ if (isset($_POST["email-asana"])) {
 		
 		}
 	} else {
-		$userMessage = '<div class="lib-error">You need to verify that you are not a robot by using the captcha.  Please try again.</div>';
+		$userMessage = '<div class="lib-error">You either did not pass the captcha or your request is not from an allowed origin.  Please try again.</div>';
 		
 	}
 
@@ -337,9 +344,10 @@ if(isset($_GET['url'])) {
 //load the header HTML
 include 'resources/php/header.php';	
 
+
+var_dump($_SERVER);
+
 ?>
-
-
 
 
 <div id="cms-body-wrapper">
