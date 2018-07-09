@@ -1,7 +1,11 @@
 <?php
 
-header("Access-Control-Allow-Origin: https://" . $_SERVER["HTTP_HOST"]);
-
+$allowed_origins = array('https://gvsu.edu');
+if (isset($_SERVER['HTTP_ORIGIN']) && !in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
+    $spamEmail = true;
+} else {
+	$spamEmail = false;
+}
 
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 setcookie("referrer", $actual_url, 0, "/");
@@ -113,7 +117,7 @@ if (isset($_POST["email-asana"])) {
 	}
 
 
-	if ($verify === true) {
+	if ($verify === true && $spamEmail === false) {
 		if (isset($_POST["name"])) {$name = $_POST["name"];} else {$name = "none";}
 		if (isset($_POST["email"])) {$email = $_POST["email"];} else {$email = "";}
 		$message = $_POST["feedback"];
