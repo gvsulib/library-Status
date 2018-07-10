@@ -2,9 +2,11 @@
 
 
 if (isset($_SERVER['HTTP_ORIGIN']) && isset($_SERVER["SERVER_NAME"])) {
-	$stringVerify = "https://" . $_SERVER["SERVER_NAME"];
 	
-	if (strcmp($_SERVER['HTTP_ORIGIN'], $stringVerify) == 0) {
+	$arr = explode("//", $_SERVER['HTTP_ORIGIN']);
+	$stringVerify = $arr[1];
+	
+	if (strcmp($stringVerify, $_SERVER["SERVER_NAME"]) == 0) {
 		$spamEmail = false;
 	} else {
 		$spamEmail = true;
