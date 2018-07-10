@@ -146,11 +146,11 @@ if (isset($_POST["email-asana"])) {
 		if ($result === true) {
 			$userMessage = '<div class="alert alert-success">Report sent!  We will get on it ASAP!</div>';
 		} else {
-			$userMessage = '<div class="lib-error">Uh-oh. There was a problem sending your report. Maybe try calling the library at ' . $library_phone . '?  Error message:' . $result . '  </div>';
+			$userMessage = '<div class="alert-danger">Uh-oh. There was a problem sending your report. Maybe try calling the library at ' . $library_phone . '?  Error message:' . $result . '  </div>';
 		
 		}
 	} else {
-		$userMessage = '<div class="lib-error">You either did not pass the captcha or your request is not from an allowed origin.  Please try again.</div>';
+		$userMessage = '<div class="alert-danger">You either did not pass the captcha or your request is not from an allowed origin.  Please try again.</div>';
 		
 	}
 
