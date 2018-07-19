@@ -294,7 +294,10 @@ $system = 0;
 
 if (isset($_GET['system'])) {
 	if ($_GET['system'] != 0) {
+		
 		$system = $_GET['system'];
+		settype($system, "integer");
+		
 		
 
 	}
@@ -302,6 +305,7 @@ if (isset($_GET['system'])) {
 } else if (isset($_POST['system'])) {
 	if ($_POST['system'] != 0) {
 		$filter = $_POST['system'];
+		settype($filter, "integer");
 		
 
 	}	
@@ -316,12 +320,14 @@ $filter = 0; // all issues by default
 if (isset($_GET['filter'])) {
 	if ($_GET['filter'] != 0) {
 			$filter = $_GET['filter'];
+			settype($filter, "integer");
 			
 	
 	}
 } else if (isset($_POST['filter'])) {
 	if ($_POST['filter'] != 0) {
 		$filter = $_POST['filter'];
+		settype($filter, "integer");
 		
 
 	}
@@ -331,10 +337,11 @@ if (isset($_GET['filter'])) {
 
 if (isset($_GET['systemID'])) {
 	$systemID = $_GET['systemID'];
+	settype($systemID, "integer");
 
 
 } else {
-	$systemID = "ALL";
+	$systemID = 0;
 }
 
 
@@ -549,7 +556,7 @@ include 'resources/php/header.php';
 		<div class="span1 unit right">
 			<label for="systemID"> Filter by system:</label>
 				<select name="systemID">
-				<option value="ALL">All</option>
+				<option value="0">All</option>
 				<?php
 					foreach ($systemArray as $id => $name) {
 					if ($id == $systemID) {$selected = "selected";} else {$selected = "";}
@@ -601,7 +608,7 @@ include 'resources/php/header.php';
 		$public = true;
 	}
 
-	if ($systemID == "ALL") {
+	if ($systemID == 0) {
 		$systemID = '';
 	} 
 
