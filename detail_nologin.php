@@ -59,8 +59,11 @@ if (isset($_GET["logout"])) {
 //in all cases, a type and an id for the issue or update must be passed or the page won't display
 if (isset($_GET['id'])) {
 	$ID = $_GET['id'];
+	settype($ID, "integer");
+	
 } else if (isset($_POST['id'])) {
 	$ID = $_POST['id'];	
+	set_type($ID, "integer");
 } else {
 	$ID = false;
 	$userMessage = "<div class=\"alert alert-danger\">No system ID provided.</div>";
@@ -69,11 +72,18 @@ if (isset($_GET['id'])) {
 
 //get the type of posting (issue or update), either from GET or POST.
 if (isset($_GET['type'])) {
-	$type = $_GET['type'];
+	if ($_GET['type'] == "issue") {
+		$type = "issue";
+	} else if ($_GET['type'] == "update") {
+		$type = "update";
+	} else {
+		$type = false;
+		$userMessage = "<div class=\"alert alert-danger\">Type of data not specified</div>";
+	}
 
 } else if (isset($_POST['type'])) {
 	$ID = $_POST['type'];	
-
+	set_type($ID, "integer");
 } else {
 	$type = false;
 	$userMessage = "<div class=\"alert alert-danger\">Type of data not specified</div>";
