@@ -53,13 +53,17 @@ function send_email_SMTP($name,$email,$message, $url) {
 	'Reply-To' => 'felkerk@gvsu.edu',
 	"X-Mailer" =>  "PHP/" . phpversion()
 	);
-
+	/*
 	$smtp = Mail::factory('smtp',
 		array ('host' => $SMTP_server,
 		'port' => $SMTP_port, 
 		'auth' => true,
 		'username' => $SMTP_username,
 		'password' => $SMTP_password));
+	*/
+	$smtp = Mail::factory('smtp',
+		array ('host' => $SMTP_server,
+		'port' => $SMTP_port));
 
 	$mail = $smtp->send($to_email, $headers, $error_report);
 
