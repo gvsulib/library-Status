@@ -706,7 +706,8 @@ include 'resources/php/header.php';
 
 	foreach ($results as $result) {
 		if ($result["type"] == "issue") {
-			echo '<!-- Issue --> <div class = "row row-gutter issue-box col-12" id="'. $result["id"] . '">';
+			echo '<!-- Issue --> <div class = "row row-gutter issue-box" id="'. $result["id"] . '">';
+			echo '<div class="col-12">';
 
 			
 			displayIssue($result);
@@ -752,14 +753,15 @@ include 'resources/php/header.php';
 
 				echo displayNewStatusForm($issueid, $userid, $text, $resolved, $when, $system, $filter);
 			}
-			echo '</div>';
+			echo '</div></div>';
 		
 		} else if ($result["type"] == "update") {
 			
-			echo '<!-- Issue --> <div class = "row row-gutter issue-box col-12" id="'. $result["update_id"] . '">';
+			echo '<!-- Issue --> <div class = "row row-gutter issue-box" id="'. $result["update_id"] . '">';
+			echo '<div class="col-12">';
 			displayUpdate($result, $db);
 			if ($logged_in == 1  && $user["id"] == $result["user"]) {echo '<a href="detail.php?type=' . $result["type"] . '&id=' . $result["update_id"] . '">Edit or delete this update</a>';}
-			echo '</div>';
+			echo '</div></div>';
 			
 		}	
 	}
