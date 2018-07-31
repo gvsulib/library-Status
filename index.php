@@ -431,7 +431,7 @@ include 'resources/php/header.php';
 			</ul>
 		</div>
 
-		<div class="cms-clear"></div>
+		<div class="clear"></div>
 	</div>
 
 	<div class="row row-gutter break status-table">
@@ -513,7 +513,7 @@ include 'resources/php/header.php';
 
 			</div>
 	</div> <!-- end line -->
-	<div class="cms-clear"></div>
+	<div class="clear"></div>
 	
 
 	<!--
@@ -534,7 +534,7 @@ include 'resources/php/header.php';
 	?>
 
 	<!-- Add blog-like view of incidents -->
-	<div class="cms-clear"></div>
+	<div class="clear"></div>
 	
 
 	<div class="row row-gutter status-bar">
@@ -570,7 +570,7 @@ include 'resources/php/header.php';
 				<input type="submit" value="Filter">
 				</form>
 		</div>
-		<div class="cms-clear"></div>
+		<div class="clear"></div>
 	</div>
 	
 	
@@ -585,7 +585,7 @@ include 'resources/php/header.php';
 		
 
 	
-	<div class="cms-clear"></div>
+	<div class="clear"></div>
 	<?php
 
 	//Get ready to retrieve issues and updates based on the system and filter criteria the user has chosen for the blog display
