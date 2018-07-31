@@ -382,8 +382,9 @@ include 'resources/php/header.php';
 	</div>
 </div> <!-- end line -->
 
-<div class="cms-clear"></div>
+<div class="clear"></div>
 	<div class="row row-gutter break" style="margin-top: 1em;">
+		<div class="col-12">
 	
 		<?php
 
@@ -411,6 +412,7 @@ include 'resources/php/header.php';
 			echo $status;
 
 		?>
+		</div>
 
 	</div> <!-- end line -->
 
