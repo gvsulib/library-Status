@@ -364,16 +364,16 @@ include 'resources/php/header.php';
 			<div id="cms-body-table">
 				<div id="cms-content">
 
-<div class="row break">
-	<div class="span3 unit left">
+<div class="row row-gutter break">
+	<div class="col-12 unit left">
 		<h2><a href="index.php"><?php echo $library_name; ?> Status</a></h2>
 	</div> <!-- end span -->
 </div>
-<div class="row">
-<div class="span1">&nbsp;</div>
+<div class="row row-gutter">
+<div class="col-4 col-sm-12">&nbsp;</div>
 
 	<!--login link-->
-	<div class="span2 unit right lib-horizontal-list" style="text-align: right;margin-top:.65em; overflow:visible;">
+	<div class="col-8 col-sm-12 unit right lib-horizontal-list" style="text-align: right;margin-top:.65em; overflow:visible;">
 		<ul>
 
 				
@@ -383,7 +383,7 @@ include 'resources/php/header.php';
 </div> <!-- end line -->
 
 <div class="cms-clear"></div>
-	<div class="row break" style="margin-top: 1em;">
+	<div class="row row-gutter break" style="margin-top: 1em;">
 	
 		<?php
 
@@ -414,13 +414,13 @@ include 'resources/php/header.php';
 
 	</div> <!-- end line -->
 
-	<div class="row status-bar" style="clear: both; margin: 2em 0; padding: .75em 1%; background: #eee; border: 1px solid #bbb;">
+	<div class="row row-gutter status-bar" style="clear: both; margin: 2em 0; padding: .75em 1%; background: #eee; border: 1px solid #bbb;">
 			
 
 			<!--select wether you want to look at systems or buildings.  
 			0=systems, 1=building issues, 3 = both-->
 
-		<div class="span2 unit left lib-horizontal-list">
+		<div class="col-8 col-sm-12 unit left lib-horizontal-list">
 			<ul>
 				<li><a href="index.php?system=0&filter=<?php echo $filter; ?>&systemID=<?php echo $systemID; ?>" class="status-button btn btn-default <?php echo ($system == 0 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-recent"><?php echo ($system == 0 ? 'Showing' : 'Show'); ?> Systems</a></li>
 				<li><a href="index.php?system=1&filter=<?php echo $filter; ?>&systemID=<?php echo $systemID; ?>" class="status-button btn btn-default <?php echo ($system == 1 ? 'active' : ''); ?>" style="margin-top: -.5em" id="filter-unresolved"><?php echo ($system == 1 ? 'Showing' : 'Show'); ?> Buildings</a></li>
@@ -432,9 +432,9 @@ include 'resources/php/header.php';
 		<div class="cms-clear"></div>
 	</div>
 
-	<div class="row break status-table">
+	<div class="row row-gutter break status-table">
 
-		<div class="half">
+		<div class="col-6 col-sm-12">
 
 						<!-- build the status table for systems -->
 						<?php
@@ -535,9 +535,9 @@ include 'resources/php/header.php';
 	<div class="cms-clear"></div>
 	
 
-	<div class="row status-bar">
+	<div class="row row-gutter status-bar">
 
-		<div class="span2 unit left">
+		<div class="col-8 col-sm-12 unit left">
 			
 			<form action="index.php" method="get">
 	
@@ -553,7 +553,7 @@ include 'resources/php/header.php';
 				<option value="3" <?php if ($filter == "3") {echo "selected";}?>>Updates</option>
 			</select>
 		</div>
-		<div class="span1 unit right">
+		<div class="col-4 col-sm-12 unit right">
 			<label for="systemID"> Filter by system:</label>
 				<select name="systemID">
 				<option value="0">All</option>
@@ -572,8 +572,8 @@ include 'resources/php/header.php';
 	</div>
 	
 	
-<div class="row">
-	<div class="span3 unit left subscription-list" style="text-align:right;">
+<div class="row row-gutter">
+	<div class="col-12 unit left subscription-list" style="text-align:right;">
                         <p>Subscribe: <a href="<?php echo $rss_url; ?>" title="Subscribe to the RSS feed">RSS</a>&nbsp;
                                 //&nbsp;
                                 <a href="<?php echo $email_subscription_url; ?>" title="Subscribe to updates via Email">Email</a></p>
@@ -706,7 +706,7 @@ include 'resources/php/header.php';
 
 	foreach ($results as $result) {
 		if ($result["type"] == "issue") {
-			echo '<!-- Issue --> <div class = "row issue-box span3" id="'. $result["id"] . '">';
+			echo '<!-- Issue --> <div class = "row row-gutter issue-box col-12" id="'. $result["id"] . '">';
 
 			
 			displayIssue($result);
@@ -756,7 +756,7 @@ include 'resources/php/header.php';
 		
 		} else if ($result["type"] == "update") {
 			
-			echo '<!-- Issue --> <div class = "row issue-box span3" id="'. $result["update_id"] . '">';
+			echo '<!-- Issue --> <div class = "row row-gutter issue-box col-12" id="'. $result["update_id"] . '">';
 			displayUpdate($result, $db);
 			if ($logged_in == 1  && $user["id"] == $result["user"]) {echo '<a href="detail.php?type=' . $result["type"] . '&id=' . $result["update_id"] . '">Edit or delete this update</a>';}
 			echo '</div>';
@@ -768,11 +768,7 @@ include 'resources/php/header.php';
 	?>
 
 
-	<div class="row break footer">
-	<div class="span3 unit break">
-		<p>Written by <a href="mailto:felkerk@gvsu.edu" title="K-felk">Kyle Felker</a> for <a href="http://gvsu.edu/library">Grand Valley State University Libraries</a>. Code is <a href="https://github.com/gvsulib/library-Status">available on Github</a>.</p>
-	</div> <!-- end span -->
-	</div> <!-- end line -->
+	
 </div><!-- End #cms-content -->
 				</div><!-- End #cms-body-table -->
 			</div><!-- End #cms-body-inner -->
