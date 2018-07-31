@@ -79,10 +79,11 @@ if (isset($_POST["submit_issue"]) && isset($submitted)) {
 
 				<div class = "col-12 unit" style="float: left; padding: 1em 0">
 					<textarea required style="font-size: 1em;width:96%" name="issue_text" placeholder="describe the issue (required)"><?php echo $text; ?></textarea>
+					<input class="status-button" style="float: left;" name="submit_issue" type="submit" value="Submit Issue" />
+
 				</div>
 
-				<input class="status-button" style="float: left;" name="submit_issue" type="submit" value="Submit Issue" />
-
+				
 				
 			</form>
 
