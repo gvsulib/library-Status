@@ -23,18 +23,34 @@ function send_email_SMTP($name,$email,$message, $url) {
 	//get SMTP settings
 	global $SMTP_username, $SMTP_password, $SMTP_server, $SMTP_port;
 
-	$verify = filter_var($email, FILTER_VALIDATE_EMAIL);
-	$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+	
+	
 	$name = filter_var($name, FILTER_SANITIZE_STRING);
 
-	if (!$email || !$verify) {
-		return "Cannot verify or sanitize email address.";
-	}
+	if ($email != "") {
+		$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+		if (!$email) {
+			return "Not a valid email address.";
+		}
+	} 
 
 	if (!$name) {
 		return "Problem with entered name.";
 	}
+
+	$headers = array();
+
+	if ($email != "") {
+		$headers["Cc"] = $email;
+	}
 	
+	$headers["From"] = $from_email;
+	$headers["To"] = $to_email;
+	$headers["Subject"] = $email_subject;
+	$headers["X-Mailer"] = "PHP/" . phpversion();
+	$headers["Reply-To"] = "Noreply@null.net";
+
+
 	
 	// Build the message
 	$error_report = $message;
@@ -45,22 +61,6 @@ function send_email_SMTP($name,$email,$message, $url) {
 		$error_report .= "\n" . 'URL: ' . $url;
 	}
 	
-
-	$headers = array ('From' => $from_email,
-	'To' => $to_email,
-	'Subject' => $email_subject,
-	'Cc' => $email,
-	'Reply-To' => 'felkerk@gvsu.edu',
-	"X-Mailer" =>  "PHP/" . phpversion()
-	);
-	/*
-	$smtp = Mail::factory('smtp',
-		array ('host' => $SMTP_server,
-		'port' => $SMTP_port, 
-		'auth' => true,
-		'username' => $SMTP_username,
-		'password' => $SMTP_password));
-	*/
 	$smtp = Mail::factory('smtp',
 		array ('host' => $SMTP_server,
 		'port' => $SMTP_port));
