@@ -1,20 +1,11 @@
 <?php
 
 
-if (isset($_SERVER['HTTP_ORIGIN']) && isset($_SERVER["SERVER_NAME"])) {
-	
-	$arr = explode("//", $_SERVER['HTTP_ORIGIN']);
-	$stringVerify = $arr[1];
-	
-	if (strcmp($stringVerify, $_SERVER["SERVER_NAME"]) == 0) {
-		$spamEmail = false;
-	} else {
-		$spamEmail = true;
-	}
-    
-} else {
-	$spamEmail = true;
-}
+//Generate a random token to use for CSRF security
+
+$security = rand(10000, 99999);
+
+setcookie("token", "$security", 0, "/");
 
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 setcookie("referrer", $actual_url, 0, "/");
@@ -125,8 +116,16 @@ if (isset($_POST["email-asana"])) {
 		$verify = false;
 	}
 
+	//now verify the token to prevent CSRF attacks
+	$verify_token = false;
+	if (isset($_COOKIE['token']) && isset($_POST['token'])) {
+		if ($_COOKIE['token'] == $_POST['token']) {
+			$verify_token = true;
+		}
+	}
 
-	if ($verify === true && $spamEmail === false) {
+
+	if ($verify === true && $verify_token === true) {
 		if (isset($_POST["name"])) {$name = $_POST["name"];} else {$name = "none";}
 		if (isset($_POST["email"])) {$email = $_POST["email"];} else {$email = "";}
 		$message = $_POST["feedback"];
@@ -150,7 +149,7 @@ if (isset($_POST["email-asana"])) {
 		
 		}
 	} else {
-		$userMessage = '<div class="alert-danger">You either did not pass the captcha or your request is not from an allowed origin.  Please try again.</div>';
+		$userMessage = '<div class="alert-danger">there was a problem submitting the form.  Check the captcha, and make sure you have cookies turned on in your browser.  Then try again.</div>';
 		
 	}
 

@@ -1,7 +1,10 @@
+
+
 <div class="feedback lib-form row">
 <a name="problem"><h3>Report an Issue</h3></a>
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 		<form method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
+		<input type="hidden" name="token" value="<? echo "$security";?>">
 		
 		<div class="span2 unit left">
 			<label for="name">Your Name:</label>

@@ -80,13 +80,16 @@ function send_email_SMTP($name,$email,$message, $url) {
 function send_email($name,$email,$message, $url) {
 
 	global $to_email, $from_email, $email_subject, $use_SMTP;
-
-	$verify = filter_var($email, FILTER_VALIDATE_EMAIL);
-	$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+	if ($email != "") {
+		$verify = filter_var($email, FILTER_VALIDATE_EMAIL);
+		$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+		
+	}
 	$name = filter_var($name, FILTER_SANITIZE_STRING);
-
-	if (!$email || !$verify) {
+	if ($email != "") {
+		if (!$verify) {
 		return "Cannot verify or sanitize email address.";
+		}
 	}
 
 	if (!$name) {
@@ -110,10 +113,13 @@ function send_email($name,$email,$message, $url) {
 //require_field($name, "name");
 
 	// Build the headers
+	
 	$headers = "From: " . $from_email . "\r\n";
 	$headers .= "Reply-To: felkerk@gvsu.edu\r\n";
 	$headers .= "X-Mailer: PHP/".phpversion() . "\r\n";
-	$headers .= "Cc: " . $email;
+	if ($email != "") {
+		$headers .= "Cc: " . $email;
+	}
 
 	// Build the message
 	$error_report = $message;
