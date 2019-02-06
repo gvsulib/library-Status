@@ -1,11 +1,11 @@
 <?php
-
-
 //Generate a random token to use for CSRF security
+$token = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
+if (session_status() == PHP_SESSION_NONE) {
+	session_start();
+	$_SESSION['token'] = $token;
+}
 
-$security = rand(1000000, 999999);
-
-setcookie("token", "$security", 0, "/", $secure=true);
 
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 setcookie("referrer", $actual_url, 0, "/");
@@ -118,14 +118,25 @@ if (isset($_POST["email-asana"])) {
 
 	//now verify the token to prevent CSRF attacks
 	$verify_token = false;
-	if (isset($_COOKIE['token']) && isset($_POST['token'])) {
-		if ($_COOKIE['token'] == $_POST['token']) {
+	if (isset($_SESSION['token']) && isset($_POST['token'])) {
+		if ($_SESSION['token'] == $_POST['token']) {
 			$verify_token = true;
 		}
 	}
 
+	//check the referrer cookie-if this was submitted from our form, it should be the url of the form.
 
-	if ($verify === true && $verify_token === true) {
+	
+	if (isset($_COOKIE["referrer"])) {
+		if ($_COOKIE["referrer"] == $actual_url) {
+			$verify_ref = true;
+		}
+
+	}
+
+
+
+	if ($verify === true && $verify_token === true && $verify_ref==true) {
 		if (isset($_POST["name"])) {$name = $_POST["name"];} else {$name = "none";}
 		if (isset($_POST["email"])) {$email = $_POST["email"];} else {$email = "";}
 		$message = $_POST["feedback"];
@@ -149,7 +160,7 @@ if (isset($_POST["email-asana"])) {
 		
 		}
 	} else {
-		$userMessage = '<div class="alert-danger">there was a problem submitting the form.  Check the captcha, and make sure you have cookies turned on in your browser.  Then try again.</div>';
+		$userMessage = '<div class="alert-danger">There was a problem submitting the form.  Check the captcha, then try again.</div>';
 		
 	}
 
