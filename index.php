@@ -113,7 +113,7 @@ if ($_COOKIE['login'] != "") { // User has logged in
 // User has filled out the asana problem submission form, process and submit
 if (isset($_POST["email-asana"])) {
 
-	var_dump($_POST);
+	
 	
 	//verify the captcha
 	if (isset($_POST["g-recaptcha-response"]) && $_POST["g-recaptcha-response"] != "") {
