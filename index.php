@@ -3,7 +3,11 @@
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 setcookie("referrer", $actual_url, 0, "/");
 
-
+if (!isset($_COOKIE["token"])) {
+	$token = bin2hex(openssl_random_pseudo_bytes(16));
+	setcookie("token", "$token", 0, "/");
+	$_COOKIE["token"] = $token;
+}
 
 
 if (!isset($_COOKIE["login"])) {
@@ -111,8 +115,8 @@ if (isset($_POST["email-asana"])) {
 
 	//now verify the token to prevent CSRF attacks
 	$verify_token = false;
-	if (isset($_SESSION['token']) && isset($_POST['token'])) {
-		if ($_SESSION['token'] == $_POST['token']) {
+	if (isset($_COOKIE['token']) && isset($_POST['token'])) {
+		if ($_COOKIE['token'] == $_POST['token']) {
 			$verify_token = true;
 		}
 	}
