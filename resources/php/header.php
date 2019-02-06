@@ -13,7 +13,6 @@
 	
 	<link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=EB+Garamond|Lato:400,700">
 	<link type="text/css" rel="stylesheet" href="https://prod.library.gvsu.edu/libs/fontawesome/fontawesome-all.min.css">
-	<link type="text/css" rel="stylesheet" href="https://gvsu.edu/cms4/skeleton//1/files/css/styles.css">
 	<link type="text/css" rel="stylesheet" href="https://gvsu.edu/library/files/css/base.css">
 	<link type="text/css" rel="stylesheet" href="https://prod.library.gvsu.edu/labs/ares/css/styles.css">
 	<link type="text/css" rel="stylesheet" href="resources/css/styles-new.css">

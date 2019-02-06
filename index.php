@@ -3,9 +3,9 @@
 
 //Generate a random token to use for CSRF security
 
-$security = rand(10000, 99999);
+$security = rand(1000000, 999999);
 
-setcookie("token", "$security", 0, "/");
+setcookie("token", "$security", 0, "/", $secure=true);
 
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 setcookie("referrer", $actual_url, 0, "/");
