@@ -13,6 +13,9 @@ blockquote {
     font-size: .9em;
 }
 
+#splabel {display: none}
+#spcomments {display: none}
+
 .def-list dt {font-weight:bold;margin-top:.8em;color:#222;}
 .def-list dd {margin-bottom:.7em;border-left:.3em solid #dedede;padding-left:.5em;}
 

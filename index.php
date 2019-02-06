@@ -1,7 +1,12 @@
 <?php
 
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
-setcookie("referrer", $actual_url, 0, "/");
+
+if (!isset($_COOKIE["referrer"])) {
+	setcookie("referrer", $actual_url, 0, "/");
+	$_COOKIE["referrer"] = $actual_url;
+
+}
 
 if (!isset($_COOKIE["token"])) {
 	$token = bin2hex(openssl_random_pseudo_bytes(16));
@@ -29,6 +34,8 @@ if (isset($_GET["problem"])) {
 		header('Location: https://prod.library.gvsu.edu/status/#problem');
 	}
 }
+
+
 
 //loads required config file
 require 'resources/config/config.php';
@@ -105,6 +112,8 @@ if ($_COOKIE['login'] != "") { // User has logged in
 
 // User has filled out the asana problem submission form, process and submit
 if (isset($_POST["email-asana"])) {
+
+	var_dump($_POST);
 	
 	//verify the captcha
 	if (isset($_POST["g-recaptcha-response"]) && $_POST["g-recaptcha-response"] != "") {
@@ -123,17 +132,28 @@ if (isset($_POST["email-asana"])) {
 
 	//check the referrer cookie-if this was submitted from our form, it should be the url of the form.
 
-	
-	if (isset($_COOKIE["referrer"])) {
-		if ($_COOKIE["referrer"] == $actual_url) {
+	$verify_ref = false;
+	if (isset($_SERVER['HTTP_REFERER'])) {
+
+		if (strpos($_SERVER['HTTP_REFERER'], 'prod.library.gvsu.edu/index.php') !== false) {
 			$verify_ref = true;
 		}
+		
 
+	}
+
+	$verify_honeypot = false;
+
+	if (isset($_POST["comments"])) {
+		
+		if ($_POST["comments"] == "") {
+			$verify_honeypot = true;
+		}
 	}
 
 
 
-	if ($verify === true && $verify_token === true && $verify_ref==true) {
+	if ($verify === true && $verify_token === true && $verify_ref===true && $verify_honeypot === true) {
 		if (isset($_POST["name"])) {$name = $_POST["name"];} else {$name = "none";}
 		if (isset($_POST["email"])) {$email = $_POST["email"];} else {$email = "";}
 		$message = $_POST["feedback"];

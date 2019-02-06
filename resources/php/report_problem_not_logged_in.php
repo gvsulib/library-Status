@@ -7,6 +7,9 @@
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 		<form method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
 		<input type="hidden" name="token" value="<? echo $_COOKIE["token"]; ?>">
+
+		
+
 		
 		<div class="span2 unit left">
 			<label for="name">Your Name:</label>
@@ -22,6 +25,8 @@
 		</div>
 		<label for="feedback">Have an idea? See a problem?</label>
 		<textarea name="feedback" required></textarea>
+		<label id="splabel" for="comments">Do not fill this field out</label>
+								<textarea ID="spcomments" name="comments" placeholder="Do not fill out this field"></textarea>
 		
 					<!--captcha code container-->
 					<div class="g-recaptcha" data-sitekey="<?php echo $recaptchaSiteKey; ?>"></div>
@@ -45,13 +50,14 @@
 														style="width: 250px; height: 40px; border: 1px solid #c1c1c1;
 																		margin: 10px 25px; padding: 0px; resize: none;" >
 								</textarea>
+								
 							</div>
 						</div>
 					</noscript>
 		     
-			
+					
 			
 				<input class="btn btn-primary" type="submit" value="Report a Problem" name="email-asana" style="margin-top: 1em;" />
-			
+				
 		</form>
 	</div>
