@@ -1,11 +1,4 @@
 <?php
-//Generate a random token to use for CSRF security
-$token = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
-if (session_status() == PHP_SESSION_NONE) {
-	session_start();
-	$_SESSION['token'] = $token;
-}
-
 
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 setcookie("referrer", $actual_url, 0, "/");
@@ -366,8 +359,6 @@ include 'resources/php/header.php';
 
 
 ?>
-
-
 <div id="cms-body-wrapper">
 	<div id="cms-body">
 		<div id="cms-body-inner">
