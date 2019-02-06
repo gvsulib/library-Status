@@ -131,11 +131,11 @@ if (isset($_POST["email-asana"])) {
 	}
 
 	//check the referrer cookie-if this was submitted from our form, it should be the url of the form.
-
+	
 	$verify_ref = false;
 	if (isset($_SERVER['HTTP_REFERER'])) {
 
-		if (strpos($_SERVER['HTTP_REFERER'], 'prod.library.gvsu.edu/index.php') !== false) {
+		if (strpos($_SERVER['HTTP_REFERER'], 'prod.library.gvsu.edu/status/index.php') !== false) {
 			$verify_ref = true;
 		}
 		
