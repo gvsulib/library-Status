@@ -8,11 +8,11 @@ if (!isset($_COOKIE["referrer"])) {
 
 }
 
-if (!isset($_COOKIE["token"])) {
-	$token = bin2hex(openssl_random_pseudo_bytes(16));
-	setcookie("token", "$token", 0, "/");
+
+$token = bin2hex(openssl_random_pseudo_bytes(16));
+setcookie("token", "$token", 0, "/");
 	
-}
+
 
 
 if (!isset($_COOKIE["login"])) {
