@@ -11,7 +11,7 @@ if (!isset($_COOKIE["referrer"])) {
 if (!isset($_COOKIE["token"])) {
 	$token = bin2hex(openssl_random_pseudo_bytes(16));
 	setcookie("token", "$token", 0, "/");
-	$_COOKIE["token"] = $token;
+	
 }
 
 
