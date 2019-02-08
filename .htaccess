@@ -2,9 +2,13 @@
 RewriteEngine on
 RewriteCond %{HTTP_USER_AGENT} ^Baiduspider
 RewriteRule ^(.*)$ http://go.away/
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 order allow,deny
 # Block access to Baiduspider and Sputnik
 deny from 180.76.15.
 deny from 5.143.231.
 allow from all
+
+ 
