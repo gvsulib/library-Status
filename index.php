@@ -2,6 +2,8 @@
 
 $actual_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 
+
+
 if (!isset($_COOKIE["referrer"])) {
 	setcookie("referrer", $actual_url, 0, "/");
 	$_COOKIE["referrer"] = $actual_url;
@@ -118,7 +120,7 @@ if ($_COOKIE['login'] != "") { // User has logged in
 if (isset($_POST["email-asana"])) {
 
 	
-	
+	$chck_errmsg = "";
 	//verify the captcha
 	if (isset($_POST["g-recaptcha-response"]) && $_POST["g-recaptcha-response"] != "") {
 		$verify = verifyRecaptcha($_POST["g-recaptcha-response"], $recaptchaSecretKey);
@@ -126,24 +128,39 @@ if (isset($_POST["email-asana"])) {
 		$verify = false;
 	}
 
+	if ($verify === false) {
+		$check_errmsg = "Captcha not correct. ";
+	}
+
 	//now verify the token to prevent CSRF attacks
 	$verify_token = false;
-	if (isset($_COOKIE['token']) && isset($_POST['token'])) {
-		if ($_COOKIE['token'] == $_POST['token']) {
+	if (isset($_COOKIE["token"]) && isset($_POST["token"])) {
+		if ($_COOKIE["token"] == $_POST["token"]) {
 			$verify_token = true;
+		} else {
+			$check_errmsg .= "Cookie not correct. ";
 		}
+	} else {
+		$check_errmsg .= "Cookie not set. ";
 	}
 
 	//check the referrer cookie-if this was submitted from our form, it should be the url of the form.
 	
+	
+
 	$verify_ref = false;
 	if (isset($_SERVER['HTTP_REFERER'])) {
 
 		if (strpos($_SERVER['HTTP_REFERER'], 'prod.library.gvsu.edu/status/index.php') !== false) {
 			$verify_ref = true;
+		} else {
+			$chck_errmsg .= "Referrer not correct. ";
 		}
 		
 
+	} else {
+
+		$chck_errmsg .= "Referrer not set. ";
 	}
 
 	$verify_honeypot = false;
@@ -152,7 +169,11 @@ if (isset($_POST["email-asana"])) {
 		
 		if ($_POST["comments"] == "") {
 			$verify_honeypot = true;
+		} else {
+			$check_errmsg .= "Honeypot not empty. ";
 		}
+	} else {
+		$check_errmsg .= "Honeypot not set. ";
 	}
 
 
@@ -181,7 +202,7 @@ if (isset($_POST["email-asana"])) {
 		
 		}
 	} else {
-		$userMessage = '<div class="alert-danger">There was a problem submitting the form.  Check the captcha, then try again.</div>';
+		$userMessage = '<div class="alert-danger">There was a problem submitting the form. ' .  $chck_errmsg .'</div>';
 		
 	}
 
