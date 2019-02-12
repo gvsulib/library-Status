@@ -40,7 +40,7 @@ if (isset($_GET["problem"])) {
 		header('Location: https://prod.library.gvsu.edu/status/#problem');
 	}
 }
-
+echo $_SERVER['HTTP_REFERER'];
 
 
 //loads required config file
