@@ -40,7 +40,7 @@ if (isset($_GET["problem"])) {
 		header('Location: https://prod.library.gvsu.edu/status/#problem');
 	}
 }
-echo $_SERVER['HTTP_REFERER'];
+//echo $_SERVER['HTTP_REFERER'];
 
 
 //loads required config file
@@ -151,7 +151,7 @@ if (isset($_POST["email-asana"])) {
 	$verify_ref = false;
 	if (isset($_SERVER['HTTP_REFERER'])) {
 
-		if (strpos($_SERVER['HTTP_REFERER'], 'prod.library.gvsu.edu/status/index.php') !== false) {
+		if (strpos($_SERVER['HTTP_REFERER'], 'prod.library.gvsu.edu/status') !== false) {
 			$verify_ref = true;
 		} else {
 			$chck_errmsg .= "Referrer not correct. ";
