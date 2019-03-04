@@ -2,6 +2,7 @@
 RewriteEngine on
 RewriteCond %{HTTP_USER_AGENT} ^Baiduspider
 RewriteRule ^(.*)$ http://go.away/
+#direct all access to https
 RewriteCond %{HTTPS} !=on
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 

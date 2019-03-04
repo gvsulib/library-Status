@@ -15,7 +15,7 @@ if ($use_SMTP) {
 	email address.
 */
 
-function send_email_SMTP($name,$email,$message, $url) {
+function send_email_SMTP($name,$email,$message, $url, $browser, $onCampus, $subject) {
 	
 	//get general email settings
 	global $to_email, $from_email, $email_subject, $use_SMTP;
@@ -53,13 +53,21 @@ function send_email_SMTP($name,$email,$message, $url) {
 
 	
 	// Build the message
-	$error_report = $message;
+	$error_report = $subject;
+	$error_report .= "\n\n" . $message;
 	$error_report .= "\n\n" . 'From: ' . $name;
 	$error_report .= "\n" . 'Email: ' . $email;
 
 	if ($url !== "") {
 		$error_report .= "\n" . 'URL: ' . $url;
 	}
+
+	$error_report .= "\n" . 'System Information: ' . $browser;
+	$error_report .= "\n" . 'On or Off Campus: ' . $onCampus;
+
+	
+
+
 	
 	$smtp = Mail::factory('smtp',
 		array ('host' => $SMTP_server,

@@ -188,7 +188,7 @@ if (isset($_POST["email-asana"])) {
 			$url = "";
 		}
 		if ($use_SMTP) {
-			$result = send_email_SMTP($name,$email,$message, $url);
+			$result = send_email_SMTP($name,$email,$message, $url, $_POST["browser"], $_POST["onOffCampus"], $_POST["description"]);
 			
 		} else {
 			
