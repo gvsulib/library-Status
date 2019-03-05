@@ -48,7 +48,12 @@
 		</div>
 		<label for="description">Describe your issue</label>
 		<input type="text" name="description" id="description" placeholder="Describe your issue in a few words (required)" required <? if (isset($_POST["description"])) {echo "value='" . $_POST["description"] . "'";} ?>/>
+		<ul id="results" aria-live="polite" role="listbox">
+		</ul>
 
+		
+		
+		
 
 		<label for="feedback">Full Description</label>
 		<textarea name="feedback" required><? if (isset($_POST["feedback"])) {echo $_POST["feedback"];} ?></textarea>
@@ -85,6 +90,52 @@
 					
 			
 				<input class="btn btn-primary" type="submit" value="Report a Problem" name="email-asana" style="margin-top: 1em;" />
-				
+				<script>
+   // Search LA API when question is asked  
+   // set variables
+   var chatOnline, submitUrl;
+	$(function () {
+	    var minlength = 3;
+	    $("#description").keyup(function () {
+	        var that = this,
+	        value = $(this).val();
+	        if (value.length >= minlength ) {
+	            $.ajax({
+	                type: "GET",
+	                url: "https://api2.libanswers.com/1.0/search/" + value,
+	                data: {
+	                    'iid' : 1050,
+	                    'callback' : 'localJsonpCallback',
+						'limit' : 5
+	                },
+	                dataType: "jsonp"
+	                
+	            });
+	        }
+	    });
+	}); 
+	
+	function localJsonpCallback(json) {
+		q = json.data.search.results;
+		if(q.length > 0) {
+			$('ul#results').html('<li><h4 tabindex="0">Are any of these links helpful?</h4></li>');
+			$.each(q, function () {
+			$('ul#results').append('<li id="answer-' + this.id + '"><a href="' + this.url + '" role="option">' + this.question + '</a></li>');
+			
+			// Show me all the responses
+       		console.log(this.question);
+       		console.log(this.url);
+       		console.log(this.topics[0]);
+    	});
+
+		$('a#searchLink').remove();
+		$('ul#results').after('<P><a  ID="searchLink" href="https://help.library.gvsu.edu">Search the Library Knowledgebase</a></P>');
+			
+		}
+		
+		
+	}              
+   
+</script>
 		</form>
 	</div>
