@@ -47,7 +47,7 @@
 		} ?>
 		</div>
 		<label for="description">Subject</label>
-		<input type="text" name="description" id="description" maxlength="125" placeholder="Describe your issue in a few words (required)" required <? if (isset($_POST["description"])) {echo "value='" . $_POST["description"] . "'";} ?>/>
+		<input type="text" name="description" id="description" maxlength="80" placeholder="Describe your issue in a few words (required)" required <? if (isset($_POST["description"])) {echo "value='" . $_POST["description"] . "'";} ?>/>
 		<ul id="results" aria-live="polite" role="listbox">
 		</ul>
 
