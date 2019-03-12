@@ -46,8 +46,8 @@
 		echo '<input type="hidden" name="url" value="' . $_GET["url"] . '">';
 		} ?>
 		</div>
-		<label for="description">Describe your issue</label>
-		<input type="text" name="description" id="description" placeholder="Describe your issue in a few words (required)" required <? if (isset($_POST["description"])) {echo "value='" . $_POST["description"] . "'";} ?>/>
+		<label for="description">Subject</label>
+		<input type="text" name="description" id="description" maxlength="125" placeholder="Describe your issue in a few words (required)" required <? if (isset($_POST["description"])) {echo "value='" . $_POST["description"] . "'";} ?>/>
 		<ul id="results" aria-live="polite" role="listbox">
 		</ul>
 
