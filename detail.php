@@ -349,7 +349,7 @@ include 'resources/php/header.php';
 					
 						echo '<input type="hidden" name="type" value="' . $type . '">';
 						echo '<label for="updatetext">Update text of this update</label>';
-						echo '<textarea name="updatetext" required>' . $update["text"] . '</textarea>';
+						echo '<textarea class="editStatus" name="updatetext" required>' . $update["text"] . '</textarea>';
 						
 						echo '<label for="public"> Public </label><input name="public" type="checkbox" ';
 						if ($update["public"] == "1") {
