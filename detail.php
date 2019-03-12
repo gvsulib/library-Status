@@ -416,7 +416,7 @@ include 'resources/php/header.php';
 							echo '<input type="hidden" name="type" value="' . $type . '">';
 
 							echo '<label for="when">Edit this status:</label>';
-							echo '<textarea name="statustext">' . $statusData["text"] . '</textarea>';
+							echo '<textarea class="editStatus" name="statustext">' . $statusData["text"] . '</textarea>';
 							
 							echo '<input style="margin-left: 1em" type="submit" name="editStatus" value="Save Changes">';
 							echo '<input style="margin-left: 1em" type="submit" name="deleteStatus" value="Delete This Status">';
