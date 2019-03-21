@@ -43,13 +43,22 @@
 
 		
 		<?php if (isset($_GET["url"])) {
-		echo '<input type="hidden" name="url" value="' . $_GET["url"] . '">';
-		} ?>
+			$url = $_GET["url"];
+		} elseif (isset($_POST["url"])) {
+			$url = $_POST["url"];
+		} else {
+			$url="";
+		}
+		echo '<input type="hidden" name="url" value="' . $url . '">';
+		?>
 		</div>
+
+		<div id="subjectContainer">
 		<label for="description">Subject</label>
 		<input type="text" name="description" id="description" maxlength="80" placeholder="Describe your issue in a few words (required)" required <? if (isset($_POST["description"])) {echo "value='" . $_POST["description"] . "'";} ?>/>
 		<ul id="results" aria-live="polite" role="listbox">
 		</ul>
+		</div>
 
 		
 		
@@ -130,7 +139,10 @@
 
 		$('a#searchLink').remove();
 		$('ul#results').after('<P><a  ID="searchLink" href="https://help.library.gvsu.edu">Search the Library Knowledgebase</a></P>');
-			
+		var blank = $("#description");
+		var position = blank.position();
+		$("#results").
+
 		}
 		
 		

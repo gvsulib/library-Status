@@ -16,6 +16,14 @@ blockquote {
 #splabel {display: none}
 #spcomments {display: none}
 
+#results {
+	position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  background-color: white; /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+
 .def-list dt {font-weight:bold;margin-top:.8em;color:#222;}
 .def-list dd {margin-bottom:.7em;border-left:.3em solid #dedede;padding-left:.5em;}
 
