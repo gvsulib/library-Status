@@ -105,7 +105,7 @@
    var chatOnline, submitUrl;
 
    $("input#description").blur(function() {
-			$("results").hide();
+			$("#results").hide();
 			console.log('Hide the autocomplete');
 		});  
 
