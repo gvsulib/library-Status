@@ -139,7 +139,6 @@
 
 		var blank = $("#description");
 		var position = blank.position();
-		$("#results").
 
 		}
 		
