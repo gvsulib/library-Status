@@ -123,10 +123,6 @@
 	        }
 	    });
 	}); 
-
-		$("#description").blur(function() {
-			$("results").hide();
-		});
 	
 	function localJsonpCallback(json) {
 		q = json.data.search.results;
@@ -143,9 +139,16 @@
 
 		var blank = $("#description");
 		var position = blank.position();
+		$("#results").
+
+		}
 		
 		
-	}              
+	}  
+
+		$("#description").blur(function() {
+			$("results").hide();
+		});            
    
 </script>
 		</form>
