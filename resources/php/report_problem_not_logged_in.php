@@ -107,7 +107,7 @@
    $("[name='feedback']").focus(function() {
 			$("results").hide();
 		});  
-   
+
 	$(function () {
 	    var minlength = 3;
 	    $("#description").keyup(function () {
@@ -135,7 +135,7 @@
 			$('ul#results').html('<li><h4 tabindex="0">Are any of these links helpful?</h4></li>');
 			$.each(q, function () {
 			$('ul#results').append('<li id="answer-' + this.id + '"><a href="' + this.url + '" role="option">' + this.question + '</a></li>');
-			
+			$('ul#results').show();
 			// Show me all the responses
        		console.log(this.question);
        		console.log(this.url);
