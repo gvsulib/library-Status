@@ -104,8 +104,9 @@
    // set variables
    var chatOnline, submitUrl;
 
-   $("[name='feedback']").focus(function() {
+   $("input#description").blur(function() {
 			$("results").hide();
+			console.log('Hide the autocomplete');
 		});  
 
 	$(function () {
