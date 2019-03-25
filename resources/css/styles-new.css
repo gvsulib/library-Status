@@ -130,6 +130,11 @@ color: #fff;}
 	width: 500px;
 	height: 300px;
 }
+
+#results {
+	display: none; /* hide by default */
+}
+
 ul#results {
 	position: absolute;
 	padding: .5em 1em;

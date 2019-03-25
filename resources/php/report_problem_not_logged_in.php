@@ -103,6 +103,11 @@
    // Search LA API when question is asked  
    // set variables
    var chatOnline, submitUrl;
+
+   $("[name='feedback']").focus(function() {
+			$("results").hide();
+		});  
+   
 	$(function () {
 	    var minlength = 3;
 	    $("#description").keyup(function () {
@@ -145,9 +150,7 @@
 		
 	}  
 
-		$("#description").blur(function() {
-			$("results").hide();
-		});            
+		          
    
 </script>
 		</form>
