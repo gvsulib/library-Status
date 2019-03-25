@@ -123,6 +123,10 @@
 	        }
 	    });
 	}); 
+
+		$("#description").blur(function() {
+			$("results").hide();
+		});
 	
 	function localJsonpCallback(json) {
 		q = json.data.search.results;
@@ -137,13 +141,8 @@
        		console.log(this.topics[0]);
     	});
 
-		$('a#searchLink').remove();
-		$('ul#results').after('<P><a  ID="searchLink" href="https://help.library.gvsu.edu">Search the Library Knowledgebase</a></P>');
 		var blank = $("#description");
 		var position = blank.position();
-		$("#results").
-
-		}
 		
 		
 	}              
