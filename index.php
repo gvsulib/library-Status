@@ -576,6 +576,7 @@ include 'resources/php/header.php';
 	<?php 
 	
 	if ($logged_in == 1) {
+		
 		require "resources/php/report_problem_logged_in.php";
 	
 	}  else {

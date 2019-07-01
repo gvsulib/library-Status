@@ -14,6 +14,7 @@ if ($use_SMTP) {
 	then sends an email with a problem report to the specified
 	email address.
 */
+		
 
 function send_email_SMTP($name,$email,$message, $url, $browser, $onCampus, $subject) {
 	
