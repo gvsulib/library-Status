@@ -22,7 +22,7 @@
 
 	<!-- Add system styles here -->
 	
-	<script src="https://gvsu.edu/cms4/skeleton/1/files/js/cms4.1.min.js"></script>
+	<script src="https://gvsu.edu/cms4/skeleton/2/files/js/cms4.2.min.js"></script>
 	<script src="https://prod.library.gvsu.edu/labs/template_hours/hours.js"></script>
 	
 	

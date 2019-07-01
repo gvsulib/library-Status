@@ -16,6 +16,7 @@ blockquote {
 #splabel {display: none}
 #spcomments {display: none}
 
+/*
 #results {
 	position: fixed; /* Sit on top of the page content */
   display: none; /* Hidden by default */
@@ -23,6 +24,7 @@ blockquote {
   z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
   cursor: pointer; /* Add a pointer on hover */
 }
+*/
 
 .def-list dt {font-weight:bold;margin-top:.8em;color:#222;}
 .def-list dd {margin-bottom:.7em;border-left:.3em solid #dedede;padding-left:.5em;}
@@ -127,4 +129,34 @@ color: #fff;}
 .editStatus {
 	width: 500px;
 	height: 300px;
+}
+
+#results {
+	display: none; /* hide by default */
+}
+
+ul#results {
+	position: absolute;
+	padding: .5em 1em;
+	margin: 0;
+	border: 1px solid #ddd;
+	border-top: 1px solid #fff;
+	-webkit-box-shadow: 10px 10px 15px -2px rgba(220,220,220,0.4);
+-moz-box-shadow: 10px 10px 15px -2px rgba(220,220,220,0.4);
+box-shadow: 10px 10px 15px -2px rgba(220,220,220,0.4);
+	background-color: #fff;
+	z-index: 100;
+	list-style: none;
+}
+
+ul#results h4 {
+	padding-top: 0;
+}
+
+ul#results li {
+	padding: .2em 0;
+}
+
+ul#results li a {
+	font-size: 1.1em;
 }

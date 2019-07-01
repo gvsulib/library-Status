@@ -103,6 +103,12 @@
    // Search LA API when question is asked  
    // set variables
    var chatOnline, submitUrl;
+
+   $("[name='feedback']").focus(function() {
+			$("#results").hide();
+			console.log('Hide the autocomplete');
+		});  
+
 	$(function () {
 	    var minlength = 3;
 	    $("#description").keyup(function () {
@@ -130,23 +136,22 @@
 			$('ul#results').html('<li><h4 tabindex="0">Are any of these links helpful?</h4></li>');
 			$.each(q, function () {
 			$('ul#results').append('<li id="answer-' + this.id + '"><a href="' + this.url + '" role="option">' + this.question + '</a></li>');
-			
+			$('ul#results').show();
 			// Show me all the responses
        		console.log(this.question);
        		console.log(this.url);
        		console.log(this.topics[0]);
     	});
 
-		$('a#searchLink').remove();
-		$('ul#results').after('<P><a  ID="searchLink" href="https://help.library.gvsu.edu">Search the Library Knowledgebase</a></P>');
 		var blank = $("#description");
 		var position = blank.position();
-		$("#results").
 
 		}
 		
 		
-	}              
+	}  
+
+		          
    
 </script>
 		</form>
