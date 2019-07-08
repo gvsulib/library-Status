@@ -35,9 +35,9 @@ if (isset($_GET["url"])) {
 
 if (isset($_GET["problem"])) {
 	if (isset($url)) {
-		header('Location: https://prod.library.gvsu.edu/status/?url=' . $url . "#problem");
+		header('Location: https://www.gvsu.edu/library/support');
 	} else {
-		header('Location: https://prod.library.gvsu.edu/status/#problem');
+		header('Location: https://www.gvsu.edu/library/support');
 	}
 }
 //echo $_SERVER['HTTP_REFERER'];
@@ -580,7 +580,7 @@ include 'resources/php/header.php';
 		require "resources/php/report_problem_logged_in.php";
 	
 	}  else {
-		require "resources/php/report_problem_not_logged_in.php";
+		// require "resources/php/report_problem_not_logged_in.php";
 	}
 	?>
 
