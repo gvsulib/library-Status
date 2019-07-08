@@ -10,16 +10,14 @@
 				</div>
 				<div class="col-6 text-right">
 					
-						<a href="https://prod.library.gvsu.edu/status/?problem" class="cms-report-problem" id="problem-link">Report a problem with this page</a>
+						
 					
 				</div>
 			</div>
 		
 			</div>
-							<script>
-								var thisUrl = encodeURI(window.location);
-								document.getElementById('problem-link').href = 'https://prod.library.gvsu.edu/status/?problem&url=' + thisUrl;
-							</script> 
+							<div id="s-la-widget-9529"></div>
+<script src="https://api2.libanswers.com/1.0/widgets/9529"></script>
 
 			</div>
 	</div>
@@ -85,7 +83,7 @@
 												
 													<a href="https://www.youtube.com/channel/UCE5pH3lsWVQ9PbWGDE6EyFA" title="YouTube" class="text-nodecoration" target="_blank">
 														<img src="https://prod.library.gvsu.edu/labs/cms4.1_files/youtube.png" alt="" style="width:auto;min-width:auto;" />
-														<span class="sr-only">https://youtube.com/user/gvsulib</span>
+														<span class="sr-only">https://www.youtube.com/channel/UCE5pH3lsWVQ9PbWGDE6EyFA</span>
 													</a>
 												
 													<a href="https://instagram.com/gvsulib" title="Instagram" class="text-nodecoration" target="_blank">
